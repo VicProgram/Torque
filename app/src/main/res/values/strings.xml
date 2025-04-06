@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Torque</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_activity_revisiones">Revisiones</string>
+    <string name="title_activity_configuracion">Configuracion</string>
+    <string name="title_activity_próximo_mantenimiento">PróximoMantenimiento</string>
+</resources>

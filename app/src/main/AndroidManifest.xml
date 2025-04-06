@@ -1,0 +1,28 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.torque">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Tyorque"
+        android:theme="@style/Theme.Torque">
+
+        <!-- Definir MainActivity como la actividad principal -->
+        <activity
+            android:name="com.example.torque.MainActivity"
+            android:exported="true"
+            android:label="Tyorque"
+            android:theme="@style/Theme.Torque">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Otras actividades como Revisiones, Configuración, etc. -->
+        <activity android:name="com.example.torque.Revisiones" android:exported="true"/>
+        <activity android:name="com.example.torque.Configuracion" android:exported="true"/>
+        <activity android:name="com.example.torque.PróximoMantenimiento" android:exported="true"/>
+    </application>
+</manifest>
