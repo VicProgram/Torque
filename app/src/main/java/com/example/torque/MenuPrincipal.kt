@@ -23,14 +23,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
-                MainMenu()  // Llamamos al composable que no necesita parámetros
+                MenuPrincipal()  // Llamamos al composable que no necesita parámetros
             }
         }
     }
 }
 
 @Composable
-fun MainMenu() {
+fun MenuPrincipal() {
     // Obtener el contexto necesario para iniciar actividades
     val context = LocalContext.current
 
@@ -52,7 +52,9 @@ fun MainMenu() {
                 val intent = Intent(context, Revisiones::class.java)
                 context.startActivity(intent)
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
             Text(text = "Revisiones")
         }
@@ -63,7 +65,9 @@ fun MainMenu() {
                 val intent = Intent(context, Configuracion::class.java)
                 context.startActivity(intent)
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
             Text(text = "Configuración")
         }
@@ -71,12 +75,15 @@ fun MainMenu() {
         // Botón para navegar a Próximo Mantenimiento
         Button(
             onClick = {
-                val intent = Intent(context, PróximoMantenimiento::class.java)
+                val intent = Intent(context, MaintenanceActivity::class.java)
                 context.startActivity(intent)
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         ) {
-            Text(text = "Próximo Mantenimiento")
+            Text(text = "Mantenimientos")
+
         }
     }
 }

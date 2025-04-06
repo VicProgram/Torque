@@ -4,25 +4,26 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Tyorque"
+        android:label="Torque"
         android:theme="@style/Theme.Torque">
 
-        <!-- Definir MainActivity como la actividad principal -->
-        <activity
-            android:name="com.example.torque.MainActivity"
-            android:exported="true"
-            android:label="Tyorque"
-            android:theme="@style/Theme.Torque">
-
+        <!-- Actividad principal (Menú Principal) -->
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Otras actividades como Revisiones, Configuración, etc. -->
-        <activity android:name="com.example.torque.Revisiones" android:exported="true"/>
-        <activity android:name="com.example.torque.Configuracion" android:exported="true"/>
-        <activity android:name="com.example.torque.PróximoMantenimiento" android:exported="true"/>
+        <!-- Actividad de Revisiones -->
+        <activity android:name=".Revisiones" />
+
+        <!-- Actividad de Configuración -->
+        <activity android:name=".Configuracion" />
+
+        <!-- Actividad de Mantenimiento (NextMaintenanceActivity) -->
+        <activity android:name=".MaintenanceActivity" />
+
     </application>
 </manifest>
