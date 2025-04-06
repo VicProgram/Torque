@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TorqueTheme {
+            TorqueTheme{
                 MenuPrincipal()  // Llamamos al composable que no necesita parámetros
             }
         }

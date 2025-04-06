@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,10 +56,16 @@ fun ConfiguracionView() {
         }
 
         Button(
-            onClick = { /* Cambiar Tema Oscuro/Claro */ },
+            onClick = {/* Cambiar Tema Oscuro/Claro */ },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Tema Oscuro/Claro")
         }
+
+
     }
+    /* AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) // Forzar oscuro
+     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)  // Forzar claro
+     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) // Seguir sistema
+ */
 }

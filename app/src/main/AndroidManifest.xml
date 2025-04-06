@@ -5,7 +5,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Torque"
-        android:theme="@style/Theme.Torque">
+        android:theme="@style/Theme.TorqueLight">
 
         <!-- Actividad principal (Menú Principal) -->
         <activity android:name=".MainActivity"
