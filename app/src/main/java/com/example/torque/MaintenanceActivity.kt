@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
@@ -42,13 +43,13 @@ fun MaintenanceGrid() {
         MaintenanceItem("Cambio de bujías") // Agregado ejemplo adicional
     )
 
-    // Usamos LazyVerticalGrid con 2 columnas
     LazyVerticalGrid(
         columns = GridCells.Fixed(2), // Dos columnas
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentPadding = PaddingValues(8.dp)
+            .padding(16.dp), contentPadding = PaddingValues(8.dp),
+
+        verticalArrangement = Arrangement.Center
     ) {
         items(items.size) { index ->
             MaintenanceItemCard(item = items[index])
