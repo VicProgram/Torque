@@ -36,13 +36,13 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -61,5 +61,9 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0") // O la versión más reciente
     implementation("androidx.appcompat:appcompat:1.6.0") // O la versión más reciente
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0") // Si usas Lifecycle
-    implementation ("androidx.navigation:navigation-compose:2.5.0")
+    implementation("androidx.navigation:navigation-compose:2.5.0")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
+    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0-alpha11")
+
 }
