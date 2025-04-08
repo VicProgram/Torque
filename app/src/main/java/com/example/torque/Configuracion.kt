@@ -92,4 +92,3 @@ fun ConfiguracionView() {
  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)  // Forzar claro
  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) // Seguir sistema
 */
-
