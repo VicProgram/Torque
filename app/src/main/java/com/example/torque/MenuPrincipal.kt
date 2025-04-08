@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import com.example.torque.ui.componentes.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
 
@@ -36,13 +41,26 @@ class MainActivity : ComponentActivity() {
 fun MenuPrincipal() {
     // Obtener el contexto necesario para iniciar actividades
     val context = LocalContext.current
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        // Imagen de fondo
+        Image(
+            painter = painterResource(id = R.drawable.fondoappwebp),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
+
+
     ) {
         Text(
             text = "Torque",
@@ -62,7 +80,6 @@ fun MenuPrincipal() {
             texto = "Revisiones"
         )
 
-
         // Botón para navegar a Configuración
         BotonLargo(
             onClick = {
@@ -75,7 +92,6 @@ fun MenuPrincipal() {
             texto = "Configuración"
         )
 
-
         // Botón para navegar a Próximo Mantenimiento
         BotonLargo(
             onClick = {
@@ -87,7 +103,6 @@ fun MenuPrincipal() {
                 .padding(bottom = 16.dp),
             texto = "Mantenimientos"
         )
-
 
     }
 }
