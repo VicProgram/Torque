@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -38,10 +39,8 @@ class Revisiones : ComponentActivity() {
 
 @Composable
 fun RevisionesView() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
         // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.fondorevwebp),
@@ -49,35 +48,44 @@ fun RevisionesView() {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Revisiones",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 32.dp)
+
+        // Capa oscura encima de la imagen
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f))
         )
 
-        Button(
-            onClick = { /* Navegar a Historial de Revisiones */ },
+        // Contenido centrado
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Ver Historial")
-        }
+            Text(
+                text = "Revisiones",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White, // Color claro para que contraste
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
 
-        Button(
-            onClick = { /* Navegar a Nueva Revisión */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Nueva Revisión")
+            Button(
+                onClick = { /* Navegar a Historial de Revisiones */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(text = "Ver Historial")
+            }
+
+            Button(
+                onClick = { /* Navegar a Nueva Revisión */ },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Nueva Revisión")
+            }
         }
     }
 }
-
