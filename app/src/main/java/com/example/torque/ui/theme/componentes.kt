@@ -45,3 +45,6 @@ fun BotonCircular(texto: String, onClick: () -> Unit, modifier: Modifier = Modif
         Text(texto)
     }
 }
+
+
+
