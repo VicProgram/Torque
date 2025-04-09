@@ -5,9 +5,9 @@ data class Moto(
     val Cilindrada: Int,
     val Anno: Int,
     val Cv: Int,
-    val Estilo: String?,
-    val Matricula: String?,
-    val Kms: Int?,
-    val Fecha_compra: String?,
-    val Foto: String?
+    val Estilo: String,
+    val Matricula: String,
+    val Kms: Int,
+    val Fecha_compra: String,
+    val Foto: String
 )
