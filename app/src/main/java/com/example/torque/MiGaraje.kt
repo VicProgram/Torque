@@ -36,7 +36,7 @@ class MiGaraje : ComponentActivity() {
         }
     }
 }
-val moto1 ="Aprilia Rs 660"
+
 
 @Composable
 fun MigarajeView() {
@@ -78,7 +78,7 @@ fun MigarajeView() {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             ) {
-                Text(text = moto1)
+                Text(text = "")
             }
 
             Button(
