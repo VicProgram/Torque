@@ -76,13 +76,13 @@ fun MenuPrincipalView() {
         // Botón para navegar a Revisiones
         BotonLargo(
             onClick = {
-                val intent = Intent(context, Revisiones::class.java)
+                val intent = Intent(context, MiGaraje::class.java)
                 context.startActivity(intent)
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            texto = "Revisiones"
+            texto = "Mi Garaje"
         )
 
         // Botón para navegar a Configuración
