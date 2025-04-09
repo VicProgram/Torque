@@ -1,5 +1,6 @@
 package com.example.torque
 
+import MiGarajeDatabaseHelper
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,11 +25,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.example.torque.ui.componentes.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
-
+import android.content.Context
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Copiar la base de datos desde assets si no existe
+        copiarBaseDeDatos(applicationContext)
+
         setContent {
             TorqueTheme {
                 MenuPrincipalView()  // Llamamos al composable que no necesita parámetros
@@ -37,12 +48,36 @@ class MenuPrincipal : ComponentActivity() {
     }
 }
 
+fun copiarBaseDeDatos(context: Context) {
+    val dbFile = context.getDatabasePath("torque.db")
+
+    // Si la base de datos no existe, copiamos desde assets
+    if (!dbFile.exists()) {
+        try {
+            val inputStream: InputStream = context.assets.open("torque.db")
+            val outputStream: OutputStream = FileOutputStream(dbFile)
+
+            val buffer = ByteArray(1024)
+            var length: Int
+            while (inputStream.read(buffer).also { length = it } > 0) {
+                outputStream.write(buffer, 0, length)
+            }
+
+            outputStream.flush()
+            outputStream.close()
+            inputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+}
+
 @Composable
 fun MenuPrincipalView() {
     // Obtener el contexto necesario para iniciar actividades
     val context = LocalContext.current
-    Box(modifier = Modifier.fillMaxSize()) {
 
+    Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.fondoappwebp),
@@ -58,14 +93,13 @@ fun MenuPrincipalView() {
                 .background(Color.Black.copy(alpha = 0.03f))
         )
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-
-
     ) {
         Text(
             text = "Torque",
@@ -108,7 +142,5 @@ fun MenuPrincipalView() {
                 .padding(bottom = 16.dp),
             texto = "Mantenimientos"
         )
-
     }
 }
-
