@@ -8,7 +8,7 @@
         android:theme="@style/Theme.TorqueLight">
 
         <!-- Actividad principal (Menú Principal) -->
-        <activity android:name=".MainActivity"
+        <activity android:name=".MenuPrincipal"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
         <activity android:name=".Configuracion" />
 
         <!-- Actividad de Mantenimiento (NextMaintenanceActivity) -->
-        <activity android:name=".MaintenanceActivity" />
+        <activity android:name=".Mantenimiento" />
 
     </application>
 </manifest>

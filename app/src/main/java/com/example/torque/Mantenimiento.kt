@@ -24,7 +24,7 @@ import com.example.torque.ui.theme.TorqueTheme
 // Data class para representar cada elemento
 data class MaintenanceItem(val name: String)
 
-class MaintenanceActivity : ComponentActivity() {
+class Mantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

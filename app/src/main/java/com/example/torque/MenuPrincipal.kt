@@ -26,19 +26,19 @@ import com.example.torque.ui.componentes.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
 
 
-class MainActivity : ComponentActivity() {
+class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
-                MenuPrincipal()  // Llamamos al composable que no necesita parámetros
+                MenuPrincipalView()  // Llamamos al composable que no necesita parámetros
             }
         }
     }
 }
 
 @Composable
-fun MenuPrincipal() {
+fun MenuPrincipalView() {
     // Obtener el contexto necesario para iniciar actividades
     val context = LocalContext.current
     Box(modifier = Modifier.fillMaxSize()) {
@@ -100,7 +100,7 @@ fun MenuPrincipal() {
         // Botón para navegar a Próximo Mantenimiento
         BotonLargo(
             onClick = {
-                val intent = Intent(context, MaintenanceActivity::class.java)
+                val intent = Intent(context, Mantenimiento::class.java)
                 context.startActivity(intent)
             },
             modifier = Modifier
