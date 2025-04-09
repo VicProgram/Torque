@@ -25,20 +25,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.torque.ui.theme.TorqueTheme
 
-class Revisiones : ComponentActivity() {
+class MiGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             TorqueTheme {
-                RevisionesView()
+                MigarajeView()
             }
         }
     }
 }
+val moto1 ="Aprilia Rs 660"
 
 @Composable
-fun RevisionesView() {
+fun MigarajeView() {
     Box(modifier = Modifier.fillMaxSize()) {
 
         // Imagen de fondo
@@ -65,7 +66,7 @@ fun RevisionesView() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Revisiones",
+                text = "Bienvendido a tu Garaje",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White, // Color claro para que contraste
                 modifier = Modifier.padding(bottom = 32.dp)
@@ -77,7 +78,7 @@ fun RevisionesView() {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             ) {
-                Text(text = "Ver Historial")
+                Text(text = moto1)
             }
 
             Button(
