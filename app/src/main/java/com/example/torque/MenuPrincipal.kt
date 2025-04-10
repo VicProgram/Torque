@@ -1,6 +1,6 @@
 package com.example.torque
 
-import MiGarajeDatabaseHelper
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -25,9 +25,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.torque.ui.componentes.BotonLargo
+import com.example.torque.database.MiGarajeDatabaseHelper
+import com.example.torque.ui.theme.componentes.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
-
 
 
 class MenuPrincipal : ComponentActivity() {
@@ -36,7 +36,7 @@ class MenuPrincipal : ComponentActivity() {
 
         // Copiar la base de datos desde assets si no existe
         //copiarBaseDeDatos(applicationContext)
-        probarBaseDeDatos(applicationContext)  // <--- Aquí llamamos a la prueba
+        //probarBaseDeDatos(applicationContext)  // <--- Aquí llamamos a la prueba
 
         setContent {
             TorqueTheme {
@@ -85,11 +85,9 @@ fun MenuPrincipalView() {
             onClick = {
                 val intent = Intent(context, MiGaraje::class.java)
                 context.startActivity(intent)
-            },
-            modifier = Modifier
+            }, modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            texto = "Mi Garaje"
+                .padding(bottom = 16.dp), texto = "Mi Garaje"
         )
 
         // Botón para navegar a Configuración
@@ -97,11 +95,9 @@ fun MenuPrincipalView() {
             onClick = {
                 val intent = Intent(context, Configuracion::class.java)
                 context.startActivity(intent)
-            },
-            modifier = Modifier
+            }, modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            texto = "Configuración"
+                .padding(bottom = 16.dp), texto = "Configuración"
         )
 
         // Botón para navegar a Próximo Mantenimiento
@@ -109,16 +105,14 @@ fun MenuPrincipalView() {
             onClick = {
                 val intent = Intent(context, Mantenimiento::class.java)
                 context.startActivity(intent)
-            },
-            modifier = Modifier
+            }, modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            texto = "Mantenimientos"
+                .padding(bottom = 16.dp), texto = "Mantenimientos"
         )
     }
 }
-
-fun probarBaseDeDatos(context: Context) {
+//METODO PROBAR EN LOGCAT LA BBDD//
+/* fun probarBaseDeDatos(context: Context) {
     val dbHelper = MiGarajeDatabaseHelper(context)
     val db = dbHelper.readableDatabase
 
@@ -144,3 +138,5 @@ fun probarBaseDeDatos(context: Context) {
     cursor2.close()
     db.close()
 }
+ */
+

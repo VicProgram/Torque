@@ -1,5 +1,4 @@
-package com.example.torque.ui.componentes
-
+package com.example.torque.ui.theme.componentes
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
