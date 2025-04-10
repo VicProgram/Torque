@@ -1,6 +1,7 @@
 package com.example.torque.database
 
 import Moto
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -137,5 +138,15 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
             cursor.close()
             null
         }
+    }
+
+    fun actualizarMoto(moto: Moto) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("kms", moto.kms)
+            // Agrega aquí cualquier otro campo que necesites actualizar
+        }
+        db.update("motos", values, "id = ?", arrayOf(moto.idMoto.toString()))
+        db.close()
     }
 }

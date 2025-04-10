@@ -1,6 +1,5 @@
 package com.example.torque
 
-
 import Moto
 import android.content.Intent
 import android.os.Bundle
@@ -36,7 +35,6 @@ class MiGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             MigarajeView()
         }
     }
@@ -46,16 +44,14 @@ class MiGaraje : ComponentActivity() {
 fun MigarajeView() {
     val context = LocalContext.current
     val dbHelper = MiGarajeDatabaseHelper(context)
-
     val motos = remember { mutableStateListOf<Moto>() }
 
     LaunchedEffect(true) {
         motos.clear()
-        motos.addAll(dbHelper.obtenerMotos())  // Usamos dbHelper aquí
+        motos.addAll(dbHelper.obtenerMotos())
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.fondorevwebp),
             contentDescription = null,
@@ -63,14 +59,12 @@ fun MigarajeView() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // Capa oscura encima de la imagen
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.4f))
         )
 
-        // Contenido centrado
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,7 +79,6 @@ fun MigarajeView() {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Crear los botones con las motos en dos columnas
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -94,11 +87,13 @@ fun MigarajeView() {
                 items(motos.size) { index ->
                     val moto = motos[index]
                     BotonCuadrado(
-                        texto = "${moto.marca} ${moto.modelo}", onClick = {
+                        texto = "${moto.marca} ${moto.modelo}",
+                        onClick = {
                             val intent = Intent(context, MotoDetalle::class.java)
-                            intent.putExtra("idMoto", moto.idMoto)  // Pasamos el id de la moto
+                            intent.putExtra("idMoto", moto.idMoto)
                             context.startActivity(intent)
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .width(150.dp)
                             .padding(8.dp)
                     )
@@ -107,6 +102,3 @@ fun MigarajeView() {
         }
     }
 }
-
-
-
