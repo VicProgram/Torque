@@ -72,7 +72,6 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                         Estilo = "",
                         Kms = 0,
                         Fecha_compra = "",
-                        Foto = "",
                         Color = ""
                     )
                 )
@@ -94,13 +93,12 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
             val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
             val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
             val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
+            val color_moto = cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto"))
             val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("Cilindrada"))
             val cv = cursor.getInt(cursor.getColumnIndexOrThrow("Cv"))
             val estilo = cursor.getString(cursor.getColumnIndexOrThrow("Estilo"))
             val kms = cursor.getInt(cursor.getColumnIndexOrThrow("Kms"))
             val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("Fecha_Compra"))
-            val foto = cursor.getString(cursor.getColumnIndexOrThrow("Foto"))
-            val color_moto = cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto"))
 
             cursor.close()
 
@@ -110,13 +108,13 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                 Modelo = modelo,
                 Anno = anno,
                 Matricula = matricula,
-                Color = color_moto,
                 Cilindrada = cilindrada,
                 Cv = cv,
                 Estilo = estilo,
                 Kms = kms,
                 Fecha_compra = fechaCompra,
-                Foto = foto
+                Color = color_moto
+
             )
         } else {
             cursor.close()

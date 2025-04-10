@@ -93,7 +93,7 @@ fun MotoDetalleView(moto: Moto?) {
                 Text(text = "Estilo: ${moto.Estilo}", color = Color.White)
                 Text(text = "Kms: ${moto.Kms}", color = Color.White)
                 Text(text = "Fecha de compra: ${moto.Fecha_compra}", color = Color.White)
-                Text(text = "Foto: ${moto.Foto}", color = Color.White)
+
             }
         }
     }
