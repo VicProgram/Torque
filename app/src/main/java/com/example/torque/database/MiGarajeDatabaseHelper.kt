@@ -25,55 +25,8 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
         onCreate(db)
     }
 
-    // MiGarajeDatabaseHelper.kt
-
-    fun obtenerMotoPorId(idMoto: Int): Moto? {
-        val db = this.readableDatabase
-        val cursor =
-            db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
-
-        return if (cursor.moveToFirst()) {
-            // Si la moto fue encontrada, devolver el objeto Moto
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto"))
-            val marca = cursor.getString(cursor.getColumnIndexOrThrow("Marca"))
-            val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
-            val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
-            val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
-            val color = cursor.getString(cursor.getColumnIndexOrThrow("Color"))
-            val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("Cilindrada"))
-            val cv = cursor.getInt(cursor.getColumnIndexOrThrow("Cv"))
-            val estilo = cursor.getString(cursor.getColumnIndexOrThrow("Estilo"))
-            val kms = cursor.getInt(cursor.getColumnIndexOrThrow("Kms"))
-            val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("Fecha_compra"))
-            val foto = cursor.getString(cursor.getColumnIndexOrThrow("Foto"))
-
-            cursor.close()
-
-            // Devolver una instancia de Moto
-            Moto(
-                idMoto = id,
-                Marca = marca,
-                Modelo = modelo,
-                Anno = anno,
-                Matricula = matricula,
-                Color = color,
-                Cilindrada = cilindrada,
-                Cv = cv,
-                Estilo = estilo,
-                Kms = kms,
-                Fecha_compra = fechaCompra,
-                Foto = foto
-            )
-        } else {
-            cursor.close()
-            null // Si no se encuentra la moto, devolver null
-        }
-    }
-
-
     fun copiarBaseDeDatos(context: Context) {
         val dbFile = context.getDatabasePath("torque.db")
-        // Si no existe la base de datos, la copiamos desde assets
         if (!dbFile.exists()) {
             try {
                 val inputStream: InputStream = context.assets.open("torque.db")
@@ -92,49 +45,6 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                 e.printStackTrace()
             }
         }
-        fun obtenerMotoPorId(idMoto: Int): Moto? {
-            val db = this.readableDatabase
-            val cursor =
-                db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
-
-            return if (cursor.moveToFirst()) {
-                // Si la moto fue encontrada, devolver el objeto Moto
-                val id = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto"))
-                val marca = cursor.getString(cursor.getColumnIndexOrThrow("Marca"))
-                val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
-                val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
-                val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
-                val color = cursor.getString(cursor.getColumnIndexOrThrow("Color"))
-                val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("Cilindrada"))
-                val cv = cursor.getInt(cursor.getColumnIndexOrThrow("Cv"))
-                val estilo = cursor.getString(cursor.getColumnIndexOrThrow("Estilo"))
-                val kms = cursor.getInt(cursor.getColumnIndexOrThrow("Kms"))
-                val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("Fecha_compra"))
-                val foto = cursor.getString(cursor.getColumnIndexOrThrow("Foto"))
-
-                cursor.close()
-
-                // Devolver una instancia de Moto
-                Moto(
-                    idMoto = id,
-                    Marca = marca,
-                    Modelo = modelo,
-                    Anno = anno,
-                    Matricula = matricula,
-                    Color = color,
-                    Cilindrada = cilindrada,
-                    Cv = cv,
-                    Estilo = estilo,
-                    Kms = kms,
-                    Fecha_compra = fechaCompra,
-                    Foto = foto
-                )
-            } else {
-                cursor.close()
-                null // Si no se encuentra la moto, devolver null
-            }
-        }
-
     }
 
     fun obtenerMotos(): List<Moto> {
@@ -144,6 +54,7 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
 
         if (cursor.moveToFirst()) {
             do {
+                val idMoto = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto"))
                 val marca = cursor.getString(cursor.getColumnIndexOrThrow("Marca"))
                 val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
                 val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
@@ -151,18 +62,18 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
 
                 lista.add(
                     Moto(
+                        idMoto = idMoto.toString(),
                         Marca = marca,
                         Modelo = modelo,
                         Anno = anno,
                         Matricula = matricula,
-                        idMoto = 0,
                         Cilindrada = "",
                         Cv = 0,
                         Estilo = "",
                         Kms = 0,
                         Fecha_compra = "",
-                        Color = "",
-                        Foto = ""
+                        Foto = "",
+                        Color = ""
                     )
                 )
             } while (cursor.moveToNext())
@@ -172,10 +83,44 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
         db.close()
         return lista
     }
+    fun obtenerMotoPorId(idMoto: Int): Moto? {
+        val db = this.readableDatabase
+        val cursor =
+            db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
 
+        return if (cursor.moveToFirst()) {
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto"))
+            val marca = cursor.getString(cursor.getColumnIndexOrThrow("Marca"))
+            val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
+            val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
+            val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
+            val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("Cilindrada"))
+            val cv = cursor.getInt(cursor.getColumnIndexOrThrow("Cv"))
+            val estilo = cursor.getString(cursor.getColumnIndexOrThrow("Estilo"))
+            val kms = cursor.getInt(cursor.getColumnIndexOrThrow("Kms"))
+            val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("Fecha_Compra"))
+            val foto = cursor.getString(cursor.getColumnIndexOrThrow("Foto"))
+            val color_moto = cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto"))
 
+            cursor.close()
 
+            Moto(
+                idMoto = id.toString(),
+                Marca = marca,
+                Modelo = modelo,
+                Anno = anno,
+                Matricula = matricula,
+                Color = color_moto,
+                Cilindrada = cilindrada,
+                Cv = cv,
+                Estilo = estilo,
+                Kms = kms,
+                Fecha_compra = fechaCompra,
+                Foto = foto
+            )
+        } else {
+            cursor.close()
+            null
+        }
+    }
 }
-
-
-

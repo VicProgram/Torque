@@ -1,10 +1,8 @@
 package com.example.torque
 
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -25,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.torque.database.MiGarajeDatabaseHelper
 import com.example.torque.ui.theme.componentes.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
 
