@@ -83,16 +83,16 @@ fun MotoDetalleView(moto: Moto?) {
                     style = MaterialTheme.typography.headlineLarge,
                     color = Color.White
                 )
-                Text(text = "Marca: ${moto.Marca}", color = Color.White)
-                Text(text = "Modelo: ${moto.Modelo}", color = Color.White)
-                Text(text = "Año: ${moto.Anno}", color = Color.White)
-                Text(text = "Matricula: ${moto.Matricula}", color = Color.White)
-                Text(text = "Color: ${moto.Color}", color = Color.White)
-                Text(text = "Cilindrada: ${moto.Cilindrada}", color = Color.White)
-                Text(text = "CV: ${moto.Cv}", color = Color.White)
-                Text(text = "Estilo: ${moto.Estilo}", color = Color.White)
-                Text(text = "Kms: ${moto.Kms}", color = Color.White)
-                Text(text = "Fecha de compra: ${moto.Fecha_compra}", color = Color.White)
+                Text(text = "Marca: ${moto.marca}", color = Color.White)
+                Text(text = "Modelo: ${moto.modelo}", color = Color.White)
+                Text(text = "Año: ${moto.anno}", color = Color.White)
+                Text(text = "Matricula: ${moto.matricula}", color = Color.White)
+                Text(text = "Color: ${moto.color_moto}", color = Color.White)
+                Text(text = "Cilindrada: ${moto.cilindrada}", color = Color.White)
+                Text(text = "CV: ${moto.cv}", color = Color.White)
+                Text(text = "Estilo: ${moto.estilo}", color = Color.White)
+                Text(text = "Kms: ${moto.kms}", color = Color.White)
+                Text(text = "Fecha de compra: ${moto.fecha_compra}", color = Color.White)
 
             }
         }
