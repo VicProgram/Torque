@@ -50,8 +50,13 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
             } catch (e: IOException) {
                 e.printStackTrace()
             }
+        } else {
+            // Si ya existe, puede eliminarse para forzar la copia
+            dbFile.delete()
+            copiarBaseDeDatos(context)
         }
     }
+
 
     // Obtener todas las motos de la base de datos
     fun obtenerMotos(): List<Moto> {
@@ -66,7 +71,8 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                 val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
                 val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
                 val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
-                val colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto"))  // Usar el nuevo campo
+                val colorMoto =
+                    cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto"))  // Usar el nuevo campo
 
                 lista.add(
                     Moto(
@@ -82,6 +88,7 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                         fecha_compra = "",
                         color_moto = colorMoto  // Usar el nuevo campo
                     )
+
                 )
             } while (cursor.moveToNext())
         }
@@ -94,7 +101,8 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
     // Obtener una moto específica por su id
     fun obtenerMotoPorId(idMoto: Int): Moto? {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
+        val cursor =
+            db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
 
         return if (cursor.moveToFirst()) {
             val id = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto"))
@@ -102,7 +110,8 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
             val modelo = cursor.getString(cursor.getColumnIndexOrThrow("Modelo"))
             val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
             val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
-            val colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto")) // Usar el nuevo campo
+            val colorMoto =
+                cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto")) // Usar el nuevo campo
             val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("Cilindrada"))
             val cv = cursor.getInt(cursor.getColumnIndexOrThrow("Cv"))
             val estilo = cursor.getString(cursor.getColumnIndexOrThrow("Estilo"))
