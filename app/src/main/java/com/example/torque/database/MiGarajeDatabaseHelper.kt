@@ -10,21 +10,21 @@ import java.io.InputStream
 import java.io.OutputStream
 
 
-class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque.db", null, 1) {
+class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque.db", null, 2) {
 
     init {
-        copiarBaseDeDatos(context)
+        copiarBaseDeDatos(context) // Copia solo si no existe
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // No se usa
+        // No se usa, ya que la base de datos se precarga
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS MiGaraje")
-        onCreate(db)
+        // No es necesario modificar la estructura si solo deseas mantener la base actualizada
     }
 
+    // Copiar la base de datos desde los assets si no existe en el dispositivo
     fun copiarBaseDeDatos(context: Context) {
         val dbFile = context.getDatabasePath("torque.db")
         if (!dbFile.exists()) {
@@ -47,6 +47,7 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
         }
     }
 
+    // Obtener todas las motos de la base de datos
     fun obtenerMotos(): List<Moto> {
         val lista = mutableListOf<Moto>()
         val db = readableDatabase
@@ -65,11 +66,11 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                         idMoto = idMoto.toString(),
                         Marca = marca,
                         Modelo = modelo,
-                        Anno = anno,
-                        Matricula = matricula,
                         Cilindrada = "",
+                        Anno = anno,
                         Cv = 0,
                         Estilo = "",
+                        Matricula = matricula,
                         Kms = 0,
                         Fecha_compra = "",
                         Color = ""
@@ -82,6 +83,8 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
         db.close()
         return lista
     }
+
+    // Obtener una moto específica por su id
     fun obtenerMotoPorId(idMoto: Int): Moto? {
         val db = this.readableDatabase
         val cursor =
@@ -114,7 +117,6 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
                 Kms = kms,
                 Fecha_compra = fechaCompra,
                 Color = color_moto
-
             )
         } else {
             cursor.close()
