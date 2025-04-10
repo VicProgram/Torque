@@ -94,7 +94,7 @@ fun MigarajeView() {
                 items(motos.size) { index ->
                     val moto = motos[index]
                     BotonCuadrado(
-                        texto = "${moto.Marca} ${moto.Modelo}", onClick = {
+                        texto = "${moto.marca} ${moto.modelo}", onClick = {
                             val intent = Intent(context, MotoDetalle::class.java)
                             intent.putExtra("idMoto", moto.idMoto)  // Pasamos el id de la moto
                             context.startActivity(intent)
