@@ -74,7 +74,7 @@ fun MotoDetalleView(moto: Moto?) {
                 Text(text = "Modelo: ${moto.modelo}", color = Color.White)
                 Text(text = "Año: ${moto.anno}", color = Color.White)
                 Text(text = "Matricula: ${moto.matricula}", color = Color.White)
-                Text(text = "Color: ${moto.color_moto}", color = Color.White)
+                Text(text = "Color: ${moto.color_moto}", color = Color.Gray)
                 Text(text = "Cilindrada: ${moto.cilindrada}", color = Color.White)
                 Text(text = "CV: ${moto.cv}", color = Color.White)
                 Text(text = "Estilo: ${moto.estilo}", color = Color.White)
