@@ -1,7 +1,7 @@
 package com.example.torque
 
 
-import Moto  // Asegúrate de tener esta importación
+import Moto
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -48,6 +48,7 @@ class MotoDetalle : ComponentActivity() {
         }
     }
 }
+
 /*
 // Método simulado para obtener los detalles de una moto por su ID
 private fun obtenerMotoPorId(id: String?): Moto? {
@@ -92,12 +93,8 @@ fun MotoDetalleView(moto: Moto?) {
                 Text(text = "Estilo: ${moto.Estilo}", color = Color.White)
                 Text(text = "Kms: ${moto.Kms}", color = Color.White)
                 Text(text = "Fecha de compra: ${moto.Fecha_compra}", color = Color.White)
-                Text(text = "Foto: ${moto.Foto}", color = Color.White)
+
             }
         }
     }
 }
-
-// MiGarajeDatabaseHelper.kt
-// MiGarajeDatabaseHelper.kt
-
