@@ -49,19 +49,6 @@ class MotoDetalle : ComponentActivity() {
     }
 }
 
-/*
-// Método simulado para obtener los detalles de una moto por su ID
-private fun obtenerMotoPorId(id: String?): Moto? {
-    // Aquí deberías hacer la consulta a tu base de datos para obtener la moto por su ID
-    // Para efectos de demostración, devolveré una moto dummy
-    return if (id != null) {
-        Moto(id, "Marca Ejemplo", "Modelo Ejemplo", "2023", "Negra", "1000cc")
-    } else {
-        null
-    }
-}
-*/
-
 // MotoDetalle.kt
 @Composable
 fun MotoDetalleView(moto: Moto?) {

@@ -108,32 +108,4 @@ fun MenuPrincipalView() {
         )
     }
 }
-//METODO PROBAR EN LOGCAT LA BBDD//
-/* fun probarBaseDeDatos(context: Context) {
-    val dbHelper = MiGarajeDatabaseHelper(context)
-    val db = dbHelper.readableDatabase
-
-    val cursor1 = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null)
-    while (cursor1.moveToNext()) {
-        val tableName = cursor1.getString(0)
-        Log.d("BD_TABLAS", "Tabla encontrada: $tableName")
-    }
-    cursor1.close()
-
-    val cursor2 = db.rawQuery("SELECT * FROM MiGaraje", null)
-
-    if (cursor2.moveToFirst()) {
-        do {
-            val marca = cursor2.getString(cursor2.getColumnIndexOrThrow("Marca"))
-            val modelo = cursor2.getString(cursor2.getColumnIndexOrThrow("Modelo"))
-            Log.d("BD_PRUEBA", "Moto: $marca $modelo")
-        } while (cursor2.moveToNext())
-    } else {
-        Log.d("BD_PRUEBA", "No hay motos en la base de datos.")
-    }
-
-    cursor2.close()
-    db.close()
-}
- */
 
