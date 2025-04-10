@@ -1,8 +1,10 @@
 package com.example.torque
 
 import MiGarajeDatabaseHelper
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -20,17 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.example.torque.ui.componentes.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
-import android.content.Context
-import android.util.Log
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+
+
 
 class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,39 +40,14 @@ class MenuPrincipal : ComponentActivity() {
 
         setContent {
             TorqueTheme {
-                MenuPrincipalView()  // Llamamos al composable que no necesita parámetros
+                MenuPrincipalView()
             }
-        }
-    }
-}
-
-fun copiarBaseDeDatos(context: Context) {
-    val dbFile = context.getDatabasePath("torque.db")
-    dbFile.delete()
-    // Si la base de datos no existe, copiamos desde assets
-    if (!dbFile.exists()) {
-        try {
-            val inputStream: InputStream = context.assets.open("torque.db")
-            val outputStream: OutputStream = FileOutputStream(dbFile)
-
-            val buffer = ByteArray(1024)
-            var length: Int
-            while (inputStream.read(buffer).also { length = it } > 0) {
-                outputStream.write(buffer, 0, length)
-            }
-
-            outputStream.flush()
-            outputStream.close()
-            inputStream.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
     }
 }
 
 @Composable
 fun MenuPrincipalView() {
-    // Obtener el contexto necesario para iniciar actividades
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -107,7 +80,7 @@ fun MenuPrincipalView() {
             modifier = Modifier.padding(top = 35.dp, bottom = 5.dp)
         )
 
-        // Botón para navegar a Revisiones
+        // Botón para navegar a Mi Garaje
         BotonLargo(
             onClick = {
                 val intent = Intent(context, MiGaraje::class.java)
@@ -156,7 +129,6 @@ fun probarBaseDeDatos(context: Context) {
     }
     cursor1.close()
 
-
     val cursor2 = db.rawQuery("SELECT * FROM MiGaraje", null)
 
     if (cursor2.moveToFirst()) {
@@ -166,7 +138,7 @@ fun probarBaseDeDatos(context: Context) {
             Log.d("BD_PRUEBA", "Moto: $marca $modelo")
         } while (cursor2.moveToNext())
     } else {
-      Log.d("BD_PRUEBA", "No hay motos en la base de datos.")
+        Log.d("BD_PRUEBA", "No hay motos en la base de datos.")
     }
 
     cursor2.close()

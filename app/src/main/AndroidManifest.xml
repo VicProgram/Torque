@@ -25,5 +25,7 @@
         <!-- Actividad de Mantenimiento (NextMaintenanceActivity) -->
         <activity android:name=".Mantenimiento" />
 
+        <activity android:name="MotoDetalle" />
+
     </application>
 </manifest>
