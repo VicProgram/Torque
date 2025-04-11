@@ -1,5 +1,6 @@
 package com.example.torque
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.torque.ui.theme.TorqueTheme
@@ -47,6 +49,7 @@ fun MaintenanceGrid() {
         MaintenanceItem("Suspensión"),
         MaintenanceItem("Cambio de bujías")
     )
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -84,9 +87,15 @@ fun MaintenanceGrid() {
 
 @Composable
 fun MaintenanceItemCard(item: MaintenanceItem) {
+
+    val context = LocalContext.current  // Obtenemos el contexto aquí
     // Cada card tendrá el nombre del mantenimiento
     Button(
-        onClick = { /* Acción cuando se haga clic en el botón */ },
+        onClick = {
+            val intent = Intent(context, MantenimientoDetalle::class.java)
+            intent.putExtra("titulo", item.name)
+            context.startActivity(intent)
+         },
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
