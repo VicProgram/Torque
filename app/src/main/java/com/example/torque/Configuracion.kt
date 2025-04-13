@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.torque.ui.theme.componentes.BotonCuadrado
+import com.example.torque.ui.theme.BotonCuadrado
 import com.example.torque.ui.theme.TorqueTheme
 
 class Configuracion : ComponentActivity() {
@@ -87,8 +87,7 @@ fun ConfiguracionView() {
         )
     }
 
-}
-/* AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) // Forzar oscuro
+}/* AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) // Forzar oscuro
  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)  // Forzar claro
  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) // Seguir sistema
 */
