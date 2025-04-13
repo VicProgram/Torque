@@ -32,7 +32,7 @@ class Prestaciones : ComponentActivity() {
 
         setContent {
             TorqueTheme {
-                Prestación()
+                Prestacion()
             }
         }
     }
@@ -40,51 +40,51 @@ class Prestaciones : ComponentActivity() {
 data class Prestacion(val nombre: String)
 
 @Composable
-fun Prestación() {
+fun Prestacion() {
 
     val motorItems = listOf(
-        Prestación("Cambio de aceite"),
-        Prestación("Cambio filtro aceite"),
-        Prestación("Cambio filtro aire"),
-        Prestación("Cambio filtro de combustible"),
-        Prestación("Cambio de bujías"),
-        Prestación("Revisión líquido refrigerante")
+        Prestacion("Cambio de aceite"),
+        Prestacion("Cambio filtro aceite"),
+        Prestacion("Cambio filtro aire"),
+        Prestacion("Cambio filtro de combustible"),
+        Prestacion("Cambio de bujías"),
+        Prestacion("Revisión líquido refrigerante")
     )
 
     val ruedasFrenosItems = listOf(
-        Prestación("Neumático delantero"),
-        Prestación("Neumático trasero"),
-        Prestación("Pastillas delanteras"),
-        Prestación("Pastillas traseras"),
-        Prestación("Cambio líquido frenos"),
-        Prestación("Presión neumáticos al guardar")
+        Prestacion("Neumático delantero"),
+        Prestacion("Neumático trasero"),
+        Prestacion("Pastillas delanteras"),
+        Prestacion("Pastillas traseras"),
+        Prestacion("Cambio líquido frenos"),
+        Prestacion("Presión neumáticos al guardar")
     )
 
     val transmisionItems = listOf(
-        Prestación("Engrase de cadena"),
-        Prestación("Tensión de cadena"),
-        Prestación("Cambio de kit de arrastre")
+        Prestacion("Engrase de cadena"),
+        Prestacion("Tensión de cadena"),
+        Prestacion("Cambio de kit de arrastre")
     )
 
     val electricoItems = listOf(
-        Prestación("Luces posición"),
-        Prestación("Luces carretera"),
-        Prestación("Luces largo alcance"),
-        Prestación("Luces intermitentes"),
-        Prestación("Batería"),
-        Prestación("Revisión fusibles"),
-        Prestación("Revisión cableado eléctrico")
+        Prestacion("Luces posición"),
+        Prestacion("Luces carretera"),
+        Prestacion("Luces largo alcance"),
+        Prestacion("Luces intermitentes"),
+        Prestacion("Batería"),
+        Prestacion("Revisión fusibles"),
+        Prestacion("Revisión cableado eléctrico")
     )
 
     val otrosItems = listOf(
-        Prestación("Acelerador"),
-        Prestación("Revisión Manetas"),
-        Prestación("Ajuste manetas de freno y embrague"),
-        Prestación("Revisión tornillería general"),
-        Prestación("Suspensión"),
-        Prestación("Preparación para invierno"),
-        Prestación("Revisión post-invierno"),
-        Prestación("Cuidado durante periodos de inactividad")
+        Prestacion("Acelerador"),
+        Prestacion("Revisión Manetas"),
+        Prestacion("Ajuste manetas de freno y embrague"),
+        Prestacion("Revisión tornillería general"),
+        Prestacion("Suspensión"),
+        Prestacion("Preparación para invierno"),
+        Prestacion("Revisión post-invierno"),
+        Prestacion("Cuidado durante periodos de inactividad")
     )
 
     val secciones = listOf(

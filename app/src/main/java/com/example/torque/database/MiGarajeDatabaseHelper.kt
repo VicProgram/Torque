@@ -6,8 +6,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.torque.mantenimientos
-import com.example.torque.Prestación
-import com.example.torque.Mantenimiento
 import com.example.torque.Prestacion
 import java.io.FileOutputStream
 import java.io.IOException
@@ -206,7 +204,7 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
         if (cursor.moveToFirst()) {
             do {
                 val nombre = cursor.getString(cursor.getColumnIndex("nombre"))
-                prestaciones.add(Prestación(nombre))
+                prestaciones.add(Prestacion(nombre))
             } while (cursor.moveToNext())
         }
 
