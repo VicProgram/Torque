@@ -31,10 +31,6 @@ class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Copiar la base de datos desde assets si no existe
-        //copiarBaseDeDatos(applicationContext)
-        //probarBaseDeDatos(applicationContext)  // <--- Aquí llamamos a la prueba
-
         setContent {
             TorqueTheme {
                 MenuPrincipalView()
@@ -100,7 +96,7 @@ fun MenuPrincipalView() {
         // Botón para navegar a Próximo Mantenimiento
         BotonLargo(
             onClick = {
-                val intent = Intent(context, Mantenimiento::class.java)
+                val intent = Intent(context, MantenimientoPreview::class.java)
                 context.startActivity(intent)
             }, modifier = Modifier
                 .fillMaxWidth()

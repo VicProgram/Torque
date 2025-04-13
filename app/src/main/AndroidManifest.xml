@@ -22,8 +22,11 @@
         <!-- Actividad de Configuración -->
         <activity android:name=".Configuracion" />
 
+
         <!-- Actividad de Mantenimiento (NextMaintenanceActivity) -->
         <activity android:name=".Mantenimiento" />
+        <activity android:name=".MantenimientoPreview"/>
+        <activity android:name=".MantenimientoHistorial"/>
 
         <activity android:name=".MotoDetalle" />
 
