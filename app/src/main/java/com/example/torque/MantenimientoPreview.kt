@@ -7,18 +7,18 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.torque.ui.theme.SquareButton
 import com.example.torque.ui.theme.TorqueTheme
 
-class MantenimientoPreview: ComponentActivity() {
+
+class MantenimientoPreview : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,7 +35,6 @@ class MantenimientoPreview: ComponentActivity() {
         }
     }
 }
-
 @Composable
 fun SeleccionMantenimientoScreen(
     onNuevoMantenimiento: () -> Unit,
@@ -44,20 +43,24 @@ fun SeleccionMantenimientoScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.DarkGray),
-        contentAlignment = Alignment.Center
+            .background(Color.Black.copy(alpha = 0.7f)),
+        contentAlignment = Alignment.Center // Centra todo el contenido (el Row)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = onNuevoMantenimiento) {
-                Text(text = "➕ Añadir nuevo mantenimiento")
-            }
+            // Botón Añadir
+            SquareButton(
+                text = "➕\nAñadir nuevo\nmantenimiento",
+                onClick = onNuevoMantenimiento
+            )
 
-            Button(onClick = onVerHistorial) {
-                Text(text = "📜 Ver historial")
-            }
+            // Botón Ver Historial
+            SquareButton(
+                text = "📜\nVer historial",
+                onClick = onVerHistorial
+            )
         }
     }
 }

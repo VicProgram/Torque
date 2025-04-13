@@ -1,5 +1,6 @@
-package com.example.torque.ui.theme.componentes
+package com.example.torque.ui.theme
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -23,8 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.torque.MaintenanceItem
 
 
@@ -52,7 +52,7 @@ fun BotonLargo(texto: String, onClick: () -> Unit, modifier: Modifier = Modifier
     }
 }
 
-@Composable
+/*@Composable
 fun BotonCircular(texto: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = onClick,
@@ -63,6 +63,8 @@ fun BotonCircular(texto: String, onClick: () -> Unit, modifier: Modifier = Modif
         Text(texto)
     }
 }
+
+ */
 
 @Composable
 fun ButtonMantenimiento() {
@@ -75,7 +77,7 @@ fun ButtonMantenimiento() {
 @Composable
 fun MaintenanceItemCard(item: MaintenanceItem) {
 
-    val context = LocalContext.current
+    //val context = LocalContext.current
     var checked by remember { mutableStateOf(false) }
 
     Button(
@@ -117,6 +119,29 @@ fun MaintenanceItemCard(item: MaintenanceItem) {
         }
     }
 }
+
+@Composable
+fun SquareButton(text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .size(180.dp)
+            .border(2.dp, Color.White, shape = RoundedCornerShape(16.dp)), // borde cuadrado
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF1F1F1F),
+            contentColor = Color.White
+        )
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(8.dp),
+            lineHeight = 22.sp
+        )
+    }
+}
+
 
 
 
