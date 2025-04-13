@@ -1,6 +1,5 @@
 package com.example.torque
 
-import androidx.compose.foundation.lazy.items
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,67 +22,69 @@ import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.ui.theme.MaintenanceItemCard
 
 // Data class para representar cada elemento
-data class MaintenanceItem(val name: String)
+//data class Prestacion(val name: String)
 
-class Mantenimiento : ComponentActivity() {
+
+
+class Prestaciones : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             TorqueTheme {
-                MaintenanceColumn()
-
+                Prestación()
             }
         }
     }
 }
+data class Prestacion(val nombre: String)
 
 @Composable
-fun MaintenanceColumn() {
+fun Prestación() {
 
     val motorItems = listOf(
-        MaintenanceItem("Cambio de aceite"),
-        MaintenanceItem("Cambio filtro aceite"),
-        MaintenanceItem("Cambio filtro aire"),
-        MaintenanceItem("Cambio filtro de combustible"),
-        MaintenanceItem("Cambio de bujías"),
-        MaintenanceItem("Revisión líquido refrigerante")
+        Prestación("Cambio de aceite"),
+        Prestación("Cambio filtro aceite"),
+        Prestación("Cambio filtro aire"),
+        Prestación("Cambio filtro de combustible"),
+        Prestación("Cambio de bujías"),
+        Prestación("Revisión líquido refrigerante")
     )
 
     val ruedasFrenosItems = listOf(
-        MaintenanceItem("Neumático delantero"),
-        MaintenanceItem("Neumático trasero"),
-        MaintenanceItem("Pastillas delanteras"),
-        MaintenanceItem("Pastillas traseras"),
-        MaintenanceItem("Cambio líquido frenos"),
-        MaintenanceItem("Presión neumáticos al guardar")
+        Prestación("Neumático delantero"),
+        Prestación("Neumático trasero"),
+        Prestación("Pastillas delanteras"),
+        Prestación("Pastillas traseras"),
+        Prestación("Cambio líquido frenos"),
+        Prestación("Presión neumáticos al guardar")
     )
 
     val transmisionItems = listOf(
-        MaintenanceItem("Engrase de cadena"),
-        MaintenanceItem("Tensión de cadena"),
-        MaintenanceItem("Cambio de kit de arrastre")
+        Prestación("Engrase de cadena"),
+        Prestación("Tensión de cadena"),
+        Prestación("Cambio de kit de arrastre")
     )
 
     val electricoItems = listOf(
-        MaintenanceItem("Luces posición"),
-        MaintenanceItem("Luces carretera"),
-        MaintenanceItem("Luces largo alcance"),
-        MaintenanceItem("Luces intermitentes"),
-        MaintenanceItem("Batería"),
-        MaintenanceItem("Revisión fusibles"),
-        MaintenanceItem("Revisión cableado eléctrico")
+        Prestación("Luces posición"),
+        Prestación("Luces carretera"),
+        Prestación("Luces largo alcance"),
+        Prestación("Luces intermitentes"),
+        Prestación("Batería"),
+        Prestación("Revisión fusibles"),
+        Prestación("Revisión cableado eléctrico")
     )
 
     val otrosItems = listOf(
-        MaintenanceItem("Acelerador"),
-        MaintenanceItem("Revisión Manetas"),
-        MaintenanceItem("Ajuste manetas de freno y embrague"),
-        MaintenanceItem("Revisión tornillería general"),
-        MaintenanceItem("Suspensión"),
-        MaintenanceItem("Preparación para invierno"),
-        MaintenanceItem("Revisión post-invierno"),
-        MaintenanceItem("Cuidado durante periodos de inactividad")
+        Prestación("Acelerador"),
+        Prestación("Revisión Manetas"),
+        Prestación("Ajuste manetas de freno y embrague"),
+        Prestación("Revisión tornillería general"),
+        Prestación("Suspensión"),
+        Prestación("Preparación para invierno"),
+        Prestación("Revisión post-invierno"),
+        Prestación("Cuidado durante periodos de inactividad")
     )
 
     val secciones = listOf(

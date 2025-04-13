@@ -24,7 +24,7 @@
 
 
         <!-- Actividad de Mantenimiento (NextMaintenanceActivity) -->
-        <activity android:name=".Mantenimiento" />
+        <activity android:name=".Prestaciones" />
         <activity android:name=".MantenimientoPreview"/>
         <activity android:name=".MantenimientoHistorial" />
 

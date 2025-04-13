@@ -1,13 +1,19 @@
 package com.example.torque.database
 
 import Moto
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.torque.mantenimientos
+import com.example.torque.Prestación
+import com.example.torque.Mantenimiento
+import com.example.torque.Prestacion
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+
 
 class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque.db", null, 2) {
 
@@ -137,6 +143,75 @@ class MiGarajeDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torq
             cursor.close()
             null
         }
+    }
+
+    // Insertar un mantenimiento
+    fun insertMantenimiento(mantenimiento: mantenimientos) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("nombre", mantenimiento.nombre)
+            put("categoria", mantenimiento.categoria)
+            put("estado", if (mantenimiento.estado) 1 else 0)
+            put("fecha", mantenimiento.fecha) // Nuevo campo
+            put("kilometros", mantenimiento.kilometros) // Nuevo campo
+        }
+        db.insert("mantenimiento", null, values)
+    }
+
+
+    // Obtener todos los mantenimientos
+    fun ObtenerMantenimientos(): List<mantenimientos> {
+        val db = readableDatabase
+        val cursor = db.query(
+            "mantenimiento", arrayOf("id", "nombre", "categoria", "estado", "fecha", "kilometros"),
+            null, null, null, null, null
+        )
+        val mantenimientos = mutableListOf<mantenimientos>()
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                val id = cursor.getLong(cursor.getColumnIndex("id"))
+                val nombre = cursor.getString(cursor.getColumnIndex("nombre"))
+                val categoria = cursor.getString(cursor.getColumnIndex("categoria"))
+                val estado = cursor.getInt(cursor.getColumnIndex("estado")) == 1
+                val fecha = cursor.getString(cursor.getColumnIndex("fecha")) // Nuevo campo
+                val kilometros = cursor.getInt(cursor.getColumnIndex("kilometros")) // Nuevo campo
+
+                mantenimientos.add(mantenimientos(id, nombre, categoria, estado, fecha, kilometros))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return mantenimientos
+    }
+
+
+    // Actualizar el estado de un mantenimiento
+    fun updateMantenimiento(mantenimiento: mantenimientos) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("estado", if (mantenimiento.estado) 1 else 0)
+        }
+        db.update(
+            "mantenimiento",
+            values,
+            "id = ?",
+            arrayOf(mantenimiento.id.toString())
+        )
+    }
+
+    fun obtenerPrestaciones(db: SQLiteDatabase): List<Prestacion> {
+        val prestaciones = mutableListOf<Prestacion>()
+        val cursor = db.query("prestaciones", null, null, null, null, null, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val nombre = cursor.getString(cursor.getColumnIndex("nombre"))
+                prestaciones.add(Prestación(nombre))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return prestaciones
     }
 
 }

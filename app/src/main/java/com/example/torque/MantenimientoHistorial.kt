@@ -6,20 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.torque.database.MiGarajeDatabaseHelper
 import com.example.torque.ui.theme.TorqueTheme
 
-data class MantenimientoRealizado(
-    val nombre: String,
-    val fecha: String,
-    val kilometros: Int
-)
+// Clase de datos para el mantenimiento
+
 
 class MantenimientoHistorial : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,14 +34,18 @@ class MantenimientoHistorial : ComponentActivity() {
     }
 }
 
+
+
 @Composable
 fun HistorialScreen() {
-    val historial = listOf(
-        MantenimientoRealizado("Cambio de aceite", "2024-12-15", 10500),
-        MantenimientoRealizado("Cambio filtro aire", "2024-11-01", 9800),
-        MantenimientoRealizado("Pastillas delanteras", "2024-09-20", 9200),
-        MantenimientoRealizado("Revisión general", "2024-06-10", 8500),
-    )
+    // Obtener la base de datos de manera local
+    val dbHelper = MiGarajeDatabaseHelper(LocalContext.current)
+    val mantenimientos = remember { mutableStateListOf<mantenimientos>() }
+
+    // Cargar los datos de la base de datos
+    LaunchedEffect(Unit) {
+        mantenimientos.addAll(dbHelper.ObtenerMantenimientos())
+    }
 
     Column(
         modifier = Modifier
@@ -56,8 +60,9 @@ fun HistorialScreen() {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        // Mostrar los mantenimientos en un LazyColumn
         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(historial) { item ->
+            items(mantenimientos) { item ->
                 MantenimientoHistorialCard(item)
             }
         }
@@ -65,7 +70,7 @@ fun HistorialScreen() {
 }
 
 @Composable
-fun MantenimientoHistorialCard(item: MantenimientoRealizado) {
+fun MantenimientoHistorialCard(item: mantenimientos) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,3 +89,4 @@ fun MantenimientoHistorialCard(item: MantenimientoRealizado) {
         }
     }
 }
+
