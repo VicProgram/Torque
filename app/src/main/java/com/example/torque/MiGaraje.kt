@@ -4,9 +4,7 @@ import Moto
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.torque.database.MiGarajeDatabaseHelper
-import com.example.torque.ui.theme.componentes.BotonCuadrado
+import com.example.torque.ui.theme.BotonCuadrado
 
 class MiGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,13 +89,11 @@ fun MigarajeView() {
                 items(motos.size) { index ->
                     val moto = motos[index]
                     BotonCuadrado(
-                        texto = "${moto.marca} ${moto.modelo}",
-                        onClick = {
+                        texto = "${moto.marca} ${moto.modelo}", onClick = {
                             val intent = Intent(context, MotoDetalle::class.java)
                             intent.putExtra("idMoto", moto.idMoto)
                             context.startActivity(intent)
-                        },
-                        modifier = Modifier
+                        }, modifier = Modifier
                             .width(150.dp)
                             .padding(8.dp)
                     )

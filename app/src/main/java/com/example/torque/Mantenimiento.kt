@@ -20,7 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.ui.theme.componentes.MaintenanceItemCard
+import com.example.torque.ui.theme.MaintenanceItemCard
 
 // Data class para representar cada elemento
 data class MaintenanceItem(val name: String)
