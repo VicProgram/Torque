@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.torque.database.MiGarajeDatabaseHelper
+import androidx.activity.compose.LocalActivity
+
 
 class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +47,8 @@ fun MotoDetalleScreen(idMotoString: String?) {
 
 @Composable
 fun MotoDetalleView(moto: Moto?) {
+    val activity = LocalActivity.current // ✅ Forma moderna y recomendada
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -72,10 +76,9 @@ fun MotoDetalleView(moto: Moto?) {
                 Text(text = "CV: ${moto.cv}", color = Color.White)
                 Text(text = "Estilo: ${moto.estilo}", color = Color.White)
 
-                // Aquí puedes agregar otros detalles si lo deseas
                 Button(
                     onClick = {
-                        // Acción para cuando el botón sea presionado
+                        activity?.finish()
                     },
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
@@ -85,3 +88,4 @@ fun MotoDetalleView(moto: Moto?) {
         }
     }
 }
+
