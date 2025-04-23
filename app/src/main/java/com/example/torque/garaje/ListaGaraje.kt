@@ -1,6 +1,5 @@
-package com.example.torque
+package com.example.torque.garaje
 
-import Moto
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -28,75 +25,84 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.torque.database.MiGarajeDatabaseHelper
+import com.example.torque.Moto
+import com.example.torque.R
+import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.BotonCuadrado
+import com.example.torque.ui.theme.BotonLargo
+import com.example.torque.ui.theme.TorqueTheme
 
-class MiGaraje : ComponentActivity() {
+class ListaGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MigarajeView()
+            TorqueTheme {
+
+                ListaGarajeView()
+            }
         }
     }
-
-
 }
 
 @Composable
-fun MigarajeView() {
+fun ListaGarajeView() {
     val context = LocalContext.current
-    val dbHelper = MiGarajeDatabaseHelper(context)
+
+    val dbHelper = remember { TorqueDatabaseHelper(context) }
     val motos = remember { mutableStateListOf<Moto>() }
 
-    LaunchedEffect(true) {
+
+    LaunchedEffect(Unit) {
         motos.clear()
         motos.addAll(dbHelper.obtenerMotos())
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Imagen de fondo
         Image(
-            painter = painterResource(id = R.drawable.fondorevwebp),
+            painter = painterResource(id = R.drawable.negroblue),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
 
+        // Capa oscura encima de la imagen
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f))
+                .background(Color.Black.copy(alpha = 0.03f))
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Mi Garaje",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
+        BotonLargo(
+            texto = "Nueva Moto",
+            {
+                val intent = Intent(context, AgregarMoto::class.java)
+                context.startActivity(intent)
+            }
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(motos.size) { index ->
-                    val moto = motos[index]
+        )
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.Companion
+                .fillMaxSize()
+                .padding(top = 150.dp)
+
+        ) {
+            items(motos.size) { i ->
+                val moto = motos[i]
+                Column(horizontalAlignment = Alignment.Companion.CenterHorizontally) {
                     BotonCuadrado(
-                        texto = "${moto.marca} ${moto.modelo}", onClick = {
+                        texto = "${moto.marca} ${moto.modelo}",
+                        onClick = {
                             val intent = Intent(context, MotoDetalle::class.java)
                             intent.putExtra("idMoto", moto.idMoto)
-                            context.startActivity(intent)
-                        }, modifier = Modifier
-                            .width(150.dp)
-                            .padding(8.dp)
+                            context.startActivity(intent) // Aquí se inicia la actividad directamente
+                        },
+                        modifier = Modifier.Companion.width(150.dp)
                     )
+
                 }
             }
         }

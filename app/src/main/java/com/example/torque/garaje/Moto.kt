@@ -1,4 +1,4 @@
-// Moto.kt
+package com.example.torque
 
 data class Moto(
     val idMoto: String,
