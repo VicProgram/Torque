@@ -135,7 +135,7 @@ fun AgregarMotoView() {
 
             Button(onClick = {
                 val moto = Moto(
-                    idMoto = "0",
+                    idMoto = 0,
                     marca = marca,
                     modelo = modelo,
                     anno = anno.toIntOrNull() ?: 0,

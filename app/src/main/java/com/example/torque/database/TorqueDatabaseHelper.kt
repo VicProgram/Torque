@@ -2,8 +2,11 @@ package com.example.torque.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.net.Uri
+import android.provider.MediaStore
 import com.example.torque.garaje.Moto
 import java.io.File
 import java.io.FileOutputStream
@@ -74,7 +77,7 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
 
                     lista.add(
                         Moto(
-                            idMoto = idMoto.toString(),
+                            idMoto = idMoto,
                             marca = marca,  // Cambiado de "Marca" a "marca"
                             modelo = modelo,
                             cilindrada = "",
@@ -119,7 +122,7 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
             cursor.close()
 
             Moto(
-                idMoto = id.toString(),
+                idMoto = id,
                 marca = marca,
                 modelo = modelo,
                 anno = anno,
@@ -197,7 +200,7 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
         val cursor = db.rawQuery("SELECT * FROM MiGaraje WHERE esPrincipal = 1 LIMIT 1", null)
         return if (cursor.moveToFirst()) {
             val moto = Moto(
-                idMoto = cursor.getString(cursor.getColumnIndexOrThrow("idMoto")),
+                idMoto = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto")),
                 marca = cursor.getString(cursor.getColumnIndexOrThrow("marca")),
                 modelo = cursor.getString(cursor.getColumnIndexOrThrow("modelo")),
                 anno = cursor.getInt(cursor.getColumnIndexOrThrow("anno")),
@@ -223,4 +226,63 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
         // Abre la base de datos y copia desde assets si no existe
         abrirBaseDeDatos()
     }
+
+    fun getRealPathFromUri(context: Context, uri: Uri): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = context.contentResolver.query(uri, projection, null, null, null)
+        return cursor?.use {
+            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            it.moveToFirst()
+            it.getString(columnIndex)
+        }
+    }
+
+    fun insertarFotoMoto(idMoto: Int, ruta: String): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("idMoto", idMoto)
+            put("rutaFoto", ruta)
+        }
+        val result = db.insert("fotosMoto", null, values)
+        return result != -1L
+    }
+
+    fun obtenerFotosDeMoto(idMoto: Int): List<String> {
+        val fotos = mutableListOf<String>()
+        val db = readableDatabase
+        val cursor: Cursor = db.query(
+            "FotosMoto", // Nombre de la tabla
+            arrayOf("fotosMoto"), // Columna fotosMoto
+            "idMoto = ?", // Condición WHERE
+            arrayOf(idMoto.toString()), // Convertir idMoto a String para consulta SQL
+            null, null, null
+        )
+
+        // Recorrer el cursor para obtener las fotos
+        if (cursor.moveToFirst()) {
+            do {
+                val foto = cursor.getString(cursor.getColumnIndex("fotosMoto"))
+                fotos.add(foto)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return fotos
+    }
+
+
+    // Función para insertar una foto para una moto
+    fun insertarFoto(idMoto: Int, fotoRuta: String): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("idMoto", idMoto)
+            put("fotosMoto", fotoRuta) // Guardamos la ruta de la foto en fotosMoto
+        }
+
+        val result = db.insert("FotosMoto", null, values)
+        return result != -1L // Si la inserción fue exitosa, retornará un id de fila
+    }
 }
+
+
+

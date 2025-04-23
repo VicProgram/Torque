@@ -1,7 +1,7 @@
 package com.example.torque.garaje
 
 data class Moto(
-    val idMoto: String,
+    val idMoto: Int,
     val marca: String,
     val modelo: String,
     val anno: Int,

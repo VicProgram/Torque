@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.torque.R
 import com.example.torque.ui.theme.SquareButton
 import com.example.torque.ui.theme.TorqueTheme
 
@@ -40,23 +44,25 @@ fun SeleccionMantenimientoScreen(
     onNuevoMantenimiento: () -> Unit,
     onVerHistorial: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f)),
-        contentAlignment = Alignment.Center // Centra todo el contenido (el Row)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Imagen de fondo
+        Image(
+            painter = painterResource(id = R.drawable.negrovertiama),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Fila centrada
         Row(
+            modifier = Modifier.align(Alignment.Center), // <--- Esto centra la fila en el Box
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Botón Añadir
             SquareButton(
                 text = "➕\nAñadir nuevo\nmantenimiento",
                 onClick = onNuevoMantenimiento
             )
-
-            // Botón Ver Historial
             SquareButton(
                 text = "📜\nVer historial",
                 onClick = onVerHistorial
@@ -64,3 +70,4 @@ fun SeleccionMantenimientoScreen(
         }
     }
 }
+
