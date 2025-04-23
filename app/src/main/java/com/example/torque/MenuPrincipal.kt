@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.configuracion.Configuracion
 import com.example.torque.database.copiarBaseDeDatos
 import com.example.torque.garaje.ListaGaraje
 import com.example.torque.mantenimientos.MantenimientoPreview

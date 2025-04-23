@@ -1,4 +1,4 @@
-package com.example.torque
+package com.example.torque.configuracion
 
 
 import android.os.Bundle
@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.torque.R
 import com.example.torque.ui.theme.BotonCuadrado
 import com.example.torque.ui.theme.TorqueTheme
 

@@ -17,7 +17,7 @@
         </activity>
 
         <!-- Actividad de Configuración -->
-        <activity android:name=".Configuracion" />
+        <activity android:name=".configuracion.Configuracion" />
 
         <!-- Actividad de Mantenimiento -->
         <activity android:name=".mantenimientos.Mantenimiento" />
