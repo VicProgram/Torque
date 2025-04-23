@@ -44,7 +44,9 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
                             matricula = matricula,
                             kms = 0,
                             fecha_compra = "",
-                            color_moto = colorMoto
+                            color_moto = colorMoto,
+                            esPrincipal = 0,
+                            foto_moto = ""
                         )
                     )
                 } while (it.moveToNext())
@@ -88,7 +90,9 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
                 estilo = estilo,
                 kms = kms,
                 fecha_compra = fechaCompra,
-                color_moto = colorMoto // Usar el nuevo campo
+                color_moto = colorMoto,
+                esPrincipal = 0,
+                foto_moto = ""
             )
         } else {
             cursor.close()

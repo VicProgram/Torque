@@ -116,7 +116,9 @@ fun AgregarMotoView() {
                     cv = cv.toIntOrNull() ?: 0,
                     estilo = estilo,
                     kms = kms.toIntOrNull() ?: 0,
-                    fecha_compra = fechaCompra
+                    fecha_compra = fechaCompra,
+                    esPrincipal = 0,
+                    foto_moto = ""
                 )
 
                 // Inserción en la base de datos
