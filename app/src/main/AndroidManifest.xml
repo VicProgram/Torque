@@ -16,20 +16,20 @@
             </intent-filter>
         </activity>
 
-        <!-- Actividad de Revisiones -->
-        <activity android:name=".MiGaraje" />
-
         <!-- Actividad de Configuración -->
-        <activity android:name=".Configuracion" />
+        <activity android:name=".configuracion.Configuracion" />
+
+        <!-- Actividad de Mantenimiento -->
+        <activity android:name=".mantenimientos.Mantenimiento" />
+        <activity android:name=".mantenimientos.MantenimientoPreview"/>
+        <activity android:name=".mantenimientos.MantenimientoHistorial" />
+        <!-- Actividad de Garaje -->
+        <activity android:name=".garaje.MotoDetalle" />
+        <activity android:name=".garaje.AgregarMoto" />
+        <activity android:name=".garaje.BorrarMoto" />
+        <activity android:name=".garaje.ListaGaraje" />
 
 
-        <!-- Actividad de Mantenimiento (NextMaintenanceActivity) -->
-        <activity android:name=".Mantenimiento" />
-        <activity android:name=".MantenimientoPreview"/>
-        <activity android:name=".MantenimientoHistorial" />
-
-
-        <activity android:name=".MotoDetalle" />
 
     </application>
 </manifest>

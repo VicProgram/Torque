@@ -1,4 +1,4 @@
-package com.example.torque
+package com.example.torque.mantenimientos
 
 import androidx.compose.foundation.lazy.items
 import android.os.Bundle
@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.torque.R
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.ui.theme.MaintenanceItemCard
 
