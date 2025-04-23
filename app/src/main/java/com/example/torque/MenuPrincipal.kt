@@ -81,7 +81,7 @@ fun MenuPrincipalView() {
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontFamily = pepperoni,
                     color = Color.White,
-                    fontSize = 90.dp.value.sp,
+                    fontSize = 80.dp.value.sp,
                     shadow = androidx.compose.ui.graphics.Shadow(
                         color = Color.Black,
                         blurRadius = 2f
