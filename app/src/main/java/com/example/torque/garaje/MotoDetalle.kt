@@ -99,18 +99,6 @@ fun MotoDetalleView(
 
                     Button(
                         onClick = {
-                            val dbHelper = TorqueDatabaseHelper(context)
-                            dbHelper.marcarMotoComoPrincipal(moto.idMoto)
-
-                            // Vuelve a cargar la lista o haz un setState para refrescar
-                        }
-                    ) {
-                        Text("Marcar como principal")
-                    }
-
-
-                    Button(
-                        onClick = {
                             val success = dbHelper.eliminarMoto(moto.idMoto)
                             if (success) {
                                 Toast.makeText(

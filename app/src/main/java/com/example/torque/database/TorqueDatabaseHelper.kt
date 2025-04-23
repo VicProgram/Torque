@@ -31,7 +31,6 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
                     val anno = it.getInt(it.getColumnIndexOrThrow("Año"))
                     val matricula = it.getString(it.getColumnIndexOrThrow("Matricula"))
                     val colorMoto = it.getString(it.getColumnIndexOrThrow("Color_Moto"))
-                    val esPrincipal = it.getInt(it.getColumnIndexOrThrow("esPrincipal"))
 
                     lista.add(
                         Moto(
@@ -45,9 +44,7 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
                             matricula = matricula,
                             kms = 0,
                             fecha_compra = "",
-                            color_moto = colorMoto,
-                            esPrincipal = esPrincipal,
-                            foto_moto = ""
+                            color_moto = colorMoto
                         )
                     )
                 } while (it.moveToNext())
@@ -71,16 +68,14 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
             val anno = cursor.getInt(cursor.getColumnIndexOrThrow("Año"))
             val matricula = cursor.getString(cursor.getColumnIndexOrThrow("Matricula"))
             val colorMoto =
-                cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto"))
+                cursor.getString(cursor.getColumnIndexOrThrow("Color_Moto")) // Usar el nuevo campo
             val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("Cilindrada"))
             val cv = cursor.getInt(cursor.getColumnIndexOrThrow("Cv"))
             val estilo = cursor.getString(cursor.getColumnIndexOrThrow("Estilo"))
             val kms = cursor.getInt(cursor.getColumnIndexOrThrow("Kms"))
             val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("Fecha_Compra"))
-            val esPrincipal = cursor.getInt(cursor.getColumnIndexOrThrow("esPrincipal"))
 
             cursor.close()
-            db.close()
 
             Moto(
                 idMoto = id.toString(),
@@ -93,24 +88,20 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
                 estilo = estilo,
                 kms = kms,
                 fecha_compra = fechaCompra,
-                color_moto = colorMoto,
-                esPrincipal = esPrincipal,
-                foto_moto = ""
+                color_moto = colorMoto // Usar el nuevo campo
             )
         } else {
             cursor.close()
-            db.close()
             null
         }
     }
 
-    // Agregar una nueva moto
     fun agregarMoto(moto: Moto): Boolean {
         val db = writableDatabase
         val cvmap = ContentValues().apply {
             put("Marca", moto.marca)
             put("Modelo", moto.modelo)
-            put("Año", moto.anno)
+            put("Año", moto.anno)              // <-- Mismo nombre que en la tabla
             put("Matricula", moto.matricula)
             put("Color_Moto", moto.color_moto)
             put("Cilindrada", moto.cilindrada)
@@ -118,37 +109,22 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
             put("Estilo", moto.estilo)
             put("Kms", moto.kms)
             put("Fecha_Compra", moto.fecha_compra)
-            put("esPrincipal", moto.esPrincipal)  // Añadir esPrincipal
         }
         val rowId = db.insert("MiGaraje", null, cvmap)
         db.close()
         return rowId != -1L
     }
 
-    // Eliminar una moto
+
+    // TorqueDatabaseHelper.kt
     fun eliminarMoto(idMoto: String): Boolean {
         val db = this.writableDatabase
         val result = db.delete(
-            "MiGaraje",
+            "MiGaraje", // El nombre de la tabla donde guardas las motos
             "idMoto = ?",
-            arrayOf(idMoto)
+            arrayOf(idMoto.toString())
         )
-        db.close()
-        return result > 0
+        return result > 0 // Si se elimina al menos una fila, la eliminación fue exitosa
     }
 
-    // Marcar una moto como principal
-    fun marcarMotoComoPrincipal(idMoto: String) {
-        val db = writableDatabase
-
-        // Desmarcar todas las motos
-        db.execSQL("UPDATE MiGaraje SET esPrincipal = 0")
-
-        // Marcar la seleccionada
-        val stmt = db.compileStatement("UPDATE MiGaraje SET esPrincipal = 1 WHERE idMoto = ?")
-        stmt.bindLong(1, idMoto.toLong())
-        stmt.executeUpdateDelete()
-
-        db.close()
-    }
 }

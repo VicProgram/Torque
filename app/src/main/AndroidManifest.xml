@@ -1,16 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.torque">
 
-    <!-- Permiso para importar fotos -->
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Torque"
         android:theme="@style/Theme.TorqueLight">
 
+        <!-- Actividad principal (Menú Principal) -->
         <activity android:name=".MenuPrincipal"
             android:exported="true">
             <intent-filter>
@@ -28,7 +25,7 @@
         <activity android:name=".mantenimientos.MantenimientoHistorial" />
         <!-- Actividad de Garaje -->
         <activity android:name=".garaje.MotoDetalle" />
-        <activity android:name=".garaje.AgregarMoto2" />
+        <activity android:name=".garaje.AgregarMoto" />
         <activity android:name=".garaje.BorrarMoto" />
         <activity android:name=".garaje.ListaGaraje" />
 

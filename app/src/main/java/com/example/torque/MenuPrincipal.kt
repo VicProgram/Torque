@@ -81,14 +81,14 @@ fun MenuPrincipalView() {
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontFamily = pepperoni,
                     color = Color.White,
-                    fontSize = 80.dp.value.sp,
+                    fontSize = 90.dp.value.sp,
                     shadow = androidx.compose.ui.graphics.Shadow(
                         color = Color.Black,
                         blurRadius = 2f
                     )
 
                 ),
-                modifier = Modifier.padding(top = 35.dp, bottom = 55.dp)
+                modifier = Modifier.padding(top = 35.dp, bottom = 5.dp)
             )
 
             // Botón para navegar a Mi Garaje
@@ -101,15 +101,6 @@ fun MenuPrincipalView() {
                     .padding(bottom = 16.dp), texto = "Mi Garaje"
             )
 
-            // Botón para Mantenimientos
-            BotonLargo(
-                onClick = {
-                    val intent = Intent(context, MantenimientoPreview::class.java)
-                    context.startActivity(intent)
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp), texto = "Mantenimientos"
-            )
             // Botón para Configuración
             BotonLargo(
                 onClick = {
@@ -118,6 +109,16 @@ fun MenuPrincipalView() {
                 }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp), texto = "Configuración"
+            )
+
+            // Botón para Mantenimientos
+            BotonLargo(
+                onClick = {
+                    val intent = Intent(context, MantenimientoPreview::class.java)
+                    context.startActivity(intent)
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp), texto = "Mantenimientos"
             )
         }
     }
