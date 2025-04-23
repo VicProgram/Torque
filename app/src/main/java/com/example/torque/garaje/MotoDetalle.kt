@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.torque.Moto
 import com.example.torque.R
 import com.example.torque.database.TorqueDatabaseHelper
 
@@ -90,12 +89,24 @@ fun MotoDetalleView(
                     Text("Modelo: ${moto.modelo}", color = Color.White)
                     Text("Año: ${moto.anno}", color = Color.White)
                     Text("Matrícula: ${moto.matricula}", color = Color.White)
-                    Text("Color: ${moto.color_moto}", color = Color.White)
+                    Text("Color: ${moto.colorMoto}", color = Color.White)
                     Text("Cilindrada: ${moto.cilindrada}", color = Color.White)
                     Text("CV: ${moto.cv}", color = Color.White)
                     Text("Estilo: ${moto.estilo}", color = Color.White)
 
                     Spacer(Modifier.height(24.dp))
+
+                    Button(onClick = {
+                        val success = dbHelper.hacerPrincipal(moto.idMoto)
+                        if (success) {
+                            Toast.makeText(context, "Moto establecida como principal", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Error al establecer como principal", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Text("Establecer como principal")
+                    }
+
 
                     Button(
                         onClick = {

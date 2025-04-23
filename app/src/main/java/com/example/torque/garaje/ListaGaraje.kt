@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -25,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.torque.Moto
 import com.example.torque.R
 import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.BotonCuadrado
@@ -47,10 +47,8 @@ class ListaGaraje : ComponentActivity() {
 @Composable
 fun ListaGarajeView() {
     val context = LocalContext.current
-
     val dbHelper = remember { TorqueDatabaseHelper(context) }
     val motos = remember { mutableStateListOf<Moto>() }
-
 
     LaunchedEffect(Unit) {
         motos.clear()
@@ -73,38 +71,45 @@ fun ListaGarajeView() {
                 .background(Color.Black.copy(alpha = 0.03f))
         )
 
-        BotonLargo(
-            texto = "Nueva Moto",
-            {
-                val intent = Intent(context, AgregarMoto::class.java)
-                context.startActivity(intent)
-            }
-
-        )
-
+        // Lista de motos
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 150.dp)
-
+                .padding(top = 150.dp, bottom = 100.dp) // margen inferior para dejar espacio al botón
         ) {
             items(motos.size) { i ->
                 val moto = motos[i]
-                Column(horizontalAlignment = Alignment.Companion.CenterHorizontally) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     BotonCuadrado(
                         texto = "${moto.marca} ${moto.modelo}",
                         onClick = {
                             val intent = Intent(context, MotoDetalle::class.java)
                             intent.putExtra("idMoto", moto.idMoto)
-                            context.startActivity(intent) // Aquí se inicia la actividad directamente
+                            context.startActivity(intent)
                         },
-                        modifier = Modifier.Companion.width(150.dp)
+                        modifier = Modifier.width(150.dp)
                     )
-
                 }
             }
+        }
+
+        // Botón "Nueva Moto" abajo centrado
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            BotonLargo(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                texto = "Nueva Moto",
+                onClick = {
+                    val intent = Intent(context, AgregarMoto::class.java)
+                    context.startActivity(intent)
+                }
+            )
         }
     }
 }

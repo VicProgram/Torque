@@ -1,4 +1,4 @@
-package com.example.torque
+package com.example.torque.garaje
 
 data class Moto(
     val idMoto: String,
@@ -6,13 +6,13 @@ data class Moto(
     val modelo: String,
     val anno: Int,
     val matricula: String,
-    val color_moto: String,
+    val colorMoto: String,
     val cilindrada: String,
     val cv: Int,
     val estilo: String,
     val kms: Int,
-    val fecha_compra: String,
+    val fechaCompra: String,
     val esPrincipal: Int,
-    val foto_moto: String// 0 o 1
+    val fotoMoto: String
 
 )
