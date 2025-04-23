@@ -88,7 +88,7 @@ fun MenuPrincipalView() {
                     )
 
                 ),
-                modifier = Modifier.padding(top = 35.dp, bottom = 5.dp)
+                modifier = Modifier.padding(top = 35.dp, bottom = 55.dp)
             )
 
             // Botón para navegar a Mi Garaje
@@ -101,16 +101,6 @@ fun MenuPrincipalView() {
                     .padding(bottom = 16.dp), texto = "Mi Garaje"
             )
 
-            // Botón para Configuración
-            BotonLargo(
-                onClick = {
-                    val intent = Intent(context, Configuracion::class.java)
-                    context.startActivity(intent)
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp), texto = "Configuración"
-            )
-
             // Botón para Mantenimientos
             BotonLargo(
                 onClick = {
@@ -119,6 +109,15 @@ fun MenuPrincipalView() {
                 }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp), texto = "Mantenimientos"
+            )
+            // Botón para Configuración
+            BotonLargo(
+                onClick = {
+                    val intent = Intent(context, Configuracion::class.java)
+                    context.startActivity(intent)
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp), texto = "Configuración"
             )
         }
     }

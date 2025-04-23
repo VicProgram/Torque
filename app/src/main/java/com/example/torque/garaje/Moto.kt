@@ -11,5 +11,8 @@ data class Moto(
     val cv: Int,
     val estilo: String,
     val kms: Int,
-    val fecha_compra: String
+    val fecha_compra: String,
+    val esPrincipal: Int,
+    val foto_moto: String// 0 o 1
+
 )

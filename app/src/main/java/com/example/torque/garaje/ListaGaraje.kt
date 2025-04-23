@@ -51,7 +51,6 @@ fun ListaGarajeView() {
     val dbHelper = remember { TorqueDatabaseHelper(context) }
     val motos = remember { mutableStateListOf<Moto>() }
 
-
     LaunchedEffect(Unit) {
         motos.clear()
         motos.addAll(dbHelper.obtenerMotos())
@@ -73,38 +72,41 @@ fun ListaGarajeView() {
                 .background(Color.Black.copy(alpha = 0.03f))
         )
 
-        BotonLargo(
-            texto = "Nueva Moto",
-            {
-                val intent = Intent(context, AgregarMoto::class.java)
-                context.startActivity(intent)
-            }
-
-        )
-
+        // Lista de motos
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 150.dp)
-
+                .padding(top = 150.dp) // Deja un espacio suficiente en la parte superior para la lista de motos
         ) {
             items(motos.size) { i ->
                 val moto = motos[i]
-                Column(horizontalAlignment = Alignment.Companion.CenterHorizontally) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     BotonCuadrado(
-                        texto = "${moto.marca} ${moto.modelo}",
-                        onClick = {
+                        texto = "${moto.marca} ${moto.modelo}", onClick = {
                             val intent = Intent(context, MotoDetalle::class.java)
                             intent.putExtra("idMoto", moto.idMoto)
                             context.startActivity(intent) // Aquí se inicia la actividad directamente
-                        },
-                        modifier = Modifier.Companion.width(150.dp)
+                        }, modifier = Modifier.width(150.dp)
                     )
-
                 }
             }
+        }
+
+        // Caja que contiene el botón "Nueva Moto"
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter) // Ubicamos el botón en la parte inferior centrado
+                .padding(32.dp) // Ajustar espacio entre el botón y el borde inferior
+        ) {
+            BotonLargo(
+                modifier = Modifier.width(250.dp), // Ancho fijo para el botón
+                texto = "Nueva Moto", onClick = {
+                    val intent = Intent(context, AgregarMoto2::class.java)
+                    context.startActivity(intent)
+
+                })
         }
     }
 }
