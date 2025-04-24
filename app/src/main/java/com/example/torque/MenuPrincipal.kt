@@ -159,15 +159,6 @@ fun MenuPrincipalView() {
                         .fillMaxWidth()
                         .padding(top = 35.dp, bottom = 5.dp)
                 ) {
-                    Text(
-                        text = "Moto Principal:",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontFamily = FontFamily.SansSerif,
-                            color = Color.White,
-                            fontSize = 45.sp
-                        )
-                    )
-
                     // Agregar un poco de espacio entre el título y los textos
                     Spacer(modifier = Modifier.height(10.dp))
 
