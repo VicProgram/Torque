@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,8 +20,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -52,6 +55,7 @@ fun MotoDetalleView(
     moto: Moto?, dbHelper: TorqueDatabaseHelper, context: Context, activity: Activity
 ) {
     val fotos = remember { mutableStateListOf<String>() }
+    var selectedPhoto by remember { mutableStateOf<String?>(null) } // Para mantener la foto seleccionada
 
     // Cargar fotos desde la base de datos
     LaunchedEffect(moto?.idMoto) {
@@ -66,7 +70,7 @@ fun MotoDetalleView(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val ruta = copiarImagenEnCache(context, it)
+            val ruta = copiarImagenPermanente(context, it)
             if (ruta != null && moto != null) {
                 dbHelper.insertarFoto(moto.idMoto, ruta)
                 fotos.add(ruta)
@@ -78,24 +82,20 @@ fun MotoDetalleView(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Imagen de fondo
         Image(
-            painter = painterResource(id = R.drawable.negroblue),
+            painter = painterResource(id = R.drawable.negrolinama),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize()  // Ocupa toda la pantalla
         )
 
+        // Fondo oscuro semitransparente solo para los elementos (textos, botones)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.03f))
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .padding(16.dp)
+                .background(Color.Black.copy(alpha = 0.6f)) // Este es el fondo oscuro
+                .padding(16.dp) // Esto asegura que haya espacio entre el borde y los elementos
         ) {
             if (moto == null) {
                 Text("No se ha encontrado la moto.", color = Color.White)
@@ -119,7 +119,6 @@ fun MotoDetalleView(
                     Spacer(Modifier.height(24.dp))
 
                     Button(onClick = {
-                        // Se pasa el idMoto directamente como Int
                         val success = dbHelper.hacerPrincipal(moto.idMoto.toString())
                         Toast.makeText(
                             context,
@@ -131,7 +130,6 @@ fun MotoDetalleView(
                     }
 
                     Button(onClick = {
-                        // Se pasa el idMoto directamente como Int
                         val success = dbHelper.eliminarMoto(moto.idMoto.toString())
                         if (success) {
                             Toast.makeText(
@@ -167,14 +165,47 @@ fun MotoDetalleView(
                         Text("Fotos", color = Color.White)
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             items(fotos) { ruta ->
-                                Image(
-                                    painter = rememberAsyncImagePainter(ruta),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
+                                var showDeleteButton by remember { mutableStateOf(false) }
+
+                                Box(
                                     modifier = Modifier
                                         .size(120.dp)
                                         .background(Color.DarkGray)
-                                )
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(
+                                                onLongPress = {
+                                                    selectedPhoto = ruta
+                                                    showDeleteButton =
+                                                        true // Mostrar el botón de eliminar en la pulsación larga
+                                                })
+                                        }) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(ruta),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+
+                                    // Mostrar el botón de eliminar solo si showDeleteButton es verdadero
+                                    if (showDeleteButton) {
+                                        Button(
+                                            onClick = {
+                                                // Eliminar foto
+                                                dbHelper.eliminarFoto(moto.idMoto, ruta)
+                                                fotos.remove(ruta)
+                                                showDeleteButton = false
+                                                Toast.makeText(
+                                                    context, "Foto eliminada", Toast.LENGTH_SHORT
+                                                ).show()
+                                            },
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .padding(4.dp)
+                                        ) {
+                                            Text("Eliminar", color = Color.White)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -184,8 +215,7 @@ fun MotoDetalleView(
     }
 }
 
-// Copia la imagen en cache local para su uso interno
-fun copiarImagenEnCache(context: Context, uri: Uri): String? {
+fun copiarImagenPermanente(context: Context, uri: Uri): String? {
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
         val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
@@ -194,7 +224,8 @@ fun copiarImagenEnCache(context: Context, uri: Uri): String? {
             cursor.getString(nameIndex)
         } ?: "imagen_moto_${System.currentTimeMillis()}.jpg"
 
-        val outputFile = File(context.cacheDir, fileName)
+        // Guardar la imagen en el directorio de archivos internos de la app
+        val outputFile = File(context.filesDir, fileName)
         inputStream?.use { input ->
             outputFile.outputStream().use { output ->
                 input.copyTo(output)
@@ -206,3 +237,4 @@ fun copiarImagenEnCache(context: Context, uri: Uri): String? {
         null
     }
 }
+

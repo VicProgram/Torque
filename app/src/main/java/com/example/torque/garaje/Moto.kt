@@ -8,7 +8,7 @@ data class Moto(
     val matricula: String,
     val colorMoto: String,
     val cilindrada: String,
-    val cv: Int,
+    val cv: String,
     val estilo: String,
     val kms: Int,
     val fechaCompra: String,

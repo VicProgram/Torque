@@ -74,7 +74,6 @@ fun AgregarMotoView() {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Fondo
         Image(
             painter = painterResource(id = R.drawable.negroblue),
             contentDescription = null,
@@ -82,7 +81,6 @@ fun AgregarMotoView() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // Capa oscura
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,16 +96,56 @@ fun AgregarMotoView() {
         ) {
             Text("Añadir Moto", style = MaterialTheme.typography.titleLarge)
 
-            OutlinedTextField(value = marca, onValueChange = { marca = it }, label = { Text("Marca") })
-            OutlinedTextField(value = modelo, onValueChange = { modelo = it }, label = { Text("Modelo") })
-            OutlinedTextField(value = anno, onValueChange = { anno = it }, label = { Text("Año") })
-            OutlinedTextField(value = matricula, onValueChange = { matricula = it }, label = { Text("Matrícula") })
-            OutlinedTextField(value = colorMoto, onValueChange = { colorMoto = it }, label = { Text("Color") })
-            OutlinedTextField(value = cilindrada, onValueChange = { cilindrada = it }, label = { Text("Cilindrada") })
-            OutlinedTextField(value = cv, onValueChange = { cv = it }, label = { Text("CV") })
-            OutlinedTextField(value = estilo, onValueChange = { estilo = it }, label = { Text("Estilo") })
-            OutlinedTextField(value = kms, onValueChange = { kms = it }, label = { Text("Kms") })
-            OutlinedTextField(value = fechaCompra, onValueChange = { fechaCompra = it }, label = { Text("Fecha Compra") })
+            OutlinedTextField(
+                value = marca,
+                onValueChange = { marca = it },
+                label = { Text("Marca") }
+            )
+            OutlinedTextField(
+                value = modelo,
+                onValueChange = { modelo = it },
+                label = { Text("Modelo") }
+            )
+            OutlinedTextField(
+                value = anno,
+                onValueChange = { anno = it },
+                label = { Text("Año") }
+            )
+            OutlinedTextField(
+                value = matricula,
+                onValueChange = { matricula = it },
+                label = { Text("Matrícula") }
+            )
+            OutlinedTextField(
+                value = colorMoto,
+                onValueChange = { colorMoto = it },
+                label = { Text("Color") }
+            )
+            OutlinedTextField(
+                value = cilindrada,
+                onValueChange = { cilindrada = it },
+                label = { Text("Cilindrada") }
+            )
+            OutlinedTextField(
+                value = cv,
+                onValueChange = { cv = it },
+                label = { Text("CV") }
+            )
+            OutlinedTextField(
+                value = estilo,
+                onValueChange = { estilo = it },
+                label = { Text("Estilo") }
+            )
+            OutlinedTextField(
+                value = kms,
+                onValueChange = { kms = it },
+                label = { Text("Kms") }
+            )
+            OutlinedTextField(
+                value = fechaCompra,
+                onValueChange = { fechaCompra = it },
+                label = { Text("Fecha Compra") }
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -142,7 +180,7 @@ fun AgregarMotoView() {
                     matricula = matricula,
                     colorMoto = colorMoto,
                     cilindrada = cilindrada,
-                    cv = cv.toIntOrNull() ?: 0,
+                    cv = (cv.toIntOrNull() ?: 0).toString(),
                     estilo = estilo,
                     kms = kms.toIntOrNull() ?: 0,
                     fechaCompra = fechaCompra,
@@ -151,7 +189,8 @@ fun AgregarMotoView() {
                 )
                 val success = dbHelper.agregarMoto(moto)
                 if (success) {
-                    Toast.makeText(context, "Moto guardada correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Moto guardada correctamente", Toast.LENGTH_SHORT)
+                        .show()
                     (context as Activity).apply {
                         setResult(Activity.RESULT_OK)
                         finish()

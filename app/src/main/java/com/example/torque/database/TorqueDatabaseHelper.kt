@@ -5,8 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.net.Uri
-import android.provider.MediaStore
+import android.util.Log
 import com.example.torque.garaje.Moto
 import java.io.File
 import java.io.FileOutputStream
@@ -18,7 +17,7 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     private val dbPath = context.applicationContext.getDatabasePath("torque.db").absolutePath
 
-    // Método para copiar la base de datos desde assets
+
     private fun copiarBaseDeDatos() {
         val dbFile = File(dbPath)
         if (!dbFile.exists()) {
@@ -41,7 +40,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         }
     }
 
-    // Método para abrir la base de datos
+
     fun abrirBaseDeDatos() {
         if (!File(dbPath).exists()) {
             copiarBaseDeDatos() // Si no existe la base de datos, copia la desde assets
@@ -54,11 +53,9 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // Aquí puedes poner la lógica para migrar la base de datos si es necesario.
-        // Por ejemplo, agregar columnas o modificar la estructura de la base de datos.
     }
 
     // Obtener todas las motos de la base de datos
-    // Método para obtener todas las motos de la base de datos
     fun obtenerMotos(): List<Moto> {
         val lista = mutableListOf<Moto>()
         val db = readableDatabase
@@ -68,8 +65,7 @@ class TorqueDatabaseHelper(private val context: Context) :
             if (it.moveToFirst()) {
                 do {
                     val idMoto = it.getInt(it.getColumnIndexOrThrow("idMoto"))
-                    val marca =
-                        it.getString(it.getColumnIndexOrThrow("marca"))  // Cambiado de "Marca" a "marca"
+                    val marca = it.getString(it.getColumnIndexOrThrow("marca"))
                     val modelo = it.getString(it.getColumnIndexOrThrow("modelo"))
                     val anno = it.getInt(it.getColumnIndexOrThrow("anno"))
                     val matricula = it.getString(it.getColumnIndexOrThrow("matricula"))
@@ -78,18 +74,18 @@ class TorqueDatabaseHelper(private val context: Context) :
                     lista.add(
                         Moto(
                             idMoto = idMoto,
-                            marca = marca,  // Cambiado de "Marca" a "marca"
+                            marca = marca,
                             modelo = modelo,
                             cilindrada = "",
                             anno = anno,
-                            cv = 0,
+                            cv = "",
                             estilo = "",
                             matricula = matricula,
                             kms = 0,
                             fechaCompra = "",
                             colorMoto = colorMoto,
                             esPrincipal = 0,
-                            fotoMoto = ""
+                            fotoMoto = "" // No se guarda la foto directamente aquí, sino en FotosMoto
                         )
                     )
                 } while (it.moveToNext())
@@ -127,14 +123,14 @@ class TorqueDatabaseHelper(private val context: Context) :
                 modelo = modelo,
                 anno = anno,
                 matricula = matricula,
-                cilindrada = cilindrada,
-                cv = cv,
+                cilindrada = "",
+                cv = "",
                 estilo = estilo,
                 kms = kms,
                 fechaCompra = fechaCompra,
                 colorMoto = colorMoto,
                 esPrincipal = 0,
-                fotoMoto = ""
+                fotoMoto = "" // Foto no incluida directamente aquí
             )
         } else {
             cursor.close()
@@ -142,10 +138,110 @@ class TorqueDatabaseHelper(private val context: Context) :
         }
     }
 
-    // Método para agregar una moto
+    // Función para insertar foto en la base de datos
+    fun insertarFoto(idMoto: Int, ruta: String): Boolean {
+        val db = writableDatabase
+        val contentValues = ContentValues().apply {
+            put("idMoto", idMoto)
+            put("rutaFoto", ruta)
+        }
+        val result = db.insert("FotosMoto", null, contentValues)
+        return result != -1L
+    }
+
+    // Función para hacer una moto principal
+    fun hacerPrincipal(idMoto: String): Boolean {
+        val db = writableDatabase
+        val contentValues = ContentValues().apply {
+            put("esPrincipal", true)
+        }
+        val result = db.update("MiGaraje", contentValues, "idMoto = ?", arrayOf(idMoto))
+        return result > 0
+    }
+
+    // Función para eliminar moto
+    fun eliminarMoto(idMoto: String): Boolean {
+        val db = writableDatabase
+        val result = db.delete("MiGaraje", "idMoto = ?", arrayOf(idMoto))
+        return result > 0
+    }
+
+
+    fun obtenerFotosDeMoto(idMoto: Int): List<String> {
+        val fotos = mutableListOf<String>()
+        val db = readableDatabase
+        val cursor: Cursor = db.query(
+            "fotosMoto", // Nombre de la tabla
+            arrayOf("rutaFoto"), // Columna rutaFoto
+            "idMoto = ?", // Condición WHERE
+            arrayOf(idMoto.toString()), // Condición para el idMoto
+            null, null, null
+        )
+
+        // Recorrer el cursor para obtener las rutas de las fotos
+        if (cursor.moveToFirst()) {
+            do {
+                val foto = cursor.getString(cursor.getColumnIndex("rutaFoto"))
+                fotos.add(foto)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return fotos
+    }
+
+    // Función para eliminar foto
+    fun eliminarFoto(idMoto: Int, rutaFoto: String): Boolean {
+        val db = writableDatabase
+        val result = db.delete(
+            "FotosMoto", "idMoto = ? AND rutaFoto = ?", arrayOf(idMoto.toString(), rutaFoto)
+        )
+        return result > 0
+    }
+
+    // Función para obtener la moto principal desde la base de datos
+    fun obtenerMotoPrincipal(): Moto? {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM MiGaraje WHERE esPrincipal = 1 LIMIT 1", null)
+
+        if (cursor.moveToFirst()) {
+            // Verifica que la columna exista antes de acceder a ella
+            val idMotoIndex = cursor.getColumnIndex("idMoto")
+            val marcaIndex = cursor.getColumnIndex("marca")
+            val modeloIndex = cursor.getColumnIndex("modelo")
+            // Verifica si los índices son válidos
+            if (idMotoIndex != -1 && marcaIndex != -1 && modeloIndex != -1) {
+                val moto = Moto(
+                    idMoto = cursor.getInt(idMotoIndex),
+                    marca = cursor.getString(marcaIndex),
+                    modelo = cursor.getString(modeloIndex),
+                    anno = 0,
+                    matricula = "",
+                    cilindrada = "",
+                    cv = "",
+                    estilo = "",
+                    kms = 0,
+                    fechaCompra = "",
+                    colorMoto = "",
+                    esPrincipal = 0,
+                    fotoMoto = ""
+
+                )
+                cursor.close()
+                return moto
+            } else {
+                // Si alguna columna no se encuentra, manejar el error adecuadamente
+                Log.e("DatabaseError", "Una o más columnas no existen en el Cursor")
+            }
+        }
+        cursor.close()
+        return null
+    }
+
+    // Función para agregar una nueva moto a la base de datos
     fun agregarMoto(moto: Moto): Boolean {
-        val db = this.writableDatabase
-        val values = ContentValues().apply {
+        val db = writableDatabase
+        val contentValues = ContentValues().apply {
             put("marca", moto.marca)
             put("modelo", moto.modelo)
             put("anno", moto.anno)
@@ -156,78 +252,10 @@ class TorqueDatabaseHelper(private val context: Context) :
             put("estilo", moto.estilo)
             put("kms", moto.kms)
             put("fechaCompra", moto.fechaCompra)
-            put("esPrincipal", moto.esPrincipal)
-            put("fotoMoto", moto.fotoMoto)
+            put("esPrincipal", moto.esPrincipal) // Si estás agregando una moto principal
         }
-        val result = db.insert("MiGaraje", null, values)
+        val result = db.insert("MiGaraje", null, contentValues)
         return result != -1L
-    }
-
-    // Método para eliminar una moto
-    fun eliminarMoto(idMoto: String): Boolean {
-        val db = this.writableDatabase
-        val result = db.delete(
-            "MiGaraje", "idMoto = ?", arrayOf(idMoto)
-        )
-        return result > 0
-    }
-
-    // Método para hacer principal una moto
-    fun hacerPrincipal(idMoto: String): Boolean {
-        val db = writableDatabase
-        return try {
-            db.beginTransaction()
-
-            // Desmarcar todas las motos
-            db.execSQL("UPDATE MiGaraje SET esPrincipal = 0")
-
-            // Marcar esta moto como principal
-            db.execSQL("UPDATE MiGaraje SET esPrincipal = 1 WHERE idMoto = ?", arrayOf(idMoto))
-
-            db.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        } finally {
-            db.endTransaction()
-        }
-    }
-
-    // Método para obtener la moto principal
-    fun obtenerMotoPrincipal(): Moto? {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM MiGaraje WHERE esPrincipal = 1 LIMIT 1", null)
-        return if (cursor.moveToFirst()) {
-            val moto = Moto(
-                idMoto = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto")),
-                marca = cursor.getString(cursor.getColumnIndexOrThrow("marca"))
-                    ?: "Marca desconocida", // Valor por defecto si es null
-                modelo = cursor.getString(cursor.getColumnIndexOrThrow("modelo"))
-                    ?: "Modelo desconocido", // Valor por defecto si es null
-                anno = cursor.getInt(cursor.getColumnIndexOrThrow("anno")),
-                matricula = cursor.getString(cursor.getColumnIndexOrThrow("matricula"))
-                    ?: "Matrícula desconocida", // Valor por defecto si es null
-                colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("colorMoto"))
-                    ?: "Color desconocido", // Valor por defecto si es null
-                cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("cilindrada"))
-                    ?: "Cilindrada desconocida", // Valor por defecto si es null
-                cv = cursor.getInt(cursor.getColumnIndexOrThrow("cv")),
-                estilo = cursor.getString(cursor.getColumnIndexOrThrow("estilo"))
-                    ?: "Estilo desconocido", // Valor por defecto si es null
-                kms = cursor.getInt(cursor.getColumnIndexOrThrow("kms")),
-                fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("fechaCompra"))
-                    ?: "Fecha desconocida", // Valor por defecto si es null
-                esPrincipal = 1,
-                fotoMoto = cursor.getString(cursor.getColumnIndexOrThrow("fotoMoto"))
-                    ?: "" // Valor por defecto si es null
-            )
-            cursor.close()
-            moto
-        } else {
-            cursor.close()
-            null
-        }
     }
 
 
@@ -235,63 +263,4 @@ class TorqueDatabaseHelper(private val context: Context) :
         // Abre la base de datos y copia desde assets si no existe
         abrirBaseDeDatos()
     }
-
-    fun getRealPathFromUri(context: Context, uri: Uri): String? {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = context.contentResolver.query(uri, projection, null, null, null)
-        return cursor?.use {
-            val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            it.moveToFirst()
-            it.getString(columnIndex)
-        }
-    }
-
-    fun insertarFotoMoto(idMoto: Int, ruta: String): Boolean {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put("idMoto", idMoto)
-            put("rutaFoto", ruta)
-        }
-        val result = db.insert("fotosMoto", null, values)
-        return result != -1L
-    }
-
-    fun obtenerFotosDeMoto(idMoto: Int): List<String> {
-        val fotos = mutableListOf<String>()
-        val db = readableDatabase
-        val cursor: Cursor = db.query(
-            "FotosMoto", // Nombre de la tabla
-            arrayOf("fotosMoto"), // Columna fotosMoto
-            "idMoto = ?", // Condición WHERE
-            arrayOf(idMoto.toString()), // Convertir idMoto a String para consulta SQL
-            null, null, null
-        )
-
-        // Recorrer el cursor para obtener las fotos
-        if (cursor.moveToFirst()) {
-            do {
-                val foto = cursor.getString(cursor.getColumnIndex("fotosMoto"))
-                fotos.add(foto)
-            } while (cursor.moveToNext())
-        }
-
-        cursor.close()
-        return fotos
-    }
-
-
-    // Función para insertar una foto para una moto
-    fun insertarFoto(idMoto: Int, fotoRuta: String): Boolean {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put("idMoto", idMoto)
-            put("fotosMoto", fotoRuta) // Guardamos la ruta de la foto en fotosMoto
-        }
-
-        val result = db.insert("FotosMoto", null, values)
-        return result != -1L // Si la inserción fue exitosa, retornará un id de fila
-    }
 }
-
-
-
