@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import com.example.torque.garaje.Moto
 import java.io.File
 import java.io.FileOutputStream
@@ -282,7 +283,31 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
         val result = db.insert("FotosMoto", null, values)
         return result != -1L // Si la inserción fue exitosa, retornará un id de fila
     }
+
+
+    fun copiarImagenEnCache(context: Context, uri: Uri): String? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                cursor.moveToFirst()
+                cursor.getString(nameIndex)
+            } ?: "imagen_moto_${System.currentTimeMillis()}.jpg"
+
+            val outputFile = File(context.cacheDir, fileName)
+            inputStream?.use { input ->
+                outputFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            outputFile.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 }
+
 
 
 

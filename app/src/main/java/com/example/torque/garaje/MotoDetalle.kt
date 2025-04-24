@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,13 +11,25 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -27,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.database.TorqueDatabaseHelper
-import java.io.File
+
 
 class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +77,7 @@ fun MotoDetalleView(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val ruta = copiarImagenEnCache(context, it)
+            val ruta = dbHelper.copiarImagenEnCache(context, it)
             if (ruta != null && moto != null) {
                 dbHelper.insertarFoto(moto.idMoto, ruta)
                 fotos.add(ruta)
@@ -77,36 +88,55 @@ fun MotoDetalleView(
         }
     }
 
+    // Contenedor principal
     Box(modifier = Modifier.fillMaxSize()) {
+        // Fondo con el drawable 'negrolinama'
         Image(
-            painter = painterResource(id = R.drawable.negroblue),
+            painter = painterResource(id = R.drawable.negrolinama), // Aquí se usa el fondo
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize() // Aseguramos que ocupe toda la pantalla
         )
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.03f))
+                .background(Color.Black.copy(alpha = 0.6f)) // Fondo oscuro para los detalles
         )
-
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
                 .padding(16.dp)
         ) {
             if (moto == null) {
                 Text("No se ha encontrado la moto.", color = Color.White)
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    // Marca y modelo al inicio como título
                     Text(
-                        "Detalles de la Moto",
+                        text = moto.marca,
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Text(
+                        text = moto.modelo,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Spacer(Modifier.height(16.dp)) // Espacio entre el título y los detalles
+
+                    // Título "Detalles de la moto"
+                    Text(
+                        text = "Detalles de la moto",
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.White
                     )
                     Spacer(Modifier.height(8.dp))
+
+                    // Detalles de la moto
                     Text("Marca: ${moto.marca}", color = Color.White)
                     Text("Modelo: ${moto.modelo}", color = Color.White)
                     Text("Año: ${moto.anno}", color = Color.White)
@@ -118,8 +148,8 @@ fun MotoDetalleView(
 
                     Spacer(Modifier.height(24.dp))
 
+                    // Botones de acción
                     Button(onClick = {
-                        // Se pasa el idMoto directamente como Int
                         val success = dbHelper.hacerPrincipal(moto.idMoto.toString())
                         Toast.makeText(
                             context,
@@ -131,11 +161,12 @@ fun MotoDetalleView(
                     }
 
                     Button(onClick = {
-                        // Se pasa el idMoto directamente como Int
                         val success = dbHelper.eliminarMoto(moto.idMoto.toString())
                         if (success) {
                             Toast.makeText(
-                                context, "Moto eliminada correctamente", Toast.LENGTH_SHORT
+                                context,
+                                "Moto eliminada correctamente",
+                                Toast.LENGTH_SHORT
                             ).show()
                             activity.setResult(Activity.RESULT_OK)
                             activity.finish()
@@ -156,7 +187,8 @@ fun MotoDetalleView(
                     Spacer(Modifier.height(12.dp))
 
                     Button(
-                        onClick = { launcher.launch("image/*") }, modifier = Modifier.fillMaxWidth()
+                        onClick = { launcher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Añadir Foto")
                     }
@@ -181,28 +213,5 @@ fun MotoDetalleView(
                 }
             }
         }
-    }
-}
-
-// Copia la imagen en cache local para su uso interno
-fun copiarImagenEnCache(context: Context, uri: Uri): String? {
-    return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            cursor.getString(nameIndex)
-        } ?: "imagen_moto_${System.currentTimeMillis()}.jpg"
-
-        val outputFile = File(context.cacheDir, fileName)
-        inputStream?.use { input ->
-            outputFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-        outputFile.absolutePath
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
     }
 }

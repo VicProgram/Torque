@@ -45,4 +45,6 @@ fun guardarMantenimiento(context: Context, m: MantenimientoDetalle) {
     // Insertar los valores en la tabla Mantenimientos
     db.insert("Mantenimientos", null, values)
     db.close()  // Cerrar la base de datos
+
 }
+
