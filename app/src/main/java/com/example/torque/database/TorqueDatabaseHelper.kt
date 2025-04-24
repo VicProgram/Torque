@@ -7,16 +7,15 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.net.Uri
 import android.provider.MediaStore
-import android.provider.OpenableColumns
 import com.example.torque.garaje.Moto
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque.db", null, 2) {
+class TorqueDatabaseHelper(private val context: Context) :
+    SQLiteOpenHelper(context, "torque.db", null, 2) {
 
-    private val context = context
     private val dbPath = context.applicationContext.getDatabasePath("torque.db").absolutePath
 
     // Método para copiar la base de datos desde assets
@@ -202,18 +201,26 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
         return if (cursor.moveToFirst()) {
             val moto = Moto(
                 idMoto = cursor.getInt(cursor.getColumnIndexOrThrow("idMoto")),
-                marca = cursor.getString(cursor.getColumnIndexOrThrow("marca")),
-                modelo = cursor.getString(cursor.getColumnIndexOrThrow("modelo")),
+                marca = cursor.getString(cursor.getColumnIndexOrThrow("marca"))
+                    ?: "Marca desconocida", // Valor por defecto si es null
+                modelo = cursor.getString(cursor.getColumnIndexOrThrow("modelo"))
+                    ?: "Modelo desconocido", // Valor por defecto si es null
                 anno = cursor.getInt(cursor.getColumnIndexOrThrow("anno")),
-                matricula = cursor.getString(cursor.getColumnIndexOrThrow("matricula")),
-                colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("colorMoto")),
-                cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("cilindrada")),
+                matricula = cursor.getString(cursor.getColumnIndexOrThrow("matricula"))
+                    ?: "Matrícula desconocida", // Valor por defecto si es null
+                colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("colorMoto"))
+                    ?: "Color desconocido", // Valor por defecto si es null
+                cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("cilindrada"))
+                    ?: "Cilindrada desconocida", // Valor por defecto si es null
                 cv = cursor.getInt(cursor.getColumnIndexOrThrow("cv")),
-                estilo = cursor.getString(cursor.getColumnIndexOrThrow("estilo")),
+                estilo = cursor.getString(cursor.getColumnIndexOrThrow("estilo"))
+                    ?: "Estilo desconocido", // Valor por defecto si es null
                 kms = cursor.getInt(cursor.getColumnIndexOrThrow("kms")),
-                fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("fechaCompra")),
+                fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("fechaCompra"))
+                    ?: "Fecha desconocida", // Valor por defecto si es null
                 esPrincipal = 1,
                 fotoMoto = cursor.getString(cursor.getColumnIndexOrThrow("fotoMoto"))
+                    ?: "" // Valor por defecto si es null
             )
             cursor.close()
             moto
@@ -222,6 +229,7 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
             null
         }
     }
+
 
     init {
         // Abre la base de datos y copia desde assets si no existe
@@ -283,31 +291,7 @@ class TorqueDatabaseHelper(context: Context) : SQLiteOpenHelper(context, "torque
         val result = db.insert("FotosMoto", null, values)
         return result != -1L // Si la inserción fue exitosa, retornará un id de fila
     }
-
-
-    fun copiarImagenEnCache(context: Context, uri: Uri): String? {
-        return try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                cursor.moveToFirst()
-                cursor.getString(nameIndex)
-            } ?: "imagen_moto_${System.currentTimeMillis()}.jpg"
-
-            val outputFile = File(context.cacheDir, fileName)
-            inputStream?.use { input ->
-                outputFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-            outputFile.absolutePath
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
 }
-
 
 
 

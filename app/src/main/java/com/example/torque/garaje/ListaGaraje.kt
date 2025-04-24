@@ -3,7 +3,9 @@ package com.example.torque.garaje
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +45,7 @@ class ListaGaraje : ComponentActivity() {
         }
     }
 }
-
+/*
 @Composable
 fun ListaGarajeView() {
     val context = LocalContext.current
@@ -108,6 +110,91 @@ fun ListaGarajeView() {
                 onClick = {
                     val intent = Intent(context, AgregarMoto::class.java)
                     context.startActivity(intent)
+                }
+            )
+        }
+    }
+}
+*/
+
+@Composable
+fun ListaGarajeView() {
+    val context = LocalContext.current
+    val dbHelper = remember { TorqueDatabaseHelper(context) }
+    val motos = remember { mutableStateListOf<Moto>() }
+
+    // Función para recargar la lista
+    fun recargarMotos() {
+        motos.clear()
+        motos.addAll(dbHelper.obtenerMotos())
+    }
+
+    // Launcher que se activa cuando volvés de AgregarMoto o MotoDetalle
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        // Al volver, recargamos la lista
+        recargarMotos()
+    }
+
+    // Se ejecuta al crear la vista por primera vez
+    LaunchedEffect(Unit) {
+        recargarMotos()
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Imagen de fondo
+        Image(
+            painter = painterResource(id = R.drawable.negroblue),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Capa oscura encima de la imagen
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.03f))
+        )
+
+        // Lista de motos
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 150.dp, bottom = 100.dp)
+        ) {
+            items(motos.size) { i ->
+                val moto = motos[i]
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    BotonCuadrado(
+                        texto = "${moto.marca} ${moto.modelo}",
+                        onClick = {
+                            val intent = Intent(context, MotoDetalle::class.java)
+                            intent.putExtra("idMoto", moto.idMoto)
+                            launcher.launch(intent)
+                        },
+                        modifier = Modifier.width(150.dp)
+                    )
+                }
+            }
+        }
+
+        // Botón "Nueva Moto" abajo centrado
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            BotonLargo(
+                modifier = Modifier.fillMaxWidth(0.8f),
+                texto = "Nueva Moto",
+                onClick = {
+                    val intent = Intent(context, AgregarMoto::class.java)
+                    launcher.launch(intent)
                 }
             )
         }
