@@ -75,7 +75,7 @@ fun AgregarMotoView() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.negroblue),
+            painter = painterResource(id = R.drawable.negrobluevert),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()

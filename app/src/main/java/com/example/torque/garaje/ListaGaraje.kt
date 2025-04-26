@@ -145,7 +145,7 @@ fun ListaGarajeView() {
     Box(modifier = Modifier.fillMaxSize()) {
         // Imagen de fondo
         Image(
-            painter = painterResource(id = R.drawable.negroblue),
+            painter = painterResource(id = R.drawable.negrobluevert),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -186,7 +186,7 @@ fun ListaGarajeView() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 32.dp),
+                .padding(bottom = 100.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             BotonLargo(

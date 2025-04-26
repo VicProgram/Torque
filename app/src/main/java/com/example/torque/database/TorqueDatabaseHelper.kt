@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import com.example.torque.Usuario
 import com.example.torque.garaje.Moto
 import java.io.File
 import java.io.FileOutputStream
@@ -17,7 +18,7 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     private val dbPath = context.applicationContext.getDatabasePath("torque.db").absolutePath
 
-
+    //--------------------------MOTOS-------------------------------------------
     private fun copiarBaseDeDatos() {
         val dbFile = File(dbPath)
         if (!dbFile.exists()) {
@@ -47,9 +48,6 @@ class TorqueDatabaseHelper(private val context: Context) :
         }
     }
 
-    override fun onCreate(db: SQLiteDatabase) {
-        // No crear nada si copiamos la base de datos desde assets
-    }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // Aquí puedes poner la lógica para migrar la base de datos si es necesario.
@@ -263,4 +261,105 @@ class TorqueDatabaseHelper(private val context: Context) :
         // Abre la base de datos y copia desde assets si no existe
         abrirBaseDeDatos()
     }
+
+
+    //--------------------------USUARIOS-------------------------------------------
+    override fun onCreate(db: SQLiteDatabase?) {
+        // No crear nada si copiamos la base de datos desde assets
+    }
+
+    companion object {
+        private const val TABLE_USUARIOS = "Usuarios" // Nombre de la tabla de usuarios
+        private const val COLUMN_ID_USUARIO = "idUsuario" // Columna para el ID del usuario
+        private const val COLUMN_NOMBRE_USUARIO = "nombre"
+        private const val COLUMN_EMAIL_USUARIO = "email"
+        private const val COLUMN_PASSWORD_HASH_USUARIO = "passwordHash"
+    }
+
+    // Insertar un nuevo usuario
+    // Insertar un nuevo usuario (SIN HASHING - SOLO PARA DESARROLLO)
+    fun insertarUsuario(
+        nombre: String,
+        email: String,
+        password: String // Cambiamos passwordHash a password
+    ): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_NOMBRE_USUARIO, nombre)
+            put(COLUMN_EMAIL_USUARIO, email)
+            put(COLUMN_PASSWORD_HASH_USUARIO, password) // Guardamos la contraseña directamente
+        }
+        return db.insert(TABLE_USUARIOS, null, values)
+    }
+
+
+
+    // Obtener un usuario por su ID
+    fun obtenerUsuarioPorId(idUsuario: Int): Usuario? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_USUARIOS,
+            arrayOf(
+                COLUMN_ID_USUARIO,
+                COLUMN_NOMBRE_USUARIO,
+                COLUMN_EMAIL_USUARIO,
+                COLUMN_PASSWORD_HASH_USUARIO
+            ),
+            "$COLUMN_ID_USUARIO = ?",
+            arrayOf(idUsuario.toString()),
+            null, null, null
+        )
+
+        return cursor.use {
+            if (it.moveToFirst()) {
+                Usuario(
+                    idUsuario = it.getInt(it.getColumnIndexOrThrow(COLUMN_ID_USUARIO)),
+                    nombre = it.getString(it.getColumnIndexOrThrow(COLUMN_NOMBRE_USUARIO)),
+                    email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL_USUARIO)),
+                    passwordHash = it.getString(
+                        it.getColumnIndexOrThrow(
+                            COLUMN_PASSWORD_HASH_USUARIO
+                        )
+                    )
+                )
+            } else {
+                null
+            }
+        }
+    }
+
+
+    fun obtenerUsuarioPorCredencial(credencial: String): Usuario? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_USUARIOS,
+            arrayOf(
+                COLUMN_ID_USUARIO,
+                COLUMN_NOMBRE_USUARIO,
+                COLUMN_EMAIL_USUARIO,
+                COLUMN_PASSWORD_HASH_USUARIO
+            ),
+            "$COLUMN_EMAIL_USUARIO = ? OR $COLUMN_NOMBRE_USUARIO = ?",
+            arrayOf(credencial, credencial),
+            null, null, null
+        )
+
+        return cursor.use {
+            if (it.moveToFirst()) {
+                Usuario(
+                    idUsuario = it.getInt(it.getColumnIndexOrThrow(COLUMN_ID_USUARIO)),
+                    nombre = it.getString(it.getColumnIndexOrThrow(COLUMN_NOMBRE_USUARIO)),
+                    email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL_USUARIO)),
+                    passwordHash = it.getString(
+                        it.getColumnIndexOrThrow(
+                            COLUMN_PASSWORD_HASH_USUARIO
+                        )
+                    )
+                )
+            } else {
+                null
+            }
+        }
+    }
+
 }

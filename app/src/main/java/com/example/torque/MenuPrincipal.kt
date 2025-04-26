@@ -59,8 +59,7 @@ class MenuPrincipal : ComponentActivity() {
 @Composable
 fun MenuPrincipalView() {
     val context = LocalContext.current
-    val databaseHelper = TorqueDatabaseHelper(context)
-
+    val databaseHelper = remember { TorqueDatabaseHelper(context) }
     // Estado que contiene la moto principal visible en la UI
     var motoPrincipal by remember { mutableStateOf<Moto?>(null) }
 

@@ -1,14 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.torque">
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/iconoapp"
+        android:icon="@mipmap/ic_launcher"
         android:label="Torque"
         android:theme="@style/Theme.TorqueLight">
 
-        <!-- Actividad principal (Menú Principal) -->
-        <activity android:name=".MenuPrincipal"
+        <activity
+            android:name=".Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,20 +17,20 @@
             </intent-filter>
         </activity>
 
-        <!-- Actividad de Configuración -->
+        <activity
+            android:name=".MenuPrincipal"
+            android:exported="false" />
+
         <activity android:name=".configuracion.Configuracion" />
 
-        <!-- Actividad de Mantenimiento -->
         <activity android:name=".mantenimientos.Mantenimiento" />
-        <activity android:name=".mantenimientos.MantenimientoPreview"/>
+        <activity android:name=".mantenimientos.MantenimientoPreview" />
         <activity android:name=".mantenimientos.MantenimientoHistorial" />
-        <!-- Actividad de Garaje -->
+
         <activity android:name=".garaje.MotoDetalle" />
         <activity android:name=".garaje.AgregarMoto" />
         <activity android:name=".garaje.BorrarMoto" />
         <activity android:name=".garaje.ListaGaraje" />
-
-
 
     </application>
 </manifest>
