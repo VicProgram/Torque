@@ -274,6 +274,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         private const val COLUMN_NOMBRE_USUARIO = "nombre"
         private const val COLUMN_EMAIL_USUARIO = "email"
         private const val COLUMN_PASSWORD_HASH_USUARIO = "passwordHash"
+        private const val COLUMN_FOTO_PERFIL_USUARIO = "fotoPerfil"
     }
 
     // Insertar un nuevo usuario
@@ -287,46 +288,12 @@ class TorqueDatabaseHelper(private val context: Context) :
         val values = ContentValues().apply {
             put(COLUMN_NOMBRE_USUARIO, nombre)
             put(COLUMN_EMAIL_USUARIO, email)
-            put(COLUMN_PASSWORD_HASH_USUARIO, password) // Guardamos la contraseña directamente
+            put(COLUMN_PASSWORD_HASH_USUARIO, password)
+            put(COLUMN_FOTO_PERFIL_USUARIO, "")
         }
         return db.insert(TABLE_USUARIOS, null, values)
     }
 
-
-
-    // Obtener un usuario por su ID
-    fun obtenerUsuarioPorId(idUsuario: Int): Usuario? {
-        val db = readableDatabase
-        val cursor = db.query(
-            TABLE_USUARIOS,
-            arrayOf(
-                COLUMN_ID_USUARIO,
-                COLUMN_NOMBRE_USUARIO,
-                COLUMN_EMAIL_USUARIO,
-                COLUMN_PASSWORD_HASH_USUARIO
-            ),
-            "$COLUMN_ID_USUARIO = ?",
-            arrayOf(idUsuario.toString()),
-            null, null, null
-        )
-
-        return cursor.use {
-            if (it.moveToFirst()) {
-                Usuario(
-                    idUsuario = it.getInt(it.getColumnIndexOrThrow(COLUMN_ID_USUARIO)),
-                    nombre = it.getString(it.getColumnIndexOrThrow(COLUMN_NOMBRE_USUARIO)),
-                    email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL_USUARIO)),
-                    passwordHash = it.getString(
-                        it.getColumnIndexOrThrow(
-                            COLUMN_PASSWORD_HASH_USUARIO
-                        )
-                    )
-                )
-            } else {
-                null
-            }
-        }
-    }
 
 
     fun obtenerUsuarioPorCredencial(credencial: String): Usuario? {
@@ -337,7 +304,9 @@ class TorqueDatabaseHelper(private val context: Context) :
                 COLUMN_ID_USUARIO,
                 COLUMN_NOMBRE_USUARIO,
                 COLUMN_EMAIL_USUARIO,
-                COLUMN_PASSWORD_HASH_USUARIO
+                COLUMN_PASSWORD_HASH_USUARIO,
+                COLUMN_FOTO_PERFIL_USUARIO
+
             ),
             "$COLUMN_EMAIL_USUARIO = ? OR $COLUMN_NOMBRE_USUARIO = ?",
             arrayOf(credencial, credencial),
@@ -347,6 +316,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         return cursor.use {
             if (it.moveToFirst()) {
                 Usuario(
+
                     idUsuario = it.getInt(it.getColumnIndexOrThrow(COLUMN_ID_USUARIO)),
                     nombre = it.getString(it.getColumnIndexOrThrow(COLUMN_NOMBRE_USUARIO)),
                     email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL_USUARIO)),
@@ -360,6 +330,29 @@ class TorqueDatabaseHelper(private val context: Context) :
                 null
             }
         }
+    }
+    fun obtenerUsuarioPorId(userId: Int): Usuario? {
+        val db = readableDatabase
+        var usuario: Usuario? = null
+        val cursor = db.query(
+            TABLE_USUARIOS,
+            arrayOf(COLUMN_ID_USUARIO, COLUMN_NOMBRE_USUARIO, COLUMN_EMAIL_USUARIO, COLUMN_FOTO_PERFIL_USUARIO),
+            "$COLUMN_ID_USUARIO = ?",
+            arrayOf(userId.toString()),
+            null, null, null
+        )
+
+        cursor.use {
+            if (it.moveToFirst()) {
+                val id = it.getInt(it.getColumnIndexOrThrow(COLUMN_ID_USUARIO))
+                val nombre = it.getString(it.getColumnIndexOrThrow(COLUMN_NOMBRE_USUARIO))
+                val email = it.getString(it.getColumnIndexOrThrow(COLUMN_EMAIL_USUARIO))
+                val fotoPerfil = it.getString(it.getColumnIndexOrThrow(COLUMN_FOTO_PERFIL_USUARIO))
+                usuario = Usuario(id, nombre, email, fotoPerfil)
+            }
+        }
+        db.close()
+        return usuario
     }
 
 }

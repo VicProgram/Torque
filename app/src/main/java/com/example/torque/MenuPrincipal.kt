@@ -43,6 +43,7 @@ import com.example.torque.mantenimientos.MantenimientoPreview
 import com.example.torque.ui.theme.BotonLargo
 import com.example.torque.ui.theme.TorqueTheme
 import com.example.torque.ui.theme.pepperoni
+import com.example.torque.usuarios.PerfilUsuario
 
 class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -150,6 +151,18 @@ fun MenuPrincipalView() {
                     .padding(bottom = 16.dp),
                 texto = "Mantenimientos"
             )
+
+            BotonLargo( // Nuevo botón para el perfil
+                onClick = {
+                    val intent = Intent(context, PerfilUsuario()::class.java)
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                texto = "Mi Perfil"
+            )
+
             motoPrincipal?.let {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
