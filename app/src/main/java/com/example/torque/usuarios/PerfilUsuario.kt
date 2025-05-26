@@ -92,8 +92,7 @@ fun PerfilView(usuario: Usuario?) {
                 FilaInfoPerfil(etiqueta = "Correo Electrónico:", valor = usuario.email)
             } else {
                 Text(
-                    text = "No se encontraron datos del usuario.",
-                    color = Color.Red
+                    text = "No se encontraron datos del usuario.", color = Color.Red
                 )
             }
         }

@@ -18,7 +18,7 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     private val dbPath = context.applicationContext.getDatabasePath("torque.db").absolutePath
 
-    //--------------------------MOTOS-------------------------------------------
+    //--------------------------MOTOS-------------------------------------------//
     private fun copiarBaseDeDatos() {
         val dbFile = File(dbPath)
         if (!dbFile.exists()) {

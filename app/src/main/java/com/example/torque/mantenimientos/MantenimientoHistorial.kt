@@ -1,5 +1,6 @@
 package com.example.torque.mantenimientos
 
+import com.example.torque.ui.theme.TorqueTheme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.torque.ui.theme.TorqueTheme
 
 data class MantenimientoRealizado(
     val nombre: String,

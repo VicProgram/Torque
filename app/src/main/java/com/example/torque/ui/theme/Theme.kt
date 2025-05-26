@@ -1,15 +1,43 @@
 package com.example.torque.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
-// Paleta personalizada con negros, amarillos y azules
+val TorqueTypography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    ), titleLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ), labelSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+)
+
+// Paleta de colores personalizada
 val Black = Color(0xFF000000)
 val DarkGray = Color(0xFF1A1A1A)
 val Yellow = Color(0xFFFFC107)
@@ -19,7 +47,7 @@ val Blue = Color(0xFF2196F3)
 val DarkBlue = Color(0xFF1976D2)
 val LightBlue = Color(0xFFBBDEFB)
 
-private val ColoresOscuros = darkColorScheme(
+private val DarkColorScheme = darkColorScheme(
     primary = Yellow,
     secondary = Blue,
     tertiary = LightBlue,
@@ -32,7 +60,7 @@ private val ColoresOscuros = darkColorScheme(
     onSurface = Color.White
 )
 
-private val ColoresClaros = lightColorScheme(
+private val LightColorScheme = lightColorScheme(
     primary = DarkBlue,
     secondary = DarkYellow,
     tertiary = LightYellow,
@@ -45,22 +73,24 @@ private val ColoresClaros = lightColorScheme(
     onSurface = Black
 )
 
+val Shapes = Shapes(
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp)
+)
+
 @Composable
 fun TorqueTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Desactiva dynamicColor para usar siempre tu paleta
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) ColoresOscuros else ColoresClaros
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography(), // Aquí puedes aplicar tu tipografía si ya la tienes
-        shapes = Shapes(
-            small = RoundedCornerShape(8.dp),
-            medium = RoundedCornerShape(16.dp),
-            large = RoundedCornerShape(24.dp)
-        ),
+        typography = TorqueTypography,
+        shapes = Shapes,
         content = content
     )
 }

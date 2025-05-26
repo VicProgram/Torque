@@ -1,5 +1,6 @@
 package com.example.torque.garaje
 
+import com.example.torque.ui.theme.TorqueTheme
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,7 +33,6 @@ import com.example.torque.R
 import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.BotonCuadrado
 import com.example.torque.ui.theme.BotonLargo
-import com.example.torque.ui.theme.TorqueTheme
 
 class ListaGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
