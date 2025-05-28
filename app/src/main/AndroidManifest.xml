@@ -21,7 +21,6 @@
             android:name=".MenuPrincipal"
             android:exported="false" />
 
-        <activity android:name=".configuracion.Configuracion" />
 
         <activity android:name=".mantenimientos.Mantenimiento" />
         <activity android:name=".mantenimientos.MantenimientoPreview" />
@@ -31,7 +30,7 @@
         <activity android:name=".garaje.AgregarMoto" />
         <activity android:name=".garaje.BorrarMoto" />
         <activity android:name=".garaje.ListaGaraje" />
-    <activity android:name=".usuarios.PerfilUsuario"/>
+        <activity android:name=".usuarios.PerfilUsuario" />
 
     </application>
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.torque.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
@@ -165,6 +166,7 @@ class TorqueDatabaseHelper(private val context: Context) :
     }
 
 
+    @SuppressLint("Range")
     fun obtenerFotosDeMoto(idMoto: Int): List<String> {
         val fotos = mutableListOf<String>()
         val db = readableDatabase

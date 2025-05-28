@@ -1,7 +1,7 @@
 <resources>
     <style name="Theme.TorqueLight" parent="@android:style/Theme.Light.NoTitleBar">
 
-    <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
     </style>
 </resources>
