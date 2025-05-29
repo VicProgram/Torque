@@ -75,7 +75,7 @@ fun ButtonMantenimiento() {
 }
 
 @Composable
-fun MaintenanceItemCard(item: MaintenanceItem) {
+fun MantenimientoItemCard(item: MaintenanceItem) {
 
     //val context = LocalContext.current
     var checked by remember { mutableStateOf(false) }
