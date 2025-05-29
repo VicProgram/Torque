@@ -151,11 +151,32 @@ class TorqueDatabaseHelper(private val context: Context) :
     // Función para hacer una moto principal
     fun hacerPrincipal(idMoto: String): Boolean {
         val db = writableDatabase
-        val contentValues = ContentValues().apply {
-            put("esPrincipal", true)
+        var success = false
+
+        db.beginTransaction() // Inicia una transacción para asegurar que ambos pasos se completen o ninguno
+        try {
+            // 1. Desmarcar todas las motos como "principal"
+            val desmarcarValues = ContentValues().apply {
+                put("esPrincipal", false)
+            }
+            db.update("MiGaraje", desmarcarValues, null, null) // Actualiza todas las filas
+
+            // 2. Marcar la moto seleccionada como "principal"
+            val marcarValues = ContentValues().apply {
+                put("esPrincipal", true)
+            }
+            val result = db.update("MiGaraje", marcarValues, "idMoto = ?", arrayOf(idMoto))
+
+            if (result > 0) {
+                success = true
+                db.setTransactionSuccessful() // Marca la transacción como exitosa
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.endTransaction() // Finaliza la transacción
         }
-        val result = db.update("MiGaraje", contentValues, "idMoto = ?", arrayOf(idMoto))
-        return result > 0
+        return success
     }
 
     // Función para eliminar moto

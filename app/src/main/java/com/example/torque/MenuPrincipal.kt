@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.torque.configuracion.Configuracion
 import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.garaje.ListaGaraje
 import com.example.torque.garaje.Moto
@@ -128,17 +127,6 @@ fun MenuPrincipalView() {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 texto = "Mi Garaje"
-            )
-
-            BotonLargo(
-                onClick = {
-                    val intent = Intent(context, Configuracion::class.java)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                texto = "Configuración"
             )
 
             BotonLargo(
