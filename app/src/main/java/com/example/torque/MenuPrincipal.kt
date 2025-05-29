@@ -84,6 +84,7 @@ fun MenuPrincipalView() {
         }
     }
 
+
     // También cargamos una vez al principio por si es la primera vez que se entra
     LaunchedEffect(Unit) {
         motoPrincipal = databaseHelper.obtenerMotoPrincipal()
