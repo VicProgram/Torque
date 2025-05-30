@@ -61,7 +61,7 @@ dependencies {
     // Revisa la última versión aquí: https://developer.android.com/jetpack/compose/bom/bom-mapping
     // La versión 2025.05.01 es la más reciente ahora mismo (mayo 2025)
     implementation(platform("androidx.compose:compose-bom:2025.05.01"))
-
+    implementation ("androidx.compose.material3:material3:1.1.0")
 
     implementation("androidx.compose.material3:material3")
 

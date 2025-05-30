@@ -1,8 +1,6 @@
 package com.example.torque.database
 
-import android.content.ContentValues
 import android.content.Context
-import com.example.torque.mantenimientos.MantenimientoDetalle
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -25,26 +23,5 @@ fun copiarBaseDeDatos(context: Context) {
     } catch (e: IOException) {
         e.printStackTrace()
     }
-}
-
-// Función para guardar un mantenimiento en la base de datos
-fun guardarMantenimiento(context: Context, m: MantenimientoDetalle) {
-    val dbHelper = TorqueDatabaseHelper(context)  // Crear instancia de TorqueDatabaseHelper
-    val db = dbHelper.writableDatabase  // Obtener writableDatabase de la instancia
-
-    val values = ContentValues().apply {
-        put("idMoto", m.idMoto)  // Agregar el idMoto
-        put("nombre", m.nombreMantenimiento)  // Agregar el nombre del mantenimiento
-        put("km", m.km)  // Agregar los kilómetros
-        put("precio", m.precio)  // Agregar el precio
-        put("tiempo", m.tiempo)  // Agregar el tiempo de servicio
-        put("notas", m.notas)  // Agregar las notas
-        put("fecha", m.fecha)  // Agregar la fecha del mantenimiento
-    }
-
-    // Insertar los valores en la tabla Mantenimientos
-    db.insert("Mantenimientos", null, values)
-    db.close()  // Cerrar la base de datos
-
 }
 

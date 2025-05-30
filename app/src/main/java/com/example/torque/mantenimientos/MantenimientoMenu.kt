@@ -1,6 +1,5 @@
 package com.example.torque.mantenimientos
 
-import com.example.torque.ui.theme.TorqueTheme
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.torque.R
 import com.example.torque.ui.theme.SquareButton
+import com.example.torque.ui.theme.TorqueTheme
 
 
 class MantenimientoPreview : ComponentActivity() {

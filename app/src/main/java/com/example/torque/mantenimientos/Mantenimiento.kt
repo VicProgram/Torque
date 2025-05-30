@@ -1,19 +1,33 @@
 package com.example.torque.mantenimientos
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,14 +41,14 @@ class Mantenimiento : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
-                MaintenanceColumn()
+                MaintenanceScreen()
             }
         }
     }
 }
 
 @Composable
-fun MaintenanceColumn() {
+fun MaintenanceScreen() {
     val motorItems = listOf(
         MaintenanceItem("Cambio de aceite"),
         MaintenanceItem("Cambio filtro aceite"),
@@ -88,8 +102,8 @@ fun MaintenanceColumn() {
         "Otros" to otrosItems
     )
 
-    // Estado centralizado para recordar qué ítems están marcados
     val checkedItems = remember { mutableStateMapOf<String, Boolean>() }
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -110,7 +124,7 @@ fun MaintenanceColumn() {
                 modifier = Modifier
                     .weight(1f)
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(30.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 secciones.forEach { (titulo, lista) ->
                     item {
@@ -135,9 +149,12 @@ fun MaintenanceColumn() {
 
             Button(
                 onClick = {
-                    val seleccionados = checkedItems.filterValues { it }.keys
-                    // Aquí puedes guardar en BD, mostrar un Toast, navegar, etc.
-                    println("Seleccionados: $seleccionados")
+                    val seleccionados = checkedItems.filterValues { it }.keys.toList()
+                    if (seleccionados.isNotEmpty()) {
+                        val intent = Intent(context, MantenimientoFormulario::class.java)
+                        intent.putStringArrayListExtra("seleccionados", ArrayList(seleccionados))
+                        context.startActivity(intent)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,7 +165,6 @@ fun MaintenanceColumn() {
         }
     }
 }
-
 
 @Composable
 fun MaintenanceItemCard(
@@ -162,27 +178,21 @@ fun MaintenanceItemCard(
             .background(Color.Cyan.copy(alpha = 0.25f), shape = MaterialTheme.shapes.medium)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically  // <-- Aquí está la clave
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = name,
             color = Color.White,
             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp)
         )
-        Box(
-            modifier = Modifier
-                .background(Color.White.copy(alpha = 0.2f), shape = MaterialTheme.shapes.small)
-                .padding(4.dp)
-        ) {
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = onCheckedChange,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = Color(0xFF4CAF50),
-                    uncheckedColor = Color.LightGray,
-                    checkmarkColor = Color.Black
-                )
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = Color(0xFF4CAF50),
+                uncheckedColor = Color.LightGray,
+                checkmarkColor = Color.Black
             )
-        }
+        )
     }
 }

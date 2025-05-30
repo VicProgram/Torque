@@ -1,6 +1,5 @@
 package com.example.torque.database
 
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
@@ -9,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.example.torque.Usuario
 import com.example.torque.garaje.Moto
+import com.example.torque.mantenimientos.MantenimientoDetalle
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -19,7 +19,7 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     private val dbPath = context.applicationContext.getDatabasePath("torque.db").absolutePath
 
-    //--------------------------MOTOS-------------------------------------------//
+    //--------------------------BASEDEDATOS-------------------------------------------//
     private fun copiarBaseDeDatos() {
         val dbFile = File(dbPath)
         if (!dbFile.exists()) {
@@ -53,6 +53,7 @@ class TorqueDatabaseHelper(private val context: Context) :
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // Aquí puedes poner la lógica para migrar la base de datos si es necesario.
     }
+    //--------------------------MOTOS-------------------------------------------
 
     // Obtener todas las motos de la base de datos
     fun obtenerMotos(): List<Moto> {
@@ -108,8 +109,8 @@ class TorqueDatabaseHelper(private val context: Context) :
             val anno = cursor.getInt(cursor.getColumnIndexOrThrow("anno"))
             val matricula = cursor.getString(cursor.getColumnIndexOrThrow("matricula"))
             val colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("colorMoto"))
-            cursor.getString(cursor.getColumnIndexOrThrow("cilindrada"))
-            cursor.getInt(cursor.getColumnIndexOrThrow("cv"))
+            val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("cilindrada"))
+            val cv = cursor.getInt(cursor.getColumnIndexOrThrow("cv"))
             val estilo = cursor.getString(cursor.getColumnIndexOrThrow("estilo"))
             val kms = cursor.getInt(cursor.getColumnIndexOrThrow("kms"))
             val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("fechaCompra"))
@@ -151,33 +152,28 @@ class TorqueDatabaseHelper(private val context: Context) :
     // Función para hacer una moto principal
     fun hacerPrincipal(idMoto: String): Boolean {
         val db = writableDatabase
-        var success = false
 
-        db.beginTransaction() // Inicia una transacción para asegurar que ambos pasos se completen o ninguno
-        try {
-            // 1. Desmarcar todas las motos como "principal"
-            val desmarcarValues = ContentValues().apply {
+        db.beginTransaction()
+        return try {
+            // Primero, desmarcar todas las motos como principal
+            val contentValuesFalse = ContentValues().apply {
                 put("esPrincipal", false)
             }
-            db.update("MiGaraje", desmarcarValues, null, null) // Actualiza todas las filas
+            db.update("MiGaraje", contentValuesFalse, null, null)
 
-            // 2. Marcar la moto seleccionada como "principal"
-            val marcarValues = ContentValues().apply {
+            // Luego marcar solo la moto con idMoto como principal
+            val contentValuesTrue = ContentValues().apply {
                 put("esPrincipal", true)
             }
-            val result = db.update("MiGaraje", marcarValues, "idMoto = ?", arrayOf(idMoto))
+            val result = db.update("MiGaraje", contentValuesTrue, "idMoto = ?", arrayOf(idMoto))
 
-            if (result > 0) {
-                success = true
-                db.setTransactionSuccessful() // Marca la transacción como exitosa
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            db.setTransactionSuccessful()
+            result > 0
         } finally {
-            db.endTransaction() // Finaliza la transacción
+            db.endTransaction()
         }
-        return success
     }
+
 
     // Función para eliminar moto
     fun eliminarMoto(idMoto: String): Boolean {
@@ -187,7 +183,6 @@ class TorqueDatabaseHelper(private val context: Context) :
     }
 
 
-    @SuppressLint("Range")
     fun obtenerFotosDeMoto(idMoto: Int): List<String> {
         val fotos = mutableListOf<String>()
         val db = readableDatabase
@@ -300,8 +295,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         private const val COLUMN_FOTO_PERFIL_USUARIO = "fotoPerfil"
     }
 
-    // Insertar un nuevo usuario
-    // Insertar un nuevo usuario (SIN HASHING - SOLO PARA DESARROLLO)
+
     fun insertarUsuario(
         nombre: String,
         email: String,
@@ -377,5 +371,58 @@ class TorqueDatabaseHelper(private val context: Context) :
         db.close()
         return usuario
     }
+
+    //--------------------------Mantenimientos-------------------------------------------
+
+    fun insertarMantenimiento(detalle: MantenimientoDetalle): Long {
+        val db = writableDatabase
+        val cv = ContentValues().apply {
+            put("name", detalle.nombreMantenimiento)
+            put("date", detalle.date)
+            put("kilometers", detalle.kilometers)
+            put("marca", detalle.marca)
+            put("modelo", detalle.modelo)
+            put("precio", detalle.precio)
+        }
+        return db.insert("mantenimiento", null, cv)
+    }
+
+    fun obtenerMantenimientos(): List<MantenimientoDetalle> {
+        val lista = mutableListOf<MantenimientoDetalle>()
+        val db = readableDatabase
+        val cursor = db.query(
+            "Mantenimientos",  // nombre tabla
+            null,  // columnas (null = todas)
+            null, null, null, null,
+            "date DESC" // orden por fecha descendente, opcional
+        )
+
+        with(cursor) {
+            while (moveToNext()) {
+                val id = getInt(getColumnIndexOrThrow("id"))
+                val nombre = getString(getColumnIndexOrThrow("nombreMantenimiento"))
+                val date = getString(getColumnIndexOrThrow("date"))
+                val kilometers = if (!isNull(getColumnIndexOrThrow("kilometers"))) getInt(getColumnIndexOrThrow("kilometers")) else null
+                val marca = getString(getColumnIndexOrThrow("marca"))
+                val modelo = getString(getColumnIndexOrThrow("modelo"))
+                val precio = getString(getColumnIndexOrThrow("precio"))
+
+                lista.add(
+                    MantenimientoDetalle(
+                        mantenimientoId = id,
+                        nombreMantenimiento = nombre,
+                        date = date,
+                        kilometers = kilometers,
+                        marca = marca,
+                        modelo = modelo,
+                        precio = precio
+                    )
+                )
+            }
+        }
+        cursor.close()
+        return lista
+    }
+
 
 }
