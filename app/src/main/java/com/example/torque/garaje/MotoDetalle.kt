@@ -2,6 +2,7 @@ package com.example.torque.garaje
 
 import android.app.Activity
 import android.content.Context
+import android.icu.text.ListFormatter
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -13,13 +14,28 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,7 +71,7 @@ fun MotoDetalleView(
     moto: Moto?, dbHelper: TorqueDatabaseHelper, context: Context, activity: Activity
 ) {
     val fotos = remember { mutableStateListOf<String>() }
-    var selectedPhoto by remember { mutableStateOf<String?>(null) } // Para mantener la foto seleccionada
+    var selectedPhoto by remember { mutableStateOf<String?>(null) }
 
     // Cargar fotos desde la base de datos
     LaunchedEffect(moto?.idMoto) {
@@ -87,76 +103,119 @@ fun MotoDetalleView(
             painter = painterResource(id = R.drawable.negrolinama),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()  // Ocupa toda la pantalla
+            modifier = Modifier.fillMaxSize()
         )
 
-        // Fondo oscuro semitransparente solo para los elementos (textos, botones)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.6f)) // Este es el fondo oscuro
-                .padding(16.dp) // Esto asegura que haya espacio entre el borde y los elementos
+                .background(Color.Black.copy(alpha = 0.6f))
+                .padding(16.dp)
         ) {
             if (moto == null) {
-                Text("No se ha encontrado la moto.", color = Color.White)
+                Text(
+                    text = "No se ha encontrado la moto.",
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             } else {
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start,
+                ) {
+
                     Text(
-                        "Detalles de la Moto",
+                        text = "Detalles de la Moto",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = Color.White
+                        color = Color.White,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text("Marca: ${moto.marca}", color = Color.White)
-                    Text("Modelo: ${moto.modelo}", color = Color.White)
-                    Text("Año: ${moto.anno}", color = Color.White)
-                    Text("Matrícula: ${moto.matricula}", color = Color.White)
-                    Text("Color: ${moto.colorMoto}", color = Color.White)
-                    Text("Cilindrada: ${moto.cilindrada}", color = Color.White)
-                    Text("CV: ${moto.cv}", color = Color.White)
-                    Text("Estilo: ${moto.estilo}", color = Color.White)
+
+                    Box(
+                        modifier = Modifier
+                            .background(Color.White.copy(alpha = 0.02f))
+                            .padding(8.dp)
+                    ) {
+                        Column { // Un Column dentro del Box para organizar los detalles
+                            val detalles = listOf(
+                                "Marca" to moto.marca,
+                                "Modelo" to moto.modelo,
+                                "Año" to moto.anno,
+                                "Matrícula" to moto.matricula,
+                                "Color" to moto.colorMoto,
+                                "Cilindrada" to moto.cilindrada,
+                                "CV" to moto.cv,
+                                "Estilo" to moto.estilo
+                            )
+                            detalles.forEach { (etiqueta, valor) ->
+                                Text(
+                                    text = "$etiqueta: $valor",
+                                    color = Color.White, // Cambia el color del texto para que contraste con el fondo
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
 
                     Spacer(Modifier.height(24.dp))
 
-                    Button(onClick = {
-                        val success = dbHelper.hacerPrincipal(moto.idMoto.toString())
-                        Toast.makeText(
-                            context,
-                            if (success) "Moto establecida como principal" else "Error al establecer como principal",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }) {
-                        Text("Establecer como principal")
-                    }
-
-                    Button(onClick = {
-                        val success = dbHelper.eliminarMoto(moto.idMoto.toString())
-                        if (success) {
+                    Button(
+                        onClick = {
+                            val success = dbHelper.hacerPrincipal(moto.idMoto.toString())
                             Toast.makeText(
-                                context, "Moto eliminada correctamente", Toast.LENGTH_SHORT
+                                context,
+                                if (success) "Moto establecida como principal" else "Error al establecer como principal",
+                                Toast.LENGTH_SHORT
                             ).show()
-                            activity.setResult(Activity.RESULT_OK)
-                            activity.finish()
-                        } else {
-                            Toast.makeText(context, "Error al eliminar la moto", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Eliminar Moto")
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Button(onClick = { activity.finish() }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Volver")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Establecer como principal")
                     }
 
                     Spacer(Modifier.height(12.dp))
 
                     Button(
-                        onClick = { launcher.launch("image/*") }, modifier = Modifier.fillMaxWidth()
+                        onClick = {
+                            val success = dbHelper.eliminarMoto(moto.idMoto.toString())
+                            if (success) {
+                                Toast.makeText(
+                                    context, "Moto eliminada correctamente", Toast.LENGTH_SHORT
+                                ).show()
+                                activity.setResult(Activity.RESULT_OK)
+                                activity.finish()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Error al eliminar la moto",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Eliminar Moto")
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { launcher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Añadir Foto")
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Button(
+                        onClick = { activity.finish() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Volver")
                     }
 
                     Spacer(Modifier.height(16.dp))
@@ -175,8 +234,7 @@ fun MotoDetalleView(
                                             detectTapGestures(
                                                 onLongPress = {
                                                     selectedPhoto = ruta
-                                                    showDeleteButton =
-                                                        true // Mostrar el botón de eliminar en la pulsación larga
+                                                    showDeleteButton = true
                                                 })
                                         }) {
                                     Image(
@@ -186,11 +244,9 @@ fun MotoDetalleView(
                                         modifier = Modifier.fillMaxSize()
                                     )
 
-                                    // Mostrar el botón de eliminar solo si showDeleteButton es verdadero
                                     if (showDeleteButton) {
                                         Button(
                                             onClick = {
-                                                // Eliminar foto
                                                 dbHelper.eliminarFoto(moto.idMoto, ruta)
                                                 fotos.remove(ruta)
                                                 showDeleteButton = false
@@ -224,7 +280,6 @@ fun copiarImagenPermanente(context: Context, uri: Uri): String? {
             cursor.getString(nameIndex)
         } ?: "imagen_moto_${System.currentTimeMillis()}.jpg"
 
-        // Guardar la imagen en el directorio de archivos internos de la app
         val outputFile = File(context.filesDir, fileName)
         inputStream?.use { input ->
             outputFile.outputStream().use { output ->
@@ -237,4 +292,3 @@ fun copiarImagenPermanente(context: Context, uri: Uri): String? {
         null
     }
 }
-

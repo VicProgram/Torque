@@ -3,157 +3,95 @@ package com.example.torque.mantenimientos
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.torque.R
-import com.example.torque.ui.theme.MantenimientoItemCard
 import com.example.torque.ui.theme.TorqueTheme
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
-data class MaintenanceItem(
-    val id: Int,
-    val name: String,
-    var isChecked: Boolean = false
-)
-
-class MaintenanceViewModel : ViewModel() {
-
-    private val _sections = MutableStateFlow<List<Pair<String, List<MaintenanceItem>>>>(emptyList())
-    val sections: StateFlow<List<Pair<String, List<MaintenanceItem>>>> = _sections
-
-    init {
-        loadMaintenanceItems()
-    }
-
-    private fun loadMaintenanceItems() {
-        viewModelScope.launch {
-            val motorItems = listOf(
-                MaintenanceItem(101, "Cambio de aceite", isChecked = false),
-                MaintenanceItem(102, "Cambio filtro aceite", isChecked = true),
-                MaintenanceItem(103, "Cambio filtro aire"),
-                MaintenanceItem(104, "Cambio filtro de combustible"),
-                MaintenanceItem(105, "Cambio de bujías"),
-                MaintenanceItem(106, "Revisión líquido refrigerante")
-            )
-
-            val ruedasFrenosItems = listOf(
-                MaintenanceItem(201, "Neumático delantero"),
-                MaintenanceItem(202, "Neumático trasero"),
-                MaintenanceItem(203, "Pastillas delanteras"),
-                MaintenanceItem(204, "Pastillas traseras"),
-                MaintenanceItem(205, "Cambio líquido frenos"),
-                MaintenanceItem(206, "Presión neumáticos al guardar")
-            )
-
-            val transmisionItems = listOf(
-                MaintenanceItem(301, "Engrase de cadena"),
-                MaintenanceItem(302, "Tensión de cadena"),
-                MaintenanceItem(303, "Cambio de kit de arrastre")
-            )
-
-            val electricoItems = listOf(
-                MaintenanceItem(401, "Luces posición"),
-                MaintenanceItem(402, "Luces carretera"),
-                MaintenanceItem(403, "Luces largo alcance"),
-                MaintenanceItem(404, "Luces intermitentes"),
-                MaintenanceItem(405, "Batería"),
-                MaintenanceItem(406, "Revisión fusibles"),
-                MaintenanceItem(407, "Revisión cableado eléctrico")
-            )
-
-            val otrosItems = listOf(
-                MaintenanceItem(501, "Acelerador"),
-                MaintenanceItem(502, "Revisión Manetas"),
-                MaintenanceItem(503, "Ajuste manetas de freno y embrague"),
-                MaintenanceItem(504, "Revisión tornillería general"),
-                MaintenanceItem(505, "Suspensión"),
-                MaintenanceItem(506, "Preparación para invierno"),
-                MaintenanceItem(507, "Revisión post-invierno"),
-                MaintenanceItem(508, "Cuidado durante periodos de inactividad")
-            )
-
-            val initialSections = listOf(
-                "Motor" to motorItems,
-                "Ruedas y Frenos" to ruedasFrenosItems,
-                "Transmisión" to transmisionItems,
-                "Sistema Eléctrico" to electricoItems,
-                "Otros" to otrosItems
-            )
-            _sections.value = initialSections
-        }
-    }
-
-    fun onMaintenanceItemCheckedChange(itemId: Int, isChecked: Boolean) {
-        val updatedSections = _sections.value.map { (title, items) ->
-            title to items.map { item ->
-                if (item.id == itemId) {
-                    item.copy(isChecked = isChecked)
-                } else {
-                    item
-                }
-            }
-        }
-        _sections.value = updatedSections
-    }
-
-    fun saveMaintenanceState() {
-        viewModelScope.launch {
-            _sections.value.forEach { (_, items) ->
-                items.forEach { item ->
-                    println("Guardando estado de ${item.name} (ID: ${item.id}): ${item.isChecked}")
-                }
-            }
-            println("Estado de mantenimiento guardado (simulado).")
-        }
-    }
-}
+data class MaintenanceItem(val name: String)
 
 class Mantenimiento : ComponentActivity() {
-
-    private val maintenanceViewModel: MaintenanceViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             TorqueTheme {
-                MaintenanceColumn(maintenanceViewModel = maintenanceViewModel)
+                MaintenanceColumn()
             }
         }
     }
 }
 
 @Composable
-fun MaintenanceColumn(maintenanceViewModel: MaintenanceViewModel) {
+fun MaintenanceColumn() {
+    val motorItems = listOf(
+        MaintenanceItem("Cambio de aceite"),
+        MaintenanceItem("Cambio filtro aceite"),
+        MaintenanceItem("Cambio filtro aire"),
+        MaintenanceItem("Cambio filtro de combustible"),
+        MaintenanceItem("Cambio de bujías"),
+        MaintenanceItem("Revisión líquido refrigerante")
+    )
 
-    val secciones by maintenanceViewModel.sections.collectAsState()
+    val ruedasFrenosItems = listOf(
+        MaintenanceItem("Neumático delantero"),
+        MaintenanceItem("Neumático trasero"),
+        MaintenanceItem("Pastillas delanteras"),
+        MaintenanceItem("Pastillas traseras"),
+        MaintenanceItem("Cambio líquido frenos"),
+        MaintenanceItem("Presión neumáticos al guardar")
+    )
+
+    val transmisionItems = listOf(
+        MaintenanceItem("Engrase de cadena"),
+        MaintenanceItem("Tensión de cadena"),
+        MaintenanceItem("Cambio de kit de arrastre")
+    )
+
+    val electricoItems = listOf(
+        MaintenanceItem("Luces posición"),
+        MaintenanceItem("Luces carretera"),
+        MaintenanceItem("Luces largo alcance"),
+        MaintenanceItem("Luces intermitentes"),
+        MaintenanceItem("Batería"),
+        MaintenanceItem("Revisión fusibles"),
+        MaintenanceItem("Revisión cableado eléctrico")
+    )
+
+    val otrosItems = listOf(
+        MaintenanceItem("Acelerador"),
+        MaintenanceItem("Revisión Manetas"),
+        MaintenanceItem("Ajuste manetas de freno y embrague"),
+        MaintenanceItem("Revisión tornillería general"),
+        MaintenanceItem("Suspensión"),
+        MaintenanceItem("Preparación para invierno"),
+        MaintenanceItem("Revisión post-invierno"),
+        MaintenanceItem("Cuidado durante periodos de inactividad")
+    )
+
+    val secciones = listOf(
+        "Motor" to motorItems,
+        "Ruedas y Frenos" to ruedasFrenosItems,
+        "Transmisión" to transmisionItems,
+        "Sistema Eléctrico" to electricoItems,
+        "Otros" to otrosItems
+    )
+
+    // Estado centralizado para recordar qué ítems están marcados
+    val checkedItems = remember { mutableStateMapOf<String, Boolean>() }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         Image(
             painter = painterResource(id = R.drawable.fondomanwebp),
             contentDescription = null,
@@ -182,11 +120,13 @@ fun MaintenanceColumn(maintenanceViewModel: MaintenanceViewModel) {
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
-                    items(lista, key = { it.id }) { item ->
-                        MantenimientoItemCard(
-                            item = item,
-                            onCheckedChange = { isChecked ->
-                                maintenanceViewModel.onMaintenanceItemCheckedChange(item.id, isChecked)
+                    items(lista) { item ->
+                        val isChecked = checkedItems[item.name] ?: false
+                        MaintenanceItemCard(
+                            name = item.name,
+                            isChecked = isChecked,
+                            onCheckedChange = { checked ->
+                                checkedItems[item.name] = checked
                             }
                         )
                     }
@@ -194,13 +134,55 @@ fun MaintenanceColumn(maintenanceViewModel: MaintenanceViewModel) {
             }
 
             Button(
-                onClick = { maintenanceViewModel.saveMaintenanceState() },
+                onClick = {
+                    val seleccionados = checkedItems.filterValues { it }.keys
+                    // Aquí puedes guardar en BD, mostrar un Toast, navegar, etc.
+                    println("Seleccionados: $seleccionados")
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text("Guardar Mantenimientos")
+                Text("Guardar Mantenimiento")
             }
+        }
+    }
+}
+
+
+@Composable
+fun MaintenanceItemCard(
+    name: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Cyan.copy(alpha = 0.25f), shape = MaterialTheme.shapes.medium)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically  // <-- Aquí está la clave
+    ) {
+        Text(
+            text = name,
+            color = Color.White,
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp)
+        )
+        Box(
+            modifier = Modifier
+                .background(Color.White.copy(alpha = 0.2f), shape = MaterialTheme.shapes.small)
+                .padding(4.dp)
+        ) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = onCheckedChange,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFF4CAF50),
+                    uncheckedColor = Color.LightGray,
+                    checkmarkColor = Color.Black
+                )
+            )
         }
     }
 }

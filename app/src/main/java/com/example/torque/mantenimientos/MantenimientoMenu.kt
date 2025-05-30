@@ -43,17 +43,14 @@ fun SeleccionMantenimientoScreen(
     onVerHistorial: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.negrovertiama),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-
-        // Fila centrada
         Row(
-            modifier = Modifier.align(Alignment.Center), // <--- Esto centra la fila en el Box
+            modifier = Modifier.align(Alignment.Center),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
