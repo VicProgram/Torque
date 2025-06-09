@@ -1,118 +1,118 @@
 package com.example.torque.mantenimientos
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.torque.database.TorqueDatabaseHelper
-import com.example.torque.ui.theme.TorqueTheme
 import java.text.SimpleDateFormat
-import java.util.*
-
-
+import java.util.Date
+import java.util.Locale
 
 class MantenimientoFormulario : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val seleccionados = intent.getStringArrayListExtra("seleccionados") ?: arrayListOf()
+
         setContent {
-            TorqueTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    MantenimientoFormularioScreen(onGuardar = { mantenimiento ->
-                        val dbHelper = TorqueDatabaseHelper(this)
-                        dbHelper.insertarMantenimiento(mantenimiento)
-                        finish()
-                    })
-                }
-            }
+            MantenimientoFormularioScreen(seleccionados)
         }
     }
 }
 
 @Composable
-fun MantenimientoFormularioScreen(
-    onGuardar: (MantenimientoDetalle) -> Unit
-) {
-    var nombreMantenimiento by remember { mutableStateOf("") }
-    var marca by remember { mutableStateOf("") }
-    var modelo by remember { mutableStateOf("") }
-    var precio by remember { mutableStateOf("") }
+fun MantenimientoFormularioScreen(seleccionados: List<String>) {
+    val context = LocalContext.current
+    val dbHelper = remember { TorqueDatabaseHelper(context) }
 
-    val fecha = obtenerFechaActual()
+    var marca by remember { mutableStateOf(TextFieldValue("")) }
+    var modelo by remember { mutableStateOf(TextFieldValue("")) }
+    var anno by remember { mutableStateOf(TextFieldValue("")) }
+    var km by remember { mutableStateOf(TextFieldValue("")) }
+    var precio by remember { mutableStateOf(TextFieldValue("")) }
+    var tiempo by remember { mutableStateOf(TextFieldValue("")) }
+    var notas by remember { mutableStateOf(TextFieldValue("")) }
+
+    val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .padding(16.dp)
-            .fillMaxWidth()
+            .background(Color.Black.copy(alpha = 0.1f)),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(text = "Formulario de Mantenimiento", style = MaterialTheme.typography.headlineSmall)
+        Text("Formulario de Mantenimiento", style = MaterialTheme.typography.headlineSmall)
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = nombreMantenimiento,
-            onValueChange = { nombreMantenimiento = it },
-            label = { Text("Nombre del mantenimiento") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = marca,
-            onValueChange = { marca = it },
-            label = { Text("Marca") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = modelo,
-            onValueChange = { modelo = it },
-            label = { Text("Modelo") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = precio,
-            onValueChange = { precio = it },
-            label = { Text("Precio") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        CustomTextField("Marca", marca) { marca = it }
+        CustomTextField("Modelo", modelo) { modelo = it }
+        CustomTextField("Año", anno) { anno = it }
+        CustomTextField("Kilómetros", km) { km = it }
+        CustomTextField("Precio", precio) { precio = it }
+        CustomTextField("Tiempo invertido", tiempo) { tiempo = it }
+        CustomTextField("Notas", notas) { notas = it }
 
         Button(
             onClick = {
-                if (nombreMantenimiento.isNotBlank()) {
-                    val mantenimiento = MantenimientoDetalle(
-                        marca = marca,
-                        modelo = modelo,
-                        precio = precio,
-                        date = fecha,
-                        kilometers = null,
-                        mantenimientoId = 0,
-                        nombreMantenimiento = nombreMantenimiento
-                    )
-                    onGuardar(mantenimiento)
-                }
+                val mantenimiento = MantenimientoDetalle(
+                    nombreMantenimiento = "Mantenimiento",
+                    date = fechaActual,
+                    kilometers = km.text.toIntOrNull(),
+                    marca = marca.text,
+                    modelo = modelo.text,
+                    anno = anno.text.toIntOrNull(),
+                    precio = precio.text,
+                    tiempo = tiempo.text,
+                    notas = notas.text,
+                    tareas = seleccionados.joinToString(", ")
+                )
+
+                dbHelper.insertarMantenimiento(mantenimiento)
+                Toast.makeText(context, "Mantenimiento guardado", Toast.LENGTH_SHORT).show()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Guardar")
+            Text("Guardar Mantenimiento")
         }
     }
 }
 
-fun obtenerFechaActual(): String {
-    val fecha = Calendar.getInstance().time
-    val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    return formato.format(fecha)
+@Composable
+fun CustomTextField(
+    label: String,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit
+) {
+    Column {
+        Text(text = label, style = MaterialTheme.typography.labelMedium)
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, MaterialTheme.shapes.small)
+                .padding(10.dp)
+        )
+    }
 }

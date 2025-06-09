@@ -23,8 +23,11 @@
 
 
         <activity android:name=".mantenimientos.Mantenimiento" />
+        <activity android:name=".mantenimientos.MantenimientoFormulario" />
         <activity android:name=".mantenimientos.MantenimientoPreview" />
         <activity android:name=".mantenimientos.MantenimientoHistorial" />
+        <activity android:name="com.example.torque.mantenimientos.MantenimientoDetalleActivity" />
+
 
         <activity android:name=".garaje.MotoDetalle" />
         <activity android:name=".garaje.AgregarMoto" />

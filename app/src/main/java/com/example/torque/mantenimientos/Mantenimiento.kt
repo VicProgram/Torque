@@ -135,7 +135,7 @@ fun MaintenanceScreen() {
                         )
                     }
                     items(lista) { item ->
-                        val isChecked = checkedItems[item.name] ?: false
+                        val isChecked = checkedItems[item.name] == true
                         MaintenanceItemCard(
                             name = item.name,
                             isChecked = isChecked,
@@ -149,6 +149,8 @@ fun MaintenanceScreen() {
 
             Button(
                 onClick = {
+
+
                     val seleccionados = checkedItems.filterValues { it }.keys.toList()
                     if (seleccionados.isNotEmpty()) {
                         val intent = Intent(context, MantenimientoFormulario::class.java)

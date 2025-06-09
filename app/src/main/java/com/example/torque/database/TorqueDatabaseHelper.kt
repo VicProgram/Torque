@@ -109,8 +109,8 @@ class TorqueDatabaseHelper(private val context: Context) :
             val anno = cursor.getInt(cursor.getColumnIndexOrThrow("anno"))
             val matricula = cursor.getString(cursor.getColumnIndexOrThrow("matricula"))
             val colorMoto = cursor.getString(cursor.getColumnIndexOrThrow("colorMoto"))
-            val cilindrada = cursor.getString(cursor.getColumnIndexOrThrow("cilindrada"))
-            val cv = cursor.getInt(cursor.getColumnIndexOrThrow("cv"))
+            cursor.getString(cursor.getColumnIndexOrThrow("cilindrada"))
+            cursor.getInt(cursor.getColumnIndexOrThrow("cv"))
             val estilo = cursor.getString(cursor.getColumnIndexOrThrow("estilo"))
             val kms = cursor.getInt(cursor.getColumnIndexOrThrow("kms"))
             val fechaCompra = cursor.getString(cursor.getColumnIndexOrThrow("fechaCompra"))
@@ -312,7 +312,6 @@ class TorqueDatabaseHelper(private val context: Context) :
     }
 
 
-
     fun obtenerUsuarioPorCredencial(credencial: String): Usuario? {
         val db = readableDatabase
         val cursor = db.query(
@@ -348,12 +347,18 @@ class TorqueDatabaseHelper(private val context: Context) :
             }
         }
     }
+
     fun obtenerUsuarioPorId(userId: Int): Usuario? {
         val db = readableDatabase
         var usuario: Usuario? = null
         val cursor = db.query(
             TABLE_USUARIOS,
-            arrayOf(COLUMN_ID_USUARIO, COLUMN_NOMBRE_USUARIO, COLUMN_EMAIL_USUARIO, COLUMN_FOTO_PERFIL_USUARIO),
+            arrayOf(
+                COLUMN_ID_USUARIO,
+                COLUMN_NOMBRE_USUARIO,
+                COLUMN_EMAIL_USUARIO,
+                COLUMN_FOTO_PERFIL_USUARIO
+            ),
             "$COLUMN_ID_USUARIO = ?",
             arrayOf(userId.toString()),
             null, null, null
@@ -374,55 +379,77 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     //--------------------------Mantenimientos-------------------------------------------
 
-    fun insertarMantenimiento(detalle: MantenimientoDetalle): Long {
+    fun insertarMantenimiento(m: MantenimientoDetalle) {
         val db = writableDatabase
-        val cv = ContentValues().apply {
-            put("name", detalle.nombreMantenimiento)
-            put("date", detalle.date)
-            put("kilometers", detalle.kilometers)
-            put("marca", detalle.marca)
-            put("modelo", detalle.modelo)
-            put("precio", detalle.precio)
+        val values = ContentValues().apply {
+            put("nombreMantenimiento", m.nombreMantenimiento)
+            put("date", m.date)
+            put("kilometers", m.kilometers)
+            put("marca", m.marca)
+            put("modelo", m.modelo)
+            put("anno", m.anno)
+            put("precio", m.precio)
+            put("tiempo", m.tiempo)
+            put("notas", m.notas)
+            put("tareas", m.tareas)
         }
-        return db.insert("mantenimiento", null, cv)
+        db.insert("Mantenimientos", null, values)
     }
+
 
     fun obtenerMantenimientos(): List<MantenimientoDetalle> {
         val lista = mutableListOf<MantenimientoDetalle>()
         val db = readableDatabase
-        val cursor = db.query(
-            "Mantenimientos",  // nombre tabla
-            null,  // columnas (null = todas)
-            null, null, null, null,
-            "date DESC" // orden por fecha descendente, opcional
-        )
-
-        with(cursor) {
-            while (moveToNext()) {
-                val id = getInt(getColumnIndexOrThrow("id"))
-                val nombre = getString(getColumnIndexOrThrow("nombreMantenimiento"))
-                val date = getString(getColumnIndexOrThrow("date"))
-                val kilometers = if (!isNull(getColumnIndexOrThrow("kilometers"))) getInt(getColumnIndexOrThrow("kilometers")) else null
-                val marca = getString(getColumnIndexOrThrow("marca"))
-                val modelo = getString(getColumnIndexOrThrow("modelo"))
-                val precio = getString(getColumnIndexOrThrow("precio"))
+        val cursor = db.rawQuery("SELECT * FROM Mantenimientos", null)
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow("mantenimientoId"))
+                val nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombreMantenimiento"))
+                val fecha = cursor.getString(cursor.getColumnIndexOrThrow("date"))
+                val km = cursor.getInt(cursor.getColumnIndexOrThrow("kilometers"))
+                val marca = cursor.getString(cursor.getColumnIndexOrThrow("marca"))
+                val modelo = cursor.getString(cursor.getColumnIndexOrThrow("modelo"))
+                val anno = cursor.getInt(cursor.getColumnIndexOrThrow("anno"))
+                val precio = cursor.getString(cursor.getColumnIndexOrThrow("precio"))
+                val tiempo = cursor.getString(cursor.getColumnIndexOrThrow("tiempo"))
+                val notas = cursor.getString(cursor.getColumnIndexOrThrow("notas"))
+                val tareas = cursor.getString(cursor.getColumnIndexOrThrow("tareas"))
 
                 lista.add(
                     MantenimientoDetalle(
                         mantenimientoId = id,
                         nombreMantenimiento = nombre,
-                        date = date,
-                        kilometers = kilometers,
+                        date = fecha,
+                        kilometers = km,
                         marca = marca,
                         modelo = modelo,
-                        precio = precio
+                        anno = anno,
+                        precio = precio,
+                        tiempo = tiempo,
+                        notas = notas,
+                        tareas = tareas
                     )
                 )
-            }
+            } while (cursor.moveToNext())
         }
         cursor.close()
         return lista
     }
 
+    fun Cursor.getStringOrNull(columnName: String): String? =
+        if (isNull(getColumnIndexOrThrow(columnName))) null else getString(
+            getColumnIndexOrThrow(
+                columnName
+            )
+        )
+
+    fun Cursor.getIntOrNull(columnName: String): Int? =
+        if (isNull(getColumnIndexOrThrow(columnName))) null else getInt(
+            getColumnIndexOrThrow(
+                columnName
+            )
+        )
 
 }
+
+
