@@ -21,8 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
+import com.example.torque.components.SectionHeader
+import com.example.torque.components.TorqueTextField
 import com.example.torque.database.TorqueDatabaseHelper
 
 class AgregarMoto : ComponentActivity() {
@@ -81,12 +81,6 @@ fun AgregarMotoView() {
             modifier = Modifier.fillMaxSize()
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.03f))
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,64 +88,22 @@ fun AgregarMotoView() {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Añadir Moto", style = MaterialTheme.typography.titleLarge)
+            SectionHeader("Añadir Moto")
 
-            OutlinedTextField(
-                value = marca,
-                onValueChange = { marca = it },
-                label = { Text("Marca") }
-            )
-            OutlinedTextField(
-                value = modelo,
-                onValueChange = { modelo = it },
-                label = { Text("Modelo") }
-            )
-            OutlinedTextField(
-                value = anno,
-                onValueChange = { anno = it },
-                label = { Text("Año") }
-            )
-            OutlinedTextField(
-                value = matricula,
-                onValueChange = { matricula = it },
-                label = { Text("Matrícula") }
-            )
-            OutlinedTextField(
-                value = colorMoto,
-                onValueChange = { colorMoto = it },
-                label = { Text("Color") }
-            )
-            OutlinedTextField(
-                value = cilindrada,
-                onValueChange = { cilindrada = it },
-                label = { Text("Cilindrada") }
-            )
-            OutlinedTextField(
-                value = cv,
-                onValueChange = { cv = it },
-                label = { Text("CV") }
-            )
-            OutlinedTextField(
-                value = estilo,
-                onValueChange = { estilo = it },
-                label = { Text("Estilo") }
-            )
-            OutlinedTextField(
-                value = kms,
-                onValueChange = { kms = it },
-                label = { Text("Kms") }
-            )
-            OutlinedTextField(
-                value = fechaCompra,
-                onValueChange = { fechaCompra = it },
-                label = { Text("Fecha Compra") }
-            )
+            TorqueTextField(marca, { marca = it }, "Marca")
+            TorqueTextField(modelo, { modelo = it }, "Modelo")
+            TorqueTextField(anno, { anno = it }, "Año")
+            TorqueTextField(matricula, { matricula = it }, "Matrícula")
+            TorqueTextField(colorMoto, { colorMoto = it }, "Color")
+            TorqueTextField(cilindrada, { cilindrada = it }, "Cilindrada")
+            TorqueTextField(cv, { cv = it }, "CV")
+            TorqueTextField(estilo, { estilo = it }, "Estilo")
+            TorqueTextField(kms, { kms = it }, "Kms")
+            TorqueTextField(fechaCompra, { fechaCompra = it }, "Fecha Compra")
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Button(onClick = {
-                imagePickerLauncher.launch("image/*")
-            }) {
+            Button(onClick = { imagePickerLauncher.launch("image/*") }) {
                 Text("Seleccionar Foto")
             }
 
@@ -189,8 +141,7 @@ fun AgregarMotoView() {
                 )
                 val success = dbHelper.agregarMoto(moto)
                 if (success) {
-                    Toast.makeText(context, "Moto guardada correctamente", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(context, "Moto guardada correctamente", Toast.LENGTH_SHORT).show()
                     (context as Activity).apply {
                         setResult(Activity.RESULT_OK)
                         finish()
@@ -201,7 +152,6 @@ fun AgregarMotoView() {
             }) {
                 Text("Guardar Moto")
             }
-
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
