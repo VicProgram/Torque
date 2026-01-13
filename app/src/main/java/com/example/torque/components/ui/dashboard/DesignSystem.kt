@@ -50,38 +50,34 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.ui.theme.*
 
-// --- Colors from HTML Designs (MD3 Dark + MotoKeep Accents) ---
+// Object para acceder a los colores desde otros archivos
 object TorqueColors {
-    val Primary = Color(0xFF135BEC) // Brand Primary
-    val Accent = Color(0xFFFF6B00)  // MotoKeep Orange Accent
-    val OnPrimary = Color(0xFFFFFFFF)
-    
-    // MD3 Palette
-    val PrimaryContainer = Color(0xFF4F378B)
-    val OnPrimaryContainer = Color(0xFFEADDFF)
-    val Secondary = Color(0xFFCCC2DC)
-    val OnSecondary = Color(0xFF332D41)
-    val SecondaryContainer = Color(0xFF4A4458)
-    val OnSecondaryContainer = Color(0xFFE8DEF8)
-    val Surface = Color(0xFF1C1B1F)
-    val OnSurface = Color(0xFFE6E1E5)
-    val SurfaceVariant = Color(0xFF49454F)
-    val OnSurfaceVariant = Color(0xFFCAC4D0)
-    val Outline = Color(0xFF938F99)
-    val Background = Color(0xFF101622) // MotoKeep Dark Background
-    val SurfaceDark = Color(0xFF1C2331) // MotoKeep Surface
-    val BorderDark = Color(0xFF2D3748)   // MotoKeep Border
-    
-    val Tertiary = Color(0xFFEFB8C8)
-    val OnTertiary = Color(0xFF492532)
-    val SurfaceContainerHigh = Color(0xFF2B2930)
-    val SurfaceContainer = Color(0xFF211F26)
-    val SurfaceContainerLow = Color(0xFF1D1B20)
-    
-    // Legacy / Utils
-    val Slate500 = Color(0xFF64748B)
-    val Slate900 = Color(0xFF0F172A)
+    val Primary = TorquePrimary
+    val Accent = TorqueAccent
+    val OnPrimary = TorqueOnPrimary
+    val PrimaryContainer = TorquePrimaryContainer
+    val OnPrimaryContainer = TorqueOnPrimaryContainer
+    val Secondary = TorqueSecondary
+    val OnSecondary = TorqueOnSecondary
+    val SecondaryContainer = TorqueSecondaryContainer
+    val OnSecondaryContainer = TorqueOnSecondaryContainer
+    val Surface = TorqueSurface
+    val OnSurface = TorqueOnSurface
+    val SurfaceVariant = TorqueSurfaceVariant
+    val OnSurfaceVariant = TorqueOnSurfaceVariant
+    val Outline = TorqueOutline
+    val Background = TorqueBackground
+    val SurfaceDark = TorqueSurfaceDark
+    val BorderDark = TorqueBorderDark
+    val Tertiary = TorqueTertiary
+    val OnTertiary = TorqueOnTertiary
+    val SurfaceContainerHigh = TorqueSurfaceContainerHigh
+    val SurfaceContainer = TorqueSurfaceContainer
+    val SurfaceContainerLow = TorqueSurfaceContainerLow
+    val Slate500 = TorqueSlate500
+    val Slate900 = TorqueSlate900
 }
 
 // --- Navigation & Utility ---
@@ -278,12 +274,12 @@ fun MotoKeepCheckItem(
         ) {
             Icon(icon, contentDescription = null, tint = iconColor)
         }
-        
+
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(text = description, color = TorqueColors.Slate500, fontSize = 12.sp)
         }
-        
+
         Checkbox(
             checked = isChecked,
             onCheckedChange = onCheckedChange,

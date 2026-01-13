@@ -2,39 +2,45 @@ package com.example.torque.database
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.torque.garage.Moto
 import com.example.torque.maintenance.MaintenanceDetail
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
 
 class TorqueDatabaseHelper(private val context: Context) :
-    SQLiteOpenHelper(context, "torque.db", null, 2) {
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-    private val dbPath = context.applicationContext.getDatabasePath("torque.db").absolutePath
+    companion object {
+        private const val DATABASE_NAME = "torque.db"
+        private const val DATABASE_VERSION = 2
+    }
+
+    private val dbPath = context.applicationContext.getDatabasePath(DATABASE_NAME).absolutePath
+
+    init {
+        openDatabase()
+    }
 
     private fun copyDatabase() {
         val dbFile = File(dbPath)
         if (!dbFile.exists()) {
             dbFile.parentFile?.mkdirs()
-            val inputStream: InputStream = context.assets.open("torque.db")
-            val outputStream: OutputStream = FileOutputStream(dbFile)
-            val buffer = ByteArray(1024)
-            var length: Int
-            while (inputStream.read(buffer).also { length = it } > 0) {
-                outputStream.write(buffer, 0, length)
+            context.assets.open(DATABASE_NAME).use { inputStream ->
+                FileOutputStream(dbFile).use { outputStream ->
+                    val buffer = ByteArray(1024)
+                    var length: Int
+                    while (inputStream.read(buffer).also { length = it } > 0) {
+                        outputStream.write(buffer, 0, length)
+                    }
+                    outputStream.flush()
+                }
             }
-            outputStream.flush()
-            outputStream.close()
-            inputStream.close()
         }
     }
 
-    fun openDatabase() {
+    private fun openDatabase() {
         if (!File(dbPath).exists()) {
             copyDatabase()
         }
@@ -43,6 +49,8 @@ class TorqueDatabaseHelper(private val context: Context) :
     override fun onCreate(db: SQLiteDatabase) {}
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {}
+
+    // ==================== MOTO OPERATIONS ====================
 
     fun getMotos(): List<Moto> {
         val list = mutableListOf<Moto>()
@@ -75,7 +83,7 @@ class TorqueDatabaseHelper(private val context: Context) :
     }
 
     fun getMotoById(idMoto: Int): Moto? {
-        val db = this.readableDatabase
+        val db = readableDatabase
         val cursor = db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
         return cursor.use {
             if (it.moveToFirst()) {
@@ -98,52 +106,6 @@ class TorqueDatabaseHelper(private val context: Context) :
         }
     }
 
-    fun insertPhoto(idMoto: Int, path: String): Boolean {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put("idMoto", idMoto)
-            put("rutaFoto", path)
-        }
-        return db.insert("FotosMoto", null, values) != -1L
-    }
-
-    fun setPrincipal(idMoto: String): Boolean {
-        val db = writableDatabase
-        db.beginTransaction()
-        return try {
-            db.update("MiGaraje", ContentValues().apply { put("esPrincipal", 0) }, null, null)
-            val result = db.update("MiGaraje", ContentValues().apply { put("esPrincipal", 1) }, "idMoto = ?", arrayOf(idMoto))
-            db.setTransactionSuccessful()
-            result > 0
-        } finally {
-            db.endTransaction()
-        }
-    }
-
-    fun deleteMoto(idMoto: String): Boolean {
-        val db = writableDatabase
-        return db.delete("MiGaraje", "idMoto = ?", arrayOf(idMoto)) > 0
-    }
-
-    fun getPhotosByMotoId(idMoto: Int): List<String> {
-        val photos = mutableListOf<String>()
-        val db = readableDatabase
-        val cursor = db.query("FotosMoto", arrayOf("rutaFoto"), "idMoto = ?", arrayOf(idMoto.toString()), null, null, null)
-        cursor.use {
-            if (it.moveToFirst()) {
-                do {
-                    photos.add(it.getString(it.getColumnIndexOrThrow("rutaFoto")))
-                } while (it.moveToNext())
-            }
-        }
-        return photos
-    }
-
-    fun deletePhoto(idMoto: Int, path: String): Boolean {
-        val db = writableDatabase
-        return db.delete("FotosMoto", "idMoto = ? AND rutaFoto = ?", arrayOf(idMoto.toString(), path)) > 0
-    }
-
     fun addMoto(moto: Moto): Boolean {
         val db = writableDatabase
         val values = ContentValues().apply {
@@ -162,26 +124,74 @@ class TorqueDatabaseHelper(private val context: Context) :
         return db.insert("MiGaraje", null, values) != -1L
     }
 
-    init {
-        openDatabase()
+    fun deleteMoto(idMoto: Int): Boolean {
+        val db = writableDatabase
+        return db.delete("MiGaraje", "idMoto = ?", arrayOf(idMoto.toString())) > 0
     }
 
-    fun insertMaintenance(m: MaintenanceDetail) {
+    fun setPrincipal(idMoto: Int): Boolean {
+        val db = writableDatabase
+        db.beginTransaction()
+        return try {
+            // Remove principal from all motos
+            db.update("MiGaraje", ContentValues().apply { put("esPrincipal", 0) }, null, null)
+            // Set new principal
+            val result = db.update(
+                "MiGaraje",
+                ContentValues().apply { put("esPrincipal", 1) },
+                "idMoto = ?",
+                arrayOf(idMoto.toString())
+            )
+            db.setTransactionSuccessful()
+            result > 0
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    // ==================== PHOTO OPERATIONS ====================
+
+    fun getPhotosByMotoId(idMoto: Int): List<String> {
+        val photos = mutableListOf<String>()
+        val db = readableDatabase
+        val cursor = db.query(
+            "FotosMoto",
+            arrayOf("rutaFoto"),
+            "idMoto = ?",
+            arrayOf(idMoto.toString()),
+            null,
+            null,
+            null
+        )
+        cursor.use {
+            if (it.moveToFirst()) {
+                do {
+                    photos.add(it.getString(it.getColumnIndexOrThrow("rutaFoto")))
+                } while (it.moveToNext())
+            }
+        }
+        return photos
+    }
+
+    fun insertPhoto(idMoto: Int, path: String): Boolean {
         val db = writableDatabase
         val values = ContentValues().apply {
-            put("nombreMantenimiento", m.maintenanceName)
-            put("date", m.date)
-            put("kilometers", m.kilometers)
-            put("marca", m.brand)
-            put("modelo", m.model)
-            put("anno", m.year)
-            put("precio", m.price)
-            put("tiempo", m.time)
-            put("notas", m.notes)
-            put("tareas", m.tasks)
+            put("idMoto", idMoto)
+            put("rutaFoto", path)
         }
-        db.insert("Mantenimientos", null, values)
+        return db.insert("FotosMoto", null, values) != -1L
     }
+
+    fun deletePhoto(idMoto: Int, path: String): Boolean {
+        val db = writableDatabase
+        return db.delete(
+            "FotosMoto",
+            "idMoto = ? AND rutaFoto = ?",
+            arrayOf(idMoto.toString(), path)
+        ) > 0
+    }
+
+    // ==================== MAINTENANCE OPERATIONS ====================
 
     fun getMaintenances(): List<MaintenanceDetail> {
         val list = mutableListOf<MaintenanceDetail>()
@@ -209,5 +219,22 @@ class TorqueDatabaseHelper(private val context: Context) :
             }
         }
         return list
+    }
+
+    fun insertMaintenance(maintenance: MaintenanceDetail): Boolean {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("nombreMantenimiento", maintenance.maintenanceName)
+            put("date", maintenance.date)
+            put("kilometers", maintenance.kilometers)
+            put("marca", maintenance.brand)
+            put("modelo", maintenance.model)
+            put("anno", maintenance.year)
+            put("precio", maintenance.price)
+            put("tiempo", maintenance.time)
+            put("notas", maintenance.notes)
+            put("tareas", maintenance.tasks)
+        }
+        return db.insert("Mantenimientos", null, values) != -1L
     }
 }

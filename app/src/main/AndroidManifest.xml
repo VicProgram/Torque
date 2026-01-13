@@ -26,7 +26,7 @@
 
         <activity android:name=".garaje.MotoDetalle" />
         <activity android:name=".garaje.AgregarMoto" />
-        <activity android:name=".garaje.BorrarMoto" />
+        <activity android:name=".garage.BorrarMoto" />
         <activity android:name=".garaje.ListaGaraje" />
         
         <activity android:name=".perfil.PerfilActivity" />

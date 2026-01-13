@@ -1,4 +1,4 @@
-package com.example.torque.garaje
+package com.example.torque.garage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

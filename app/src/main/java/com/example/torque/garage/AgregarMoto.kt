@@ -1,4 +1,4 @@
-package com.example.torque.garaje
+package com.example.torque.garage
 
 import android.app.Activity
 import android.net.Uri
@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -106,12 +107,12 @@ fun AgregarMotoView() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = TorqueColors.OnSurface)
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = TorqueColors.OnSurface)
                 }
                 Text(
-                    text = "Añadir Moto",
+                    text = "Add Motorcycle",
                     modifier = Modifier.weight(1f),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    textAlign = TextAlign.Center,
                     color = TorqueColors.OnSurface,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Normal
@@ -167,7 +168,7 @@ fun AgregarMotoView() {
                                     modifier = Modifier.size(48.dp)
                                 )
                                 Text(
-                                    "Sin foto seleccionada",
+                                    "No photo selected",
                                     color = TorqueColors.OnSurfaceVariant,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
@@ -193,7 +194,7 @@ fun AgregarMotoView() {
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "Añadir Foto",
+                                "Add Photo",
                                 color = TorqueColors.Primary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
@@ -204,18 +205,18 @@ fun AgregarMotoView() {
 
                 // --- Input Fields ---
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(marca, { marca = it }, "Marca")
-                    TorqueTextField(modelo, { modelo = it }, "Modelo")
+                    TorqueTextField(marca, { marca = it }, "Brand")
+                    TorqueTextField(modelo, { modelo = it }, "Model")
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        TorqueTextField(anno, { anno = it }, "Año", modifier = Modifier.weight(1f))
-                        TorqueTextField(cilindrada, { cilindrada = it }, "Cilindrada (cc)", modifier = Modifier.weight(1f))
+                        TorqueTextField(anno, { anno = it }, "Year", modifier = Modifier.weight(1f))
+                        TorqueTextField(cilindrada, { cilindrada = it }, "CC", modifier = Modifier.weight(1f))
                     }
 
                     TorqueTextField(
                         value = estilo,
                         onValueChange = { estilo = it },
-                        label = "Notas Opcionales",
+                        label = "Optional Notes",
                         singleLine = false,
                         modifier = Modifier.height(120.dp)
                     )
@@ -234,7 +235,7 @@ fun AgregarMotoView() {
                 .padding(24.dp)
         ) {
             TorqueButton(
-                text = "Guardar Moto",
+                text = "Save Motorcycle",
                 icon = Icons.Default.Save,
                 onClick = {
                     val moto = Moto(
@@ -252,14 +253,14 @@ fun AgregarMotoView() {
                         esPrincipal = 0,
                         fotoMoto = imageUri?.toString() ?: ""
                     )
-                    if (dbHelper.agregarMoto(moto)) {
-                        showToast(context, "¡Moto guardada con éxito!")
+                    if (dbHelper.addMoto(moto)) {
+                        showToast(context, "Motorcycle saved successfully!")
                         (context as? Activity)?.apply {
                             setResult(Activity.RESULT_OK)
                             finish()
                         }
                     } else {
-                        showToast(context, "Error al guardar la moto")
+                        showToast(context, "Error saving motorcycle")
                     }
                 }
             )

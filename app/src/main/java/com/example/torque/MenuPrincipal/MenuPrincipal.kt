@@ -9,8 +9,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.torque.components.ui.ui.TorqueDashboardScreen
-import com.example.torque.garaje.ListaGaraje
+import com.example.torque.components.ui.dashboard.TorqueDashboardScreen
+import com.example.torque.garage.ListaGarage
 import com.example.torque.mantenimientos.MantenimientoPreview
 import com.example.torque.ui.theme.TorqueTheme
 
