@@ -13,6 +13,7 @@ import com.example.torque.components.ui.dashboard.TorqueDashboardScreen
 import com.example.torque.garage.ListaGarage
 import com.example.torque.mantenimientos.MantenimientoPreview
 import com.example.torque.ui.theme.TorqueTheme
+import kotlin.jvm.java
 
 class MenuPrincipal : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +39,7 @@ fun TorqueNavHost() {
         composable("dashboard") {
             TorqueDashboardScreen(
                 onIrGaraje = { 
-                    context.startActivity(Intent(context, ListaGaraje::class.java))
+                    context.startActivity(Intent(context, ListaGarage::class.java))
                 },
                 onIrMantenimientos = { 
                     context.startActivity(Intent(context, MantenimientoPreview::class.java))

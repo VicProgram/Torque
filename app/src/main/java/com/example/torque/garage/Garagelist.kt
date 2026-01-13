@@ -1,4 +1,4 @@
-package com.example.torque.garaje
+package com.example.torque.garage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -59,36 +59,36 @@ import com.example.torque.components.ui.dashboard.launchActivity
 import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.TorqueTheme
 
-class ListaGaraje : ComponentActivity() {
+class ListaGarage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
-                ListaGarajeView()
+                ListaGarageView()
             }
         }
     }
 }
 
 @Composable
-fun ListaGarajeView() {
+fun ListaGarageView() {
     val context = LocalContext.current
     val dbHelper = remember { TorqueDatabaseHelper(context) }
     val motos = remember { mutableStateListOf<Moto>() }
 
-    fun recargarMotos() {
+    fun reloadMotos() {
         motos.clear()
-        motos.addAll(dbHelper.obtenerMotos())
+        motos.addAll(dbHelper.getMotos())
     }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
-        recargarMotos()
+        reloadMotos()
     }
 
     LaunchedEffect(Unit) {
-        recargarMotos()
+        reloadMotos()
     }
 
     Box(
@@ -109,14 +109,14 @@ fun ListaGarajeView() {
                         modifier = Modifier.padding(vertical = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item { FilterChip("Todas", isSelected = true) }
-                        item { FilterChip("Mantenimiento", isSelected = false) }
-                        item { FilterChip("Archivo", isSelected = false) }
+                        item { FilterChip("All", isSelected = true) }
+                        item { FilterChip("Maintenance", isSelected = false) }
+                        item { FilterChip("Archive", isSelected = false) }
                     }
                 }
 
                 items(motos) { moto ->
-                    MotoOutlinedCard(
+                    MotoCard(
                         moto = moto,
                         onClick = {
                             launchActivity(launcher, context, MotoDetalle::class.java) {
@@ -139,7 +139,7 @@ fun ListaGarajeView() {
             contentColor = TorqueColors.OnPrimary,
             shape = RoundedCornerShape(16.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Nueva Moto", modifier = Modifier.size(24.dp))
+            Icon(Icons.Default.Add, contentDescription = "New Moto", modifier = Modifier.size(24.dp))
         }
 
         DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
@@ -158,17 +158,17 @@ fun GarageHeader() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Mi Garaje",
+            text = "My Garage",
             color = TorqueColors.OnSurface,
             fontSize = 22.sp,
             fontWeight = FontWeight.Normal
         )
         Row {
             IconButton(onClick = { /* Search */ }) {
-                Icon(Icons.Default.Search, contentDescription = "Buscar", tint = TorqueColors.OnSurfaceVariant)
+                Icon(Icons.Default.Search, contentDescription = "Search", tint = TorqueColors.OnSurfaceVariant)
             }
             IconButton(onClick = { /* More */ }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Más", tint = TorqueColors.OnSurfaceVariant)
+                Icon(Icons.Default.MoreVert, contentDescription = "More", tint = TorqueColors.OnSurfaceVariant)
             }
         }
     }
@@ -202,7 +202,7 @@ fun FilterChip(text: String, isSelected: Boolean) {
 }
 
 @Composable
-fun MotoOutlinedCard(moto: Moto, onClick: () -> Unit) {
+fun MotoCard(moto: Moto, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -281,7 +281,7 @@ fun MotoOutlinedCard(moto: Moto, onClick: () -> Unit) {
                         .padding(horizontal = 24.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "Ver Detalles",
+                        text = "View Details",
                         color = TorqueColors.Primary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold

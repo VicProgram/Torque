@@ -12,7 +12,7 @@ class BorrarMoto : ComponentActivity() {
         if (motoId != -1) {
             // Lógica para eliminar la moto de la base de datos
             val dbHelper = TorqueDatabaseHelper(this)
-            val success = dbHelper.eliminarMoto(motoId.toString())
+            val success = dbHelper.deleteMoto(motoId)
 
             if (success) {
                 // Si la eliminación fue exitosa, devolver RESULT_OK

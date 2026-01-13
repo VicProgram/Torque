@@ -24,10 +24,10 @@
         <activity android:name=".mantenimientos.MantenimientoHistorial" />
 
 
-        <activity android:name=".garaje.MotoDetalle" />
-        <activity android:name=".garaje.AgregarMoto" />
+        <activity android:name=".garage.MotoDetalle" />
+        <activity android:name=".garage.AgregarMoto" />
         <activity android:name=".garage.BorrarMoto" />
-        <activity android:name=".garaje.ListaGaraje" />
+        <activity android:name=".garage.ListaGarage" />
         
         <activity android:name=".perfil.PerfilActivity" />
         <activity android:name=".ajustes.AjustesActivity" />
