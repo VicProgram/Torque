@@ -92,7 +92,7 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
 
     fun cargarHistorial() {
         viewModelScope.launch {
-            _historial.value = dbHelper.obtenerMantenimientos()
+            _historial.value = dbHelper.getMaintenances()
         }
     }
 }

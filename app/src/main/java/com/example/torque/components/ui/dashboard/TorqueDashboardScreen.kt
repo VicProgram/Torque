@@ -52,7 +52,7 @@ import com.example.torque.components.ui.dashboard.DashboardBottomNav
 import com.example.torque.components.ui.dashboard.TorqueButton
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.components.ui.dashboard.showToast
-import com.example.torque.garaje.AgregarMoto
+import com.example.torque.garage.AgregarMoto
 import com.example.torque.mantenimientos.Mantenimiento
 
 @Composable

@@ -167,7 +167,7 @@ fun MantenimientoFormularioScreen(seleccionados: List<String>) {
                         tareas = seleccionados.joinToString(", ")
                     )
 
-                    dbHelper.insertarMantenimiento(mantenimiento)
+                    dbHelper.insertMaintenance(mantenimiento)
                     showToast(context, "¡Mantenimiento guardado!")
                     (context as? Activity)?.finish()
                 }
