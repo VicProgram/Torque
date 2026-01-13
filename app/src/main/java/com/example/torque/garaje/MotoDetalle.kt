@@ -12,19 +12,39 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,13 +56,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
+import com.example.torque.components.ui.dashboard.TorqueButton
+import com.example.torque.components.ui.dashboard.TorqueColors
+import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.database.TorqueDatabaseHelper
 import java.io.File
 
@@ -55,7 +82,7 @@ class MotoDetalle : ComponentActivity() {
         val moto = if (idMoto != -1) dbHelper.obtenerMotoPorId(idMoto) else null
 
         setContent {
-            MaterialTheme {
+            com.example.torque.ui.theme.TorqueTheme {
                 MotoDetalleView(
                     moto = moto, dbHelper = dbHelper, context = this, activity = this
                 )
@@ -69,9 +96,9 @@ fun MotoDetalleView(
     moto: Moto?, dbHelper: TorqueDatabaseHelper, context: Context, activity: Activity
 ) {
     val fotos = remember { mutableStateListOf<String>() }
-    var selectedPhoto by remember { mutableStateOf<String?>(null) }
+    var showMenu by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
-    // Cargar fotos desde la base de datos
     LaunchedEffect(moto?.idMoto) {
         moto?.idMoto?.let {
             fotos.clear()
@@ -79,7 +106,6 @@ fun MotoDetalleView(
         }
     }
 
-    // Launcher para seleccionar foto
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -88,184 +114,145 @@ fun MotoDetalleView(
             if (ruta != null && moto != null) {
                 dbHelper.insertarFoto(moto.idMoto, ruta)
                 fotos.add(ruta)
-                Toast.makeText(context, "Foto añadida", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Error al añadir foto", Toast.LENGTH_SHORT).show()
+                showToast(context, "¡Foto añadida!")
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Imagen de fondo
-        Image(
-            painter = painterResource(id = R.drawable.negrolinama),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.6f))
-                .padding(16.dp)
-        ) {
-            if (moto == null) {
-                Text(
-                    text = "No se ha encontrado la moto.",
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start,
+    Box(modifier = Modifier.fillMaxSize().background(TorqueColors.Background)) {
+        if (moto == null) {
+            Text("Moto no encontrada", color = Color.White, modifier = Modifier.align(Alignment.Center))
+        } else {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // --- Header ---
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
+                    IconButton(onClick = { activity.finish() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                    }
                     Text(
-                        text = "Detalles de la Moto",
-                        style = MaterialTheme.typography.headlineSmall,
+                        text = moto.modelo,
+                        modifier = Modifier.weight(1f),
                         color = Color.White,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                    Spacer(Modifier.height(8.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.02f))
-                            .padding(8.dp)
-                    ) {
-                        Column { // Un Column dentro del Box para organizar los detalles
-                            val detalles = listOf(
-                                "Marca" to moto.marca,
-                                "Modelo" to moto.modelo,
-                                "Año" to moto.anno,
-                                "Matrícula" to moto.matricula,
-                                "Color" to moto.colorMoto,
-                                "Cilindrada" to moto.cilindrada,
-                                "CV" to moto.cv,
-                                "Estilo" to moto.estilo
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Menú", tint = Color.White)
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.background(TorqueColors.SurfaceDark)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Hacer Principal", color = Color.White) },
+                                leadingIcon = { Icon(Icons.Default.Star, contentDescription = null, tint = TorqueColors.Primary) },
+                                onClick = {
+                                    dbHelper.hacerPrincipal(moto.idMoto.toString())
+                                    showToast(context, "Moto principal actualizada")
+                                    showMenu = false
+                                }
                             )
-                            detalles.forEach { (etiqueta, valor) ->
-                                Text(
-                                    text = "$etiqueta: $valor",
-                                    color = Color.White, // Cambia el color del texto para que contraste con el fondo
-                                    modifier = Modifier.padding(vertical = 4.dp)
-                                )
+                            DropdownMenuItem(
+                                text = { Text("Eliminar Moto", color = Color.Red) },
+                                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red) },
+                                onClick = {
+                                    if (dbHelper.eliminarMoto(moto.idMoto.toString())) {
+                                        activity.setResult(Activity.RESULT_OK)
+                                        activity.finish()
+                                    }
+                                    showMenu = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f).verticalScroll(scrollState).padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // --- Image Gallery ---
+                    Box(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(16f / 10f).clip(RoundedCornerShape(24.dp))
+                            .background(TorqueColors.SurfaceDark)
+                    ) {
+                        if (fotos.isNotEmpty()) {
+                            Image(
+                                painter = rememberAsyncImagePainter(fotos.last()),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(48.dp))
+                                Text("Sin fotos aún", color = TorqueColors.OnSurfaceVariant)
                             }
                         }
                     }
 
-                    Spacer(Modifier.height(24.dp))
-
-                    Button(
-                        onClick = {
-                            val success = dbHelper.hacerPrincipal(moto.idMoto.toString())
-                            Toast.makeText(
-                                context,
-                                if (success) "Moto establecida como principal" else "Error al establecer como principal",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        modifier = Modifier.fillMaxWidth()
+                    // --- Basic Info Card ---
+                    Column(
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
+                            .background(TorqueColors.SurfaceDark).padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text("Establecer como principal")
+                        Text("ESPECIFICACIONES", color = TorqueColors.Primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                        
+                        DetailRow("Marca", moto.marca)
+                        DetailRow("Año", moto.anno.toString())
+                        DetailRow("Matrícula", moto.matricula)
+                        DetailRow("Cilindrada", moto.cilindrada)
+                        DetailRow("Potencia", "${moto.cv} CV")
+                        DetailRow("Estilo", moto.estilo)
                     }
 
-                    Spacer(Modifier.height(12.dp))
-
-                    Button(
-                        onClick = {
-                            val success = dbHelper.eliminarMoto(moto.idMoto.toString())
-                            if (success) {
-                                Toast.makeText(
-                                    context, "Moto eliminada correctamente", Toast.LENGTH_SHORT
-                                ).show()
-                                activity.setResult(Activity.RESULT_OK)
-                                activity.finish()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Error al eliminar la moto",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Eliminar Moto")
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Button(
-                        onClick = { launcher.launch("image/*") },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Añadir Foto")
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Button(
-                        onClick = { activity.finish() },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Volver")
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    if (fotos.isNotEmpty()) {
-                        Text("Fotos", color = Color.White)
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            items(fotos) { ruta ->
-                                var showDeleteButton by remember { mutableStateOf(false) }
-
-                                Box(
-                                    modifier = Modifier
-                                        .size(120.dp)
-                                        .background(Color.DarkGray)
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(
-                                                onLongPress = {
-                                                    selectedPhoto = ruta
-                                                    showDeleteButton = true
-                                                })
-                                        }) {
+                    // --- Photos Row ---
+                    if (fotos.size > 1) {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Text("GALERÍA", color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                items(fotos) { ruta ->
                                     Image(
                                         painter = rememberAsyncImagePainter(ruta),
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
-                                        modifier = Modifier.fillMaxSize()
+                                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp))
                                     )
-
-                                    if (showDeleteButton) {
-                                        Button(
-                                            onClick = {
-                                                dbHelper.eliminarFoto(moto.idMoto, ruta)
-                                                fotos.remove(ruta)
-                                                showDeleteButton = false
-                                                Toast.makeText(
-                                                    context, "Foto eliminada", Toast.LENGTH_SHORT
-                                                ).show()
-                                            },
-                                            modifier = Modifier
-                                                .align(Alignment.TopEnd)
-                                                .padding(4.dp)
-                                        ) {
-                                            Text("Eliminar", color = Color.White)
-                                        }
-                                    }
                                 }
                             }
                         }
                     }
+
+                    TorqueButton(
+                        text = "Añadir Foto",
+                        icon = Icons.Default.AddAPhoto,
+                        onClick = { launcher.launch("image/*") },
+                        color = TorqueColors.SurfaceDark,
+                        contentColor = Color.White
+                    )
+                    
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
+        Text(value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
     }
 }
 

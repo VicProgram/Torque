@@ -55,6 +55,7 @@ fun ButtonMantenimiento() {
     Switch(
         checked = checkedState.value, onCheckedChange = { checkedState.value = it })
 }
+
 @Composable
 fun HistorialItemCard(item: MantenimientoRealizado) {
     Card(
@@ -62,7 +63,11 @@ fun HistorialItemCard(item: MantenimientoRealizado) {
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = item.nombre, color = Color.White, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = item.nombre,
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "Fecha: ${item.fecha}", color = Color.Gray)
             Text(text = "Km: ${item.kilometros}", color = Color.Gray)

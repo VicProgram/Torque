@@ -8,16 +8,33 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,23 +43,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.torque.R
-import com.example.torque.components.BackgroundImage
-import com.example.torque.components.SectionHeader
-import com.example.torque.components.TorqueButton
-import com.example.torque.components.TorqueTextField
-import com.example.torque.components.showToast
+import com.example.torque.components.ui.dashboard.TorqueButton
+import com.example.torque.components.ui.dashboard.TorqueColors
+import com.example.torque.components.ui.dashboard.TorqueTextField
+import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.ui.theme.TorqueTheme
 
 class AgregarMoto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { AgregarMotoView() }
+        setContent {
+            TorqueTheme {
+                AgregarMotoView()
+            }
+        }
     }
 }
 
@@ -64,57 +85,184 @@ fun AgregarMotoView() {
     var fechaCompra by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri = it }
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {
+        imageUri = it
+    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        BackgroundImage(R.drawable.negrobluevert, alpha = 0.95f)
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            SectionHeader("Nueva Moto")
-
-            TorqueTextField(marca, { marca = it }, "Marca")
-            TorqueTextField(modelo, { modelo = it }, "Modelo")
-            TorqueTextField(anno, { anno = it }, "Año")
-            TorqueTextField(matricula, { matricula = it }, "Matrícula")
-            TorqueTextField(colorMoto, { colorMoto = it }, "Color")
-            TorqueTextField(cilindrada, { cilindrada = it }, "Cilindrada")
-            TorqueTextField(cv, { cv = it }, "CV")
-            TorqueTextField(estilo, { estilo = it }, "Estilo")
-            TorqueTextField(kms, { kms = it }, "Kms")
-            TorqueTextField(fechaCompra, { fechaCompra = it }, "Fecha Compra")
-
-            Spacer(Modifier.height(16.dp))
-
-            TorqueButton("Seleccionar Foto", { imagePicker.launch("image/*") }, color = Color.Gray)
-
-            imageUri?.let {
-                Spacer(Modifier.height(12.dp))
-                Image(
-                    painter = rememberAsyncImagePainter(it),
-                    contentDescription = null,
-                    modifier = Modifier.height(180.dp).fillMaxWidth().clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Crop
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(TorqueColors.Background)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // --- Header ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { (context as? Activity)?.finish() }) {
+                    Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = TorqueColors.OnSurface)
+                }
+                Text(
+                    text = "Añadir Moto",
+                    modifier = Modifier.weight(1f),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    color = TorqueColors.OnSurface,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Normal
                 )
+                Spacer(modifier = Modifier.width(48.dp))
             }
 
-            Spacer(Modifier.height(24.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                // --- Photo Selector ---
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 9f)
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(TorqueColors.SurfaceVariant.copy(alpha = 0.2f))
+                            .then(
+                                if (imageUri == null) {
+                                    Modifier.border(
+                                        width = 2.dp,
+                                        color = TorqueColors.Outline,
+                                        shape = RoundedCornerShape(24.dp)
+                                    )
+                                } else Modifier
+                            )
+                            .clickable { imagePicker.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (imageUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(imageUri),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.Default.DirectionsBike,
+                                    contentDescription = null,
+                                    tint = TorqueColors.OnSurfaceVariant,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Text(
+                                    "Sin foto seleccionada",
+                                    color = TorqueColors.OnSurfaceVariant,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
 
-            TorqueButton("Guardar Moto", {
-                val moto = Moto(0, marca, modelo, anno.toIntOrNull() ?: 0, matricula, colorMoto, cilindrada, cv, estilo, kms.toIntOrNull() ?: 0, fechaCompra, 0, imageUri?.toString() ?: "")
-                if (dbHelper.agregarMoto(moto)) {
-                    showToast(context, "¡Guardada!")
-                    (context as Activity).apply { setResult(Activity.RESULT_OK); finish() }
-                } else {
-                    showToast(context, "Error al guardar")
+                    // Add Photo Button
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .border(1.dp, TorqueColors.Outline, CircleShape)
+                            .clickable { imagePicker.launch("image/*") }
+                            .padding(horizontal = 24.dp, vertical = 10.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.AddAPhoto,
+                                contentDescription = null,
+                                tint = TorqueColors.Primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Añadir Foto",
+                                color = TorqueColors.Primary,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                 }
-            })
-            Spacer(Modifier.height(40.dp))
+
+                // --- Input Fields ---
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    TorqueTextField(marca, { marca = it }, "Marca")
+                    TorqueTextField(modelo, { modelo = it }, "Modelo")
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        TorqueTextField(anno, { anno = it }, "Año", modifier = Modifier.weight(1f))
+                        TorqueTextField(cilindrada, { cilindrada = it }, "Cilindrada (cc)", modifier = Modifier.weight(1f))
+                    }
+
+                    TorqueTextField(
+                        value = estilo,
+                        onValueChange = { estilo = it },
+                        label = "Notas Opcionales",
+                        singleLine = false,
+                        modifier = Modifier.height(120.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
+        // --- Save Button Footer ---
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(TorqueColors.Background)
+                .padding(24.dp)
+        ) {
+            TorqueButton(
+                text = "Guardar Moto",
+                icon = Icons.Default.Save,
+                onClick = {
+                    val moto = Moto(
+                        idMoto = 0,
+                        marca = marca,
+                        modelo = modelo,
+                        anno = anno.toIntOrNull() ?: 0,
+                        matricula = matricula,
+                        colorMoto = colorMoto,
+                        cilindrada = cilindrada,
+                        cv = cv,
+                        estilo = estilo,
+                        kms = kms.toIntOrNull() ?: 0,
+                        fechaCompra = fechaCompra,
+                        esPrincipal = 0,
+                        fotoMoto = imageUri?.toString() ?: ""
+                    )
+                    if (dbHelper.agregarMoto(moto)) {
+                        showToast(context, "¡Moto guardada con éxito!")
+                        (context as? Activity)?.apply {
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
+                    } else {
+                        showToast(context, "Error al guardar la moto")
+                    }
+                }
+            )
         }
     }
 }

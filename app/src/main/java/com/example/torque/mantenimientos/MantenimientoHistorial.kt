@@ -1,36 +1,66 @@
 package com.example.torque.mantenimientos
 
+import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.OilBarrel
+import androidx.compose.material.icons.filled.SettingsSuggest
+import androidx.compose.material.icons.filled.TireRepair
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.torque.components.ui.dashboard.DashboardBottomNav
+import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.TorqueTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +84,7 @@ data class MantenimientoDetalle(
 )
 
 // ---------- ViewModel ----------
-class MantenimientoHistorialView(application: Application) : AndroidViewModel(application) {
+class MantenimientoHistorialViewModel(application: Application) : AndroidViewModel(application) {
     private val dbHelper = TorqueDatabaseHelper(application)
 
     private val _historial = MutableStateFlow<List<MantenimientoDetalle>>(emptyList())
@@ -67,7 +97,6 @@ class MantenimientoHistorialView(application: Application) : AndroidViewModel(ap
     }
 }
 
-// ---------- Activity principal (una sola pantalla) ----------
 class MantenimientoHistorial : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,109 +108,215 @@ class MantenimientoHistorial : ComponentActivity() {
     }
 }
 
-// ---------- Pantalla unificada ----------
 @Composable
 fun MantenimientoHistorialPantalla() {
-    val viewModel: MantenimientoHistorialView = viewModel()
-    val historial = viewModel.historial.collectAsState()
-
-    // Estado para controlar qué mantenimiento está seleccionado
-    val selectedMantenimiento = remember { mutableStateOf<MantenimientoDetalle?>(null) }
+    val context = LocalContext.current
+    val viewModel: MantenimientoHistorialViewModel = viewModel()
+    val historial by viewModel.historial.collectAsState()
+    var selectedFilter by remember { mutableStateOf("Todos") }
 
     LaunchedEffect(Unit) {
         viewModel.cargarHistorial()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF121212))
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Historial de Mantenimientos",
-            style = MaterialTheme.typography.headlineSmall,
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        if (historial.value.isEmpty()) {
-            Text(
-                text = "No hay mantenimientos registrados.",
-                color = Color.LightGray,
-                modifier = Modifier.padding(16.dp)
-            )
+    val filteredHistorial = remember(historial, selectedFilter) {
+        if (selectedFilter == "Todos") {
+            historial
         } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(historial.value) { item ->
-                    HistorialItemCard(
-                        nombre = item.nombreMantenimiento,
-                        fecha = item.date,
-                        kilometros = item.kilometers ?: 0,
-                        onClick = {
-                            selectedMantenimiento.value = item
-                        }
-                    )
+            historial.filter { item ->
+                when (selectedFilter) {
+                    "Aceite" -> item.nombreMantenimiento.contains("aceite", ignoreCase = true)
+                    "Neumáticos" -> item.nombreMantenimiento.contains("neumático", ignoreCase = true)
+                    "Motor" -> item.nombreMantenimiento.contains("motor", ignoreCase = true)
+                    "Cadena" -> item.nombreMantenimiento.contains("cadena", ignoreCase = true)
+                    else -> true
                 }
             }
         }
+    }
 
-        // Mostrar detalles si hay uno seleccionado
-        selectedMantenimiento.value?.let { mantenimiento ->
-            Spacer(modifier = Modifier.height(24.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(TorqueColors.Background)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // --- Header ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                IconButton(onClick = { (context as? Activity)?.finish() }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = TorqueColors.OnSurface)
+                }
+                Text(
+                    text = "Historial",
+                    modifier = Modifier.weight(1f),
+                    color = TorqueColors.OnSurface,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Normal
+                )
+                IconButton(onClick = { /* More options */ }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "Más", tint = TorqueColors.OnSurface)
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 140.dp)
+            ) {
+                // --- Filter Chips ---
+                item {
+                    LazyRow(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val filters = listOf("Todos", "Aceite", "Neumáticos", "Motor", "Cadena")
+                        items(filters) { filter ->
+                            HistoryFilterChip(
+                                text = filter,
+                                isSelected = selectedFilter == filter,
+                                onClick = { selectedFilter = filter }
+                            )
+                        }
+                    }
+                }
+
+                item {
                     Text(
-                        "Detalles del Mantenimiento",
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium
+                        text = "ACTIVIDAD RECIENTE",
+                        color = TorqueColors.Primary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(16.dp)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Nombre: ${mantenimiento.nombreMantenimiento}", color = Color.Gray)
-                    Text("Fecha: ${mantenimiento.date}", color = Color.Gray)
-                    Text("Km: ${mantenimiento.kilometers ?: "N/D"}", color = Color.Gray)
-                    Text(
-                        "Moto: ${mantenimiento.marca ?: ""} ${mantenimiento.modelo ?: ""} (${mantenimiento.anno ?: ""})",
-                        color = Color.Gray
-                    )
-                    Text("Precio: ${mantenimiento.precio ?: "N/D"}", color = Color.Gray)
-                    Text("Tiempo: ${mantenimiento.tiempo ?: "N/D"}", color = Color.Gray)
-                    Text("Notas: ${mantenimiento.notas ?: "N/D"}", color = Color.Gray)
-                    Text("Tareas: ${mantenimiento.tareas ?: "N/D"}", color = Color.Gray)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(onClick = { selectedMantenimiento.value = null }) {
-                        Text("Cerrar", color = Color.White)
+                }
+
+                if (filteredHistorial.isEmpty()) {
+                    item {
+                        Text(
+                            text = if (historial.isEmpty()) "No hay mantenimientos registrados." else "No hay resultados para este filtro.",
+                            color = TorqueColors.OnSurfaceVariant,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                } else {
+                    items(filteredHistorial) { item ->
+                        HistoryLogItem(item)
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = TorqueColors.SurfaceVariant.copy(alpha = 0.3f)
+                        )
                     }
                 }
             }
         }
+
+        // --- FAB ---
+        FloatingActionButton(
+            onClick = { /* Add activity */ },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 24.dp, bottom = 110.dp),
+            containerColor = TorqueColors.PrimaryContainer,
+            contentColor = TorqueColors.OnPrimaryContainer,
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Añadir", modifier = Modifier.size(24.dp))
+        }
+
+        // --- Bottom Navigation ---
+        DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
-// ---------- Card de cada item ----------
 @Composable
-fun HistorialItemCard(
-    nombre: String,
-    fecha: String,
-    kilometros: Int,
-    onClick: () -> Unit
-) {
-    Card(
+fun HistoryFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
+    val bgColor = if (isSelected) TorqueColors.SecondaryContainer else Color.Transparent
+    val contentColor = if (isSelected) TorqueColors.OnSecondaryContainer else TorqueColors.OnSurfaceVariant
+    val borderColor = if (isSelected) Color.Transparent else TorqueColors.Outline.copy(alpha = 0.5f)
+
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F))
+            .clip(RoundedCornerShape(8.dp))
+            .background(bgColor)
+            .border(
+                width = if (isSelected) 0.dp else 1.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = nombre, color = Color.White, style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Fecha: $fecha", color = Color.Gray)
-            Text(text = "Km: $kilometros", color = Color.Gray)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (isSelected) {
+                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = contentColor)
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Text(text = text, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
 
+@Composable
+fun HistoryLogItem(item: MantenimientoDetalle) {
+    // Determine icon based on name (simple logic)
+    val icon = when {
+        item.nombreMantenimiento.contains("aceite", ignoreCase = true) -> Icons.Default.OilBarrel
+        item.nombreMantenimiento.contains("neumático", ignoreCase = true) -> Icons.Default.TireRepair
+        item.nombreMantenimiento.contains("cadena", ignoreCase = true) -> Icons.Default.SettingsSuggest
+        item.nombreMantenimiento.contains("luz", ignoreCase = true) || item.nombreMantenimiento.contains("eléctrico", ignoreCase = true) -> Icons.Default.Bolt
+        else -> Icons.Default.Build
+    }
 
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { /* Show details */ }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(TorqueColors.SurfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = null, tint = TorqueColors.OnSurfaceVariant)
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = item.nombreMantenimiento,
+                color = TorqueColors.OnSurface,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1
+            )
+            Text(
+                text = "${item.date} • ${item.precio ?: "$0.00"}",
+                color = TorqueColors.OnSurfaceVariant,
+                fontSize = 14.sp
+            )
+        }
+
+        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Icon(
+                Icons.Default.CheckCircle,
+                contentDescription = "Completado",
+                tint = Color(0xFF81C784),
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = "${item.kilometers ?: 0} km",
+                color = TorqueColors.Outline,
+                fontSize = 11.sp
+            )
+        }
+    }
+}

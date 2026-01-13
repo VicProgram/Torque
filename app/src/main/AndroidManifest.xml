@@ -9,7 +9,7 @@
         android:theme="@style/Theme.TorqueLight">
 
         <activity
-            android:name=".Login"
+            android:name=".MenuPrincipal.MenuPrincipal"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,23 +17,21 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".MenuPrincipal"
-            android:exported="false" />
-
 
         <activity android:name=".mantenimientos.Mantenimiento" />
         <activity android:name=".mantenimientos.MantenimientoFormulario" />
         <activity android:name=".mantenimientos.MantenimientoPreview" />
         <activity android:name=".mantenimientos.MantenimientoHistorial" />
-        <activity android:name="com.example.torque.mantenimientos.MantenimientoDetalleActivity" />
 
 
         <activity android:name=".garaje.MotoDetalle" />
         <activity android:name=".garaje.AgregarMoto" />
         <activity android:name=".garaje.BorrarMoto" />
         <activity android:name=".garaje.ListaGaraje" />
-        <activity android:name=".usuarios.PerfilUsuario" />
+        
+        <activity android:name=".perfil.PerfilActivity" />
+        <activity android:name=".ajustes.AjustesActivity" />
+
 
     </application>
 </manifest>
