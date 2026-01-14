@@ -18,17 +18,17 @@
         </activity>
 
 
-        <activity android:name=".mantenimientos.Mantenimiento" />
+        <activity android:name=".maintenance.Mantenimiento" />
         <activity android:name=".mantenimientos.MantenimientoFormulario" />
-        <activity android:name=".mantenimientos.MantenimientoPreview" />
-        <activity android:name=".mantenimientos.MantenimientoHistorial" />
+        <activity android:name=".maintenance.MantenimientoPreview" />
+        <activity android:name=".maintenance.MantenimientoHistorial" />
 
 
         <activity android:name=".garage.MotoDetalle" />
         <activity android:name=".garage.AgregarMoto" />
         <activity android:name=".garage.BorrarMoto" />
         <activity android:name=".garage.ListaGarage" />
-        
+
         <activity android:name=".perfil.PerfilActivity" />
         <activity android:name=".ajustes.AjustesActivity" />
 

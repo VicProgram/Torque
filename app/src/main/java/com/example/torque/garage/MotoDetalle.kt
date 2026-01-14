@@ -106,18 +106,31 @@ fun MotoDetalleView(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(TorqueColors.Background)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(TorqueColors.Background)) {
         if (moto == null) {
-            Text("Moto no encontrada", color = Color.White, modifier = Modifier.align(Alignment.Center))
+            Text(
+                "Moto no encontrada",
+                color = Color.White,
+                modifier = Modifier.align(Alignment.Center)
+            )
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
                 // --- Header ---
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { activity.finish() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Atrás",
+                            tint = Color.White
+                        )
                     }
                     Text(
                         text = moto.modelo,
@@ -128,7 +141,11 @@ fun MotoDetalleView(
                     )
                     Box {
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menú", tint = Color.White)
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = "Menú",
+                                tint = Color.White
+                            )
                         }
                         DropdownMenu(
                             expanded = showMenu,
@@ -137,18 +154,32 @@ fun MotoDetalleView(
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Hacer Principal", color = Color.White) },
-                                leadingIcon = { Icon(Icons.Default.Star, contentDescription = null, tint = TorqueColors.Primary) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Star,
+                                        contentDescription = null,
+                                        tint = TorqueColors.Primary
+                                    )
+                                },
                                 onClick = {
-                                    dbHelper.setPrincipal(moto.idMoto.toString())
+                                    // CORRECCIÓN: Quitar .toString()
+                                    dbHelper.setPrincipal(moto.idMoto)
                                     showToast(context, "Moto principal actualizada")
                                     showMenu = false
                                 }
                             )
                             DropdownMenuItem(
                                 text = { Text("Eliminar Moto", color = Color.Red) },
-                                leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = null,
+                                        tint = Color.Red
+                                    )
+                                },
                                 onClick = {
-                                    if (dbHelper.deleteMoto(moto.idMoto.toString())) {
+                                    // CORRECCIÓN: Quitar .toString()
+                                    if (dbHelper.deleteMoto(moto.idMoto)) {
                                         activity.setResult(Activity.RESULT_OK)
                                         activity.finish()
                                     }
@@ -160,12 +191,18 @@ fun MotoDetalleView(
                 }
 
                 Column(
-                    modifier = Modifier.weight(1f).verticalScroll(scrollState).padding(16.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(scrollState)
+                        .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     // --- Image Gallery ---
                     Box(
-                        modifier = Modifier.fillMaxWidth().aspectRatio(16f / 10f).clip(RoundedCornerShape(24.dp))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16f / 10f)
+                            .clip(RoundedCornerShape(24.dp))
                             .background(TorqueColors.SurfaceDark)
                     ) {
                         if (photos.isNotEmpty()) {
@@ -181,7 +218,12 @@ fun MotoDetalleView(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(48.dp))
+                                Icon(
+                                    Icons.Default.AddAPhoto,
+                                    contentDescription = null,
+                                    tint = TorqueColors.OnSurfaceVariant,
+                                    modifier = Modifier.size(48.dp)
+                                )
                                 Text("Sin fotos aún", color = TorqueColors.OnSurfaceVariant)
                             }
                         }
@@ -189,12 +231,21 @@ fun MotoDetalleView(
 
                     // --- Basic Info Card ---
                     Column(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
-                            .background(TorqueColors.SurfaceDark).padding(20.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(TorqueColors.SurfaceDark)
+                            .padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text("ESPECIFICACIONES", color = TorqueColors.Primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                        
+                        Text(
+                            "ESPECIFICACIONES",
+                            color = TorqueColors.Primary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        )
+
                         DetailRow("Marca", moto.marca)
                         DetailRow("Año", moto.anno.toString())
                         DetailRow("Matrícula", moto.matricula)
@@ -206,14 +257,21 @@ fun MotoDetalleView(
                     // --- Photos Row ---
                     if (photos.size > 1) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text("GALERÍA", color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                "GALERÍA",
+                                color = TorqueColors.OnSurfaceVariant,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 items(photos) { path ->
                                     Image(
                                         painter = rememberAsyncImagePainter(path),
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
-                                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(12.dp))
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .clip(RoundedCornerShape(12.dp))
                                     )
                                 }
                             }
@@ -227,7 +285,7 @@ fun MotoDetalleView(
                         color = TorqueColors.SurfaceDark,
                         contentColor = Color.White
                     )
-                    
+
                     Spacer(modifier = Modifier.height(80.dp))
                 }
             }

@@ -48,12 +48,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.torque.components.ui.dashboard.DashboardBottomNav
-import com.example.torque.components.ui.dashboard.TorqueButton
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.garage.AgregarMoto
-import com.example.torque.mantenimientos.Mantenimiento
+
 
 @Composable
 fun TorqueDashboardScreen(
@@ -62,7 +58,7 @@ fun TorqueDashboardScreen(
     onIrPerfil: () -> Unit
 ) {
     val context = LocalContext.current
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -97,7 +93,7 @@ fun TorqueDashboardScreen(
                 item {
                     // "Agendar Servicio" now navigates directly to creating maintenance
                     NextServiceCard(onClick = {
-                        context.startActivity(Intent(context, Mantenimiento::class.java))
+                        context.startActivity(Intent(context, onIrMantenimientos::class.java))
                     })
                 }
 
@@ -111,7 +107,10 @@ fun TorqueDashboardScreen(
                             letterSpacing = 2.sp,
                             modifier = Modifier.padding(bottom = 16.dp, start = 4.dp)
                         )
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             QuickActionCard(
                                 title = "Garaje",
                                 subtitle = "Mis Motos",
@@ -143,7 +142,7 @@ fun TorqueDashboardScreen(
         }
 
         FloatingActionButton(
-            onClick = { 
+            onClick = {
                 context.startActivity(Intent(context, AgregarMoto::class.java))
             },
             modifier = Modifier
@@ -203,7 +202,9 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Configuración",
-                        modifier = Modifier.fillMaxSize().padding(8.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
                         tint = TorqueColors.OnSurfaceVariant
                     )
                 }
@@ -214,21 +215,21 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                 ) {
                     DropdownMenuItem(
                         text = { Text("Mi Perfil", color = Color.White) },
-                        onClick = { 
+                        onClick = {
                             showSettingsMenu = false
                             onProfileClick()
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Ajustes de App", color = Color.White) },
-                        onClick = { 
+                        onClick = {
                             showSettingsMenu = false
                             showToast(context, "Ajustes abiertos")
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Cerrar Sesión", color = Color.Red) },
-                        onClick = { 
+                        onClick = {
                             showSettingsMenu = false
                             showToast(context, "Sesión cerrada")
                         }
@@ -251,13 +252,18 @@ fun NextServiceCard(onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         Column {
-            Box(modifier = Modifier.height(160.dp).background(TorqueColors.SurfaceVariant)) {
+            Box(modifier = Modifier
+                .height(160.dp)
+                .background(TorqueColors.SurfaceVariant)) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, TorqueColors.SurfaceContainerHigh)
+                                colors = listOf(
+                                    Color.Transparent,
+                                    TorqueColors.SurfaceContainerHigh
+                                )
                             )
                         )
                 )
@@ -336,7 +342,10 @@ fun NextServiceCard(onClick: () -> Unit) {
                     Spacer(modifier = Modifier.height(12.dp))
                     LinearProgressIndicator(
                         progress = 0.85f,
-                        modifier = Modifier.fillMaxWidth().height(10.dp).clip(CircleShape),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(10.dp)
+                            .clip(CircleShape),
                         color = TorqueColors.Primary,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
@@ -377,7 +386,12 @@ fun QuickActionCard(
                 .background(containerColor),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(28.dp))
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(28.dp)
+            )
         }
         Column {
             Text(text = title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)

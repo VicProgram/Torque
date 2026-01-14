@@ -1,4 +1,4 @@
-package com.example.torque.mantenimientos
+package com.example.torque.maintenance
 
 import android.app.Activity
 import android.app.Application
@@ -67,32 +67,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-
-// ---------- Modelo de datos ----------
-data class MantenimientoDetalle(
-    val mantenimientoId: Int = 0,
-    val nombreMantenimiento: String,
-    val date: String,
-    val kilometers: Int?,
-    val marca: String?,
-    val modelo: String?,
-    val anno: Int?,
-    val precio: String?,
-    val tiempo: String?,
-    val notas: String?,
-    val tareas: String?
-)
-
 // ---------- ViewModel ----------
 class MantenimientoHistorialViewModel(application: Application) : AndroidViewModel(application) {
     private val dbHelper = TorqueDatabaseHelper(application)
 
-    private val _historial = MutableStateFlow<List<MantenimientoDetalle>>(emptyList())
-    val historial: StateFlow<List<MantenimientoDetalle>> = _historial
+    private val _historial = MutableStateFlow<List<MaintenanceDetail>>(emptyList())
+    val historial: StateFlow<List<MaintenanceDetail>> = _historial
 
     fun cargarHistorial() {
         viewModelScope.launch {
-            _historial.value = dbHelper.getMaintenances()
+            _historial.value = TorqueDatabaseHelper(getApplication()).getMaintenances()
         }
     }
 }
@@ -125,10 +109,14 @@ fun MantenimientoHistorialPantalla() {
         } else {
             historial.filter { item ->
                 when (selectedFilter) {
-                    "Aceite" -> item.nombreMantenimiento.contains("aceite", ignoreCase = true)
-                    "Neumáticos" -> item.nombreMantenimiento.contains("neumático", ignoreCase = true)
-                    "Motor" -> item.nombreMantenimiento.contains("motor", ignoreCase = true)
-                    "Cadena" -> item.nombreMantenimiento.contains("cadena", ignoreCase = true)
+                    "Aceite" -> item.maintenanceName.contains("aceite", ignoreCase = true)
+                    "Neumáticos" -> item.maintenanceName.contains(
+                        "neumático",
+                        ignoreCase = true
+                    )
+
+                    "Motor" -> item.maintenanceName.contains("motor", ignoreCase = true)
+                    "Cadena" -> item.maintenanceName.contains("cadena", ignoreCase = true)
                     else -> true
                 }
             }
@@ -150,7 +138,11 @@ fun MantenimientoHistorialPantalla() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = TorqueColors.OnSurface)
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Atrás",
+                        tint = TorqueColors.OnSurface
+                    )
                 }
                 Text(
                     text = "Historial",
@@ -160,7 +152,11 @@ fun MantenimientoHistorialPantalla() {
                     fontWeight = FontWeight.Normal
                 )
                 IconButton(onClick = { /* More options */ }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Más", tint = TorqueColors.OnSurface)
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "Más",
+                        tint = TorqueColors.OnSurface
+                    )
                 }
             }
 
@@ -236,7 +232,8 @@ fun MantenimientoHistorialPantalla() {
 @Composable
 fun HistoryFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     val bgColor = if (isSelected) TorqueColors.SecondaryContainer else Color.Transparent
-    val contentColor = if (isSelected) TorqueColors.OnSecondaryContainer else TorqueColors.OnSurfaceVariant
+    val contentColor =
+        if (isSelected) TorqueColors.OnSecondaryContainer else TorqueColors.OnSurfaceVariant
     val borderColor = if (isSelected) Color.Transparent else TorqueColors.Outline.copy(alpha = 0.5f)
 
     Box(
@@ -253,22 +250,44 @@ fun HistoryFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (isSelected) {
-                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = contentColor)
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = contentColor
+                )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            Text(text = text, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text(
+                text = text,
+                color = contentColor,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
 
 @Composable
-fun HistoryLogItem(item: MantenimientoDetalle) {
+fun HistoryLogItem(item: MaintenanceDetail) {
     // Determine icon based on name (simple logic)
     val icon = when {
-        item.nombreMantenimiento.contains("aceite", ignoreCase = true) -> Icons.Default.OilBarrel
-        item.nombreMantenimiento.contains("neumático", ignoreCase = true) -> Icons.Default.TireRepair
-        item.nombreMantenimiento.contains("cadena", ignoreCase = true) -> Icons.Default.SettingsSuggest
-        item.nombreMantenimiento.contains("luz", ignoreCase = true) || item.nombreMantenimiento.contains("eléctrico", ignoreCase = true) -> Icons.Default.Bolt
+        item.maintenanceName.contains("aceite", ignoreCase = true) -> Icons.Default.OilBarrel
+        item.maintenanceName.contains(
+            "neumático",
+            ignoreCase = true
+        ) -> Icons.Default.TireRepair
+
+        item.maintenanceName.contains(
+            "cadena",
+            ignoreCase = true
+        ) -> Icons.Default.SettingsSuggest
+
+        item.maintenanceName.contains(
+            "luz",
+            ignoreCase = true
+        ) || item.maintenanceName.contains("eléctrico", ignoreCase = true) -> Icons.Default.Bolt
+
         else -> Icons.Default.Build
     }
 
@@ -292,20 +311,23 @@ fun HistoryLogItem(item: MantenimientoDetalle) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = item.nombreMantenimiento,
+                text = item.maintenanceName,
                 color = TorqueColors.OnSurface,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1
             )
             Text(
-                text = "${item.date} • ${item.precio ?: "$0.00"}",
+                text = "${item.date} • ${item.price ?: "$0.00"}",
                 color = TorqueColors.OnSurfaceVariant,
                 fontSize = 14.sp
             )
         }
 
-        Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Icon(
                 Icons.Default.CheckCircle,
                 contentDescription = "Completado",

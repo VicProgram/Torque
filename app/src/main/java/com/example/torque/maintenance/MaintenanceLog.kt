@@ -64,7 +64,7 @@ class MaintenanceLog : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
-                MaintenanceLogScreen()
+                //  MaintenanceLogScreen()
             }
         }
     }
@@ -85,14 +85,44 @@ fun MaintenanceLogScreen() {
     var searchQuery by remember { mutableStateOf("") }
 
     val commonTasks = listOf(
-        Task("Cambio de Aceite Motor", "Recomendado cada 5,000 km", Icons.Default.OilBarrel, Color(0xFF3B82F6), "Engine"),
-        Task("Filtro de Aceite", "Incluido en servicio estándar", Icons.Default.FilterAlt, Color(0xFFF97316), "Engine"),
-        Task("Limpieza y Engrase de Cadena", "Mantenimiento regular", Icons.Default.SettingsInputComponent, Color(0xFF6366F1), "Drivetrain")
+        Task(
+            "Cambio de Aceite Motor",
+            "Recomendado cada 5,000 km",
+            Icons.Default.OilBarrel,
+            Color(0xFF3B82F6),
+            "Engine"
+        ),
+        Task(
+            "Filtro de Aceite",
+            "Incluido en servicio estándar",
+            Icons.Default.FilterAlt,
+            Color(0xFFF97316),
+            "Engine"
+        ),
+        Task(
+            "Limpieza y Engrase de Cadena",
+            "Mantenimiento regular",
+            Icons.Default.SettingsInputComponent,
+            Color(0xFF6366F1),
+            "Drivetrain"
+        )
     )
 
     val safetyTasks = listOf(
-        Task("Presión de Neumáticos", "Esencial para seguridad", Icons.Default.TireRepair, Color(0xFF10B981), "Tires"),
-        Task("Inspección Pastillas Freno", "Revisar indicadores de desgaste", Icons.Default.CarRepair, Color(0xFFEF4444), "Brakes")
+        Task(
+            "Presión de Neumáticos",
+            "Esencial para seguridad",
+            Icons.Default.TireRepair,
+            Color(0xFF10B981),
+            "Tires"
+        ),
+        Task(
+            "Inspección Pastillas Freno",
+            "Revisar indicadores de desgaste",
+            Icons.Default.CarRepair,
+            Color(0xFFEF4444),
+            "Brakes"
+        )
     )
 
     Box(
@@ -112,7 +142,12 @@ fun MaintenanceLogScreen() {
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = TorqueColors.Primary, modifier = Modifier.size(28.dp))
+                        Icon(
+                            Icons.Default.ChevronLeft,
+                            contentDescription = null,
+                            tint = TorqueColors.Primary,
+                            modifier = Modifier.size(28.dp)
+                        )
                         Text("Atrás", color = TorqueColors.Primary, fontSize = 18.sp)
                     }
                 }
@@ -132,15 +167,29 @@ fun MaintenanceLogScreen() {
                 contentPadding = PaddingValues(bottom = 160.dp)
             ) {
                 item {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
                         TextField(
                             value = searchQuery,
                             onValueChange = { searchQuery = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            placeholder = { Text("Buscar tareas...", color = TorqueColors.Slate500) },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TorqueColors.Slate500) },
+                            placeholder = {
+                                Text(
+                                    "Buscar tareas...",
+                                    color = TorqueColors.Slate500
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = TorqueColors.Slate500
+                                )
+                            },
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = TorqueColors.SurfaceDark,
                                 unfocusedContainerColor = TorqueColors.SurfaceDark,
@@ -199,7 +248,11 @@ fun MaintenanceLogScreen() {
                 .fillMaxWidth()
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, TorqueColors.Background.copy(alpha = 0.95f), TorqueColors.Background)
+                        colors = listOf(
+                            Color.Transparent,
+                            TorqueColors.Background.copy(alpha = 0.95f),
+                            TorqueColors.Background
+                        )
                     )
                 )
                 .padding(24.dp)
@@ -214,9 +267,22 @@ fun MaintenanceLogScreen() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 val selectedCount = checkedItems.values.count { it }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("$selectedCount tareas seleccionadas", color = TorqueColors.Slate500, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                    Text("Estimado 45 min", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "$selectedCount tareas seleccionadas",
+                        color = TorqueColors.Slate500,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        "Estimado 45 min",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
                 }
                 TorqueButton(
                     text = "Registrar Mantenimiento",
@@ -250,6 +316,11 @@ fun FilterChip(text: String, isSelected: Boolean) {
             .border(1.dp, borderColor, CircleShape)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(text = text, color = contentColor, fontSize = 14.sp, fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium)
+        Text(
+            text = text,
+            color = contentColor,
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
+        )
     }
 }

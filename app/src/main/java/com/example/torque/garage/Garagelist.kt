@@ -139,7 +139,11 @@ fun ListaGarageView() {
             contentColor = TorqueColors.OnPrimary,
             shape = RoundedCornerShape(16.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "New Moto", modifier = Modifier.size(24.dp))
+            Icon(
+                Icons.Default.Add,
+                contentDescription = "New Moto",
+                modifier = Modifier.size(24.dp)
+            )
         }
 
         DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
@@ -165,10 +169,18 @@ fun GarageHeader() {
         )
         Row {
             IconButton(onClick = { /* Search */ }) {
-                Icon(Icons.Default.Search, contentDescription = "Search", tint = TorqueColors.OnSurfaceVariant)
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = TorqueColors.OnSurfaceVariant
+                )
             }
             IconButton(onClick = { /* More */ }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More", tint = TorqueColors.OnSurfaceVariant)
+                Icon(
+                    Icons.Default.MoreVert,
+                    contentDescription = "More",
+                    tint = TorqueColors.OnSurfaceVariant
+                )
             }
         }
     }
@@ -177,7 +189,8 @@ fun GarageHeader() {
 @Composable
 fun FilterChip(text: String, isSelected: Boolean) {
     val bgColor = if (isSelected) TorqueColors.PrimaryContainer else Color.Transparent
-    val contentColor = if (isSelected) TorqueColors.OnPrimaryContainer else TorqueColors.OnSurfaceVariant
+    val contentColor =
+        if (isSelected) TorqueColors.OnPrimaryContainer else TorqueColors.OnSurfaceVariant
     val borderColor = if (isSelected) Color.Transparent else TorqueColors.Outline
 
     Box(
@@ -223,7 +236,9 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
                     painter = rememberAsyncImagePainter(moto.fotoMoto),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().alpha(0.9f)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(0.9f)
                 )
             } else {
                 Icon(

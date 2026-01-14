@@ -40,6 +40,7 @@ import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.components.ui.dashboard.TorqueTextField
 import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.maintenance.MaintenanceDetail
 import com.example.torque.ui.theme.TorqueTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -88,7 +89,11 @@ fun MantenimientoFormularioScreen(seleccionados: List<String>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(Icons.Default.ChevronLeft, contentDescription = "Atrás", tint = TorqueColors.Primary)
+                    Icon(
+                        Icons.Default.ChevronLeft,
+                        contentDescription = "Atrás",
+                        tint = TorqueColors.Primary
+                    )
                 }
                 Text(
                     text = "Detalles Finales",
@@ -109,7 +114,7 @@ fun MantenimientoFormularioScreen(seleccionados: List<String>) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     "Tareas: ${seleccionados.joinToString(", ")}",
                     color = TorqueColors.OnSurfaceVariant,
@@ -119,15 +124,25 @@ fun MantenimientoFormularioScreen(seleccionados: List<String>) {
 
                 TorqueTextField(marca, { marca = it }, "Marca")
                 TorqueTextField(modelo, { modelo = it }, "Modelo")
-                
+
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     TorqueTextField(anno, { anno = it }, "Año", modifier = Modifier.weight(1f))
                     TorqueTextField(km, { km = it }, "Kilómetros", modifier = Modifier.weight(1f))
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(precio, { precio = it }, "Precio ($)", modifier = Modifier.weight(1f))
-                    TorqueTextField(tiempo, { tiempo = it }, "Tiempo", modifier = Modifier.weight(1f))
+                    TorqueTextField(
+                        precio,
+                        { precio = it },
+                        "Precio ($)",
+                        modifier = Modifier.weight(1f)
+                    )
+                    TorqueTextField(
+                        tiempo,
+                        { tiempo = it },
+                        "Tiempo",
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 TorqueTextField(
@@ -154,19 +169,22 @@ fun MantenimientoFormularioScreen(seleccionados: List<String>) {
                 text = "Finalizar Registro",
                 icon = Icons.Default.Save,
                 onClick = {
-                    val mantenimiento = MantenimientoDetalle(
-                        nombreMantenimiento = if (seleccionados.size == 1) seleccionados[0] else "Mantenimiento General",
+                    // CORRECCIÓN: Usar MaintenanceDetail y sus nombres de campos correctos
+                    val mantenimiento = MaintenanceDetail(
+                        maintenanceId = 0, // O el valor por defecto que use tu clase
+                        maintenanceName = if (seleccionados.size == 1) seleccionados[0] else "Mantenimiento General",
                         date = fechaActual,
-                        kilometers = km.toIntOrNull(),
-                        marca = marca,
-                        modelo = modelo,
-                        anno = anno.toIntOrNull(),
-                        precio = precio,
-                        tiempo = tiempo,
-                        notas = notas,
-                        tareas = seleccionados.joinToString(", ")
+                        kilometers = km.toIntOrNull() ?: 0,
+                        brand = marca,
+                        model = modelo,
+                        year = anno.toIntOrNull() ?: 0,
+                        price = precio,
+                        time = tiempo,
+                        notes = notas,
+                        tasks = seleccionados.joinToString(", ")
                     )
 
+                    // Ahora esto ya no dará error de tipo
                     dbHelper.insertMaintenance(mantenimiento)
                     showToast(context, "¡Mantenimiento guardado!")
                     (context as? Activity)?.finish()

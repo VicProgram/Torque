@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -50,7 +49,30 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.torque.ui.theme.*
+import com.example.torque.ui.theme.TorqueAccent
+import com.example.torque.ui.theme.TorqueBackground
+import com.example.torque.ui.theme.TorqueBorderDark
+import com.example.torque.ui.theme.TorqueOnPrimary
+import com.example.torque.ui.theme.TorqueOnPrimaryContainer
+import com.example.torque.ui.theme.TorqueOnSecondary
+import com.example.torque.ui.theme.TorqueOnSecondaryContainer
+import com.example.torque.ui.theme.TorqueOnSurface
+import com.example.torque.ui.theme.TorqueOnSurfaceVariant
+import com.example.torque.ui.theme.TorqueOnTertiary
+import com.example.torque.ui.theme.TorqueOutline
+import com.example.torque.ui.theme.TorquePrimary
+import com.example.torque.ui.theme.TorquePrimaryContainer
+import com.example.torque.ui.theme.TorqueSecondary
+import com.example.torque.ui.theme.TorqueSecondaryContainer
+import com.example.torque.ui.theme.TorqueSlate500
+import com.example.torque.ui.theme.TorqueSlate900
+import com.example.torque.ui.theme.TorqueSurface
+import com.example.torque.ui.theme.TorqueSurfaceContainer
+import com.example.torque.ui.theme.TorqueSurfaceContainerHigh
+import com.example.torque.ui.theme.TorqueSurfaceContainerLow
+import com.example.torque.ui.theme.TorqueSurfaceDark
+import com.example.torque.ui.theme.TorqueSurfaceVariant
+import com.example.torque.ui.theme.TorqueTertiary
 
 // Object para acceder a los colores desde otros archivos
 object TorqueColors {
@@ -112,9 +134,11 @@ fun BackgroundImage(resourceId: Int, alpha: Float = 1f) {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 1f - alpha)))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 1f - alpha))
+        )
     }
 }
 
@@ -205,7 +229,12 @@ fun TorqueButton(
                 Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
                 Spacer(Modifier.size(8.dp))
             }
-            Text(text.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, letterSpacing = 0.5.sp)
+            Text(
+                text.uppercase(),
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 16.sp,
+                letterSpacing = 0.5.sp
+            )
         }
     }
 }

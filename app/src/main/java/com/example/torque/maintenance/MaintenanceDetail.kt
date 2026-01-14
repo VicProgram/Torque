@@ -1,4 +1,4 @@
-package com.example.torque.mantenimientos
+package com.example.torque.maintenance
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DetalleMantenimientoScreen(
-    mantenimiento: MantenimientoDetalle,
+    mantenimiento: MaintenanceDetail,
     onBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -41,16 +41,16 @@ fun DetalleMantenimientoScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            DetalleCampo("Nombre", mantenimiento.nombreMantenimiento)
+            DetalleCampo("Nombre", mantenimiento.maintenanceName)
             DetalleCampo("Fecha", mantenimiento.date)
             DetalleCampo("Kilómetros", mantenimiento.kilometers?.toString() ?: "")
-            DetalleCampo("Marca", mantenimiento.marca ?: "")
-            DetalleCampo("Modelo", mantenimiento.modelo ?: "")
-            DetalleCampo("Año", mantenimiento.anno?.toString() ?: "")
-            DetalleCampo("Precio", mantenimiento.precio ?: "")
-            DetalleCampo("Tiempo", mantenimiento.tiempo ?: "")
-            DetalleCampo("Notas", mantenimiento.notas ?: "")
-            DetalleCampo("Tareas", mantenimiento.tareas ?: "")
+            DetalleCampo("Marca", mantenimiento.brand ?: "")
+            DetalleCampo("Modelo", mantenimiento.model ?: "")
+            DetalleCampo("Año", mantenimiento.year?.toString() ?: "")
+            DetalleCampo("Precio", mantenimiento.price ?: "")
+            DetalleCampo("Tiempo", mantenimiento.time ?: "")
+            DetalleCampo("Notas", mantenimiento.notes ?: "")
+            DetalleCampo("Tareas", mantenimiento.tasks ?: "")
 
             Spacer(modifier = Modifier.height(24.dp))
 

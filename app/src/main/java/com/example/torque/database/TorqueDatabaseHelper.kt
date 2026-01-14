@@ -84,7 +84,8 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     fun getMotoById(idMoto: Int): Moto? {
         val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
+        val cursor =
+            db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
         return cursor.use {
             if (it.moveToFirst()) {
                 Moto(

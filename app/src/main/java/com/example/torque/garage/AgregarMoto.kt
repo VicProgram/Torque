@@ -107,7 +107,11 @@ fun AgregarMotoView() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = TorqueColors.OnSurface)
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = TorqueColors.OnSurface
+                    )
                 }
                 Text(
                     text = "Add Motorcycle",
@@ -210,7 +214,12 @@ fun AgregarMotoView() {
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         TorqueTextField(anno, { anno = it }, "Year", modifier = Modifier.weight(1f))
-                        TorqueTextField(cilindrada, { cilindrada = it }, "CC", modifier = Modifier.weight(1f))
+                        TorqueTextField(
+                            cilindrada,
+                            { cilindrada = it },
+                            "CC",
+                            modifier = Modifier.weight(1f)
+                        )
                     }
 
                     TorqueTextField(

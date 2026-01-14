@@ -1,4 +1,4 @@
-package com.example.torque.mantenimientos
+package com.example.torque.maintenance
 
 import android.app.Activity
 import android.content.Intent
@@ -47,7 +47,7 @@ class MantenimientoPreview : ComponentActivity() {
             TorqueTheme {
                 SeleccionMantenimientoScreen(
                     onNuevoMantenimiento = {
-                        startActivity(Intent(this, Mantenimiento::class.java))
+                        startActivity(Intent(this, MaintenanceDetail::class.java))
                     },
                     onVerHistorial = {
                         startActivity(Intent(this, MantenimientoHistorial::class.java))
@@ -107,9 +107,9 @@ fun SeleccionMantenimientoScreen(
                     color = TorqueColors.Primary,
                     onClick = onNuevoMantenimiento
                 )
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 MantenimientoOptionCard(
                     title = "Ver Historial",
                     subtitle = "Consulta registros pasados",
@@ -119,7 +119,7 @@ fun SeleccionMantenimientoScreen(
                 )
             }
         }
-        
+
         DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }

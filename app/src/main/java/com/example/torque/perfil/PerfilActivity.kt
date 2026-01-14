@@ -140,14 +140,27 @@ fun PerfilScreen(onBack: () -> Unit) {
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(TorqueColors.SurfaceDark)
-                                    .border(1.dp, TorqueColors.BorderDark, RoundedCornerShape(12.dp))
+                                    .border(
+                                        1.dp,
+                                        TorqueColors.BorderDark,
+                                        RoundedCornerShape(12.dp)
+                                    )
                                     .padding(16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Badge, contentDescription = null, tint = TorqueColors.Primary, modifier = Modifier.size(18.dp))
+                                    Icon(
+                                        Icons.Default.Badge,
+                                        contentDescription = null,
+                                        tint = TorqueColors.Primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = carnet, color = Color.White, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        text = carnet,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 }
                             }
                         }

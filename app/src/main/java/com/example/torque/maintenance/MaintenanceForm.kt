@@ -87,7 +87,11 @@ fun MaintenanceFormScreen(selectedTasks: List<String>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(Icons.Default.ChevronLeft, contentDescription = "Atrás", tint = TorqueColors.Primary)
+                    Icon(
+                        Icons.Default.ChevronLeft,
+                        contentDescription = "Atrás",
+                        tint = TorqueColors.Primary
+                    )
                 }
                 Text(
                     text = "Detalles Finales",
@@ -108,7 +112,7 @@ fun MaintenanceFormScreen(selectedTasks: List<String>) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     "Tareas: ${selectedTasks.joinToString(", ")}",
                     color = TorqueColors.OnSurfaceVariant,
@@ -118,14 +122,19 @@ fun MaintenanceFormScreen(selectedTasks: List<String>) {
 
                 TorqueTextField(brand, { brand = it }, "Marca")
                 TorqueTextField(model, { model = it }, "Modelo")
-                
+
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     TorqueTextField(year, { year = it }, "Año", modifier = Modifier.weight(1f))
                     TorqueTextField(km, { km = it }, "Kilómetros", modifier = Modifier.weight(1f))
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(price, { price = it }, "Precio ($)", modifier = Modifier.weight(1f))
+                    TorqueTextField(
+                        price,
+                        { price = it },
+                        "Precio ($)",
+                        modifier = Modifier.weight(1f)
+                    )
                     TorqueTextField(time, { time = it }, "Tiempo", modifier = Modifier.weight(1f))
                 }
 

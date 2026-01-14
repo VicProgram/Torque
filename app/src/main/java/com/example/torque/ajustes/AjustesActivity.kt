@@ -112,7 +112,10 @@ fun AjustesScreen(onBack: () -> Unit) {
                     initialValue = true
                 )
 
-                HorizontalDivider(color = TorqueColors.SurfaceVariant.copy(alpha = 0.2f), modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(
+                    color = TorqueColors.SurfaceVariant.copy(alpha = 0.2f),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
                 Text(
                     text = "SISTEMA",
@@ -140,9 +143,14 @@ fun AjustesScreen(onBack: () -> Unit) {
 }
 
 @Composable
-fun AjusteToggleItem(title: String, subtitle: String, icon: ImageVector, initialValue: Boolean = false) {
+fun AjusteToggleItem(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    initialValue: Boolean = false
+) {
     var checked by remember { mutableStateOf(initialValue) }
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -151,10 +159,20 @@ fun AjusteToggleItem(title: String, subtitle: String, icon: ImageVector, initial
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = TorqueColors.OnSurfaceVariant,
+            modifier = Modifier.size(24.dp)
+        )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text(
+                text = title,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
             Text(text = subtitle, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
         }
         Switch(
@@ -179,10 +197,20 @@ fun AjusteSimpleItem(title: String, subtitle: String, icon: ImageVector) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = TorqueColors.OnSurfaceVariant,
+            modifier = Modifier.size(24.dp)
+        )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text(
+                text = title,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp
+            )
             Text(text = subtitle, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
         }
     }
