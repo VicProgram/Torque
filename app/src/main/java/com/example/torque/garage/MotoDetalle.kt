@@ -105,9 +105,11 @@ fun MotoDetalleView(
         }
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(TorqueColors.Background)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(TorqueColors.Background)
+    ) {
         if (moto == null) {
             Text(
                 "Moto no encontrada, puedes añadirla en el perfil",

@@ -1,12 +1,12 @@
 package com.example.torque.room
 
 import android.content.Context
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.room.entity.PhotoEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -20,7 +20,8 @@ object RoomMigrationUtil {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val dbHelper = TorqueDatabaseHelper(context)
-                val oldMotos = dbHelper.getMotos() // tu helper devuelve lista de Moto (clase antigua)
+                val oldMotos =
+                    dbHelper.getMotos() // tu helper devuelve lista de Moto (clase antigua)
                 val repo = AppRepository.getInstance(context)
                 val now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
 

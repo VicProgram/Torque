@@ -279,12 +279,16 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
                         imageVector = if (moto.idMoto % 2L == 0L) Icons.Default.CalendarToday else Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
-                        tint = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(0xFF34D399)
+                        tint = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(
+                            0xFF34D399
+                        )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (moto.idMoto % 2L == 0L) "Service in 15d" else "Healthy Status",
-                        color = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(0xFF34D399),
+                        color = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(
+                            0xFF34D399
+                        ),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )

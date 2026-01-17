@@ -3,7 +3,6 @@ package com.example.torque.components.ui.dashboard
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,7 +61,8 @@ private fun safeNavigate(context: Context, activityClass: Class<*>) {
         val intent = Intent(context, activityClass)
         context.startActivity(intent)
     } catch (ignored: Exception) {
-        Toast.makeText(context, "Error al abrir: ${activityClass.simpleName}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Error al abrir: ${activityClass.simpleName}", Toast.LENGTH_SHORT)
+            .show()
     }
 }
 
@@ -176,7 +176,7 @@ fun TorqueDashboardScreen(
 fun DashboardHeader(onProfileClick: () -> Unit) {
     val context = LocalContext.current
     var showSettingsMenu by rememberSaveable { mutableStateOf(false) }
-    
+
     val menuToast = stringResource(id = R.string.menu_toast)
     val noNotifications = stringResource(id = R.string.no_notifications)
     val loggedOut = stringResource(id = R.string.logged_out)
@@ -191,7 +191,11 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { showToast(context, menuToast) }) {
-                Icon(Icons.Default.Menu, contentDescription = stringResource(id = R.string.menu), tint = TorqueColors.OnSurface)
+                Icon(
+                    Icons.Default.Menu,
+                    contentDescription = stringResource(id = R.string.menu),
+                    tint = TorqueColors.OnSurface
+                )
             }
             Text(
                 text = stringResource(id = R.string.dashboard_title),
@@ -231,14 +235,24 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                     modifier = Modifier.background(TorqueColors.SurfaceDark)
                 ) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(id = R.string.my_profile), color = Color.White) },
+                        text = {
+                            Text(
+                                stringResource(id = R.string.my_profile),
+                                color = Color.White
+                            )
+                        },
                         onClick = {
                             showSettingsMenu = false
                             onProfileClick()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(stringResource(id = R.string.app_settings), color = Color.White) },
+                        text = {
+                            Text(
+                                stringResource(id = R.string.app_settings),
+                                color = Color.White
+                            )
+                        },
                         onClick = {
                             showSettingsMenu = false
                             safeNavigate(context, AjustesActivity::class.java)
@@ -269,20 +283,23 @@ fun NextServiceCard(onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         Column {
-            Box(modifier = Modifier
-                .height(160.dp)
-                .background(TorqueColors.SurfaceVariant)) {
+            Box(
+                modifier = Modifier
+                    .height(160.dp)
+                    .background(TorqueColors.SurfaceVariant)
+            ) {
 
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                TorqueColors.SurfaceContainerHigh
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    TorqueColors.SurfaceContainerHigh
+                                )
                             )
                         )
-                    )
                 )
 
                 Box(

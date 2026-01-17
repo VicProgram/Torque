@@ -22,7 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun photoDao(): PhotoDao
 
     companion object {
-        @Volatile private var INSTANCE: AppDatabase? = null
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
