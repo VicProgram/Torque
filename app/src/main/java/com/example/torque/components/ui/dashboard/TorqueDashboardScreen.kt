@@ -112,7 +112,7 @@ fun TorqueDashboardScreen(
                 item {
                     Column {
                         Text(
-                            text = stringResource(id = R.string.quick_actions_title), // "ACCIONES RÁPIDAS"
+                            text = stringResource(id = R.string.quick_actions_title), // fast actions"
                             color = TorqueColors.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
