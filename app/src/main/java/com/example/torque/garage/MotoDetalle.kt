@@ -62,7 +62,7 @@ class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // FIX: Changed getIntExtra to getLongExtra and -1 to -1L
+        // Fix: Use getLongExtra to match the expected Long type for idMoto
         val idMoto = intent.getLongExtra("idMoto", -1L)
         val dbHelper = TorqueDatabaseHelper(this)
         val moto = if (idMoto != -1L) dbHelper.getMotoById(idMoto) else null
