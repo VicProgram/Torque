@@ -1,4 +1,4 @@
-val org.gradle.accessors.dm.LibrariesForLibs.coil: Any
+//val org.gradle.accessors.dm.LibrariesForLibs.coil: Any
 
 plugins {
     alias(libs.plugins.android.application)
