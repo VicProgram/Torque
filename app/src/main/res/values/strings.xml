@@ -16,8 +16,6 @@
     <string name="no_notifications">No tienes notificaciones</string>
     <string name="menu_toast">Menú lateral no implementado</string>
     <string name="save_motorcycle">Save Motorcycle</string>
-    <?xml version="1.0" encoding="utf-8"?>
-    <!-- existing keys... -->
     <string name="welcome_prefix">Bienvenido,</string>
     <string name="welcome_name">Rider</string>
     <string name="quick_actions_title">ACCIONES RÁPIDAS</string>
@@ -40,12 +38,9 @@
     <string name="app_settings">Ajustes de App</string>
     <string name="logout">Cerrar Sesión</string>
     <string name="logged_out">Sesión cerrada</string>
-
-    <!-- profile -->
     <string name="profile_title">Perfil</string>
     <string name="profile_name">Nombre</string>
     <string name="profile_birthday_hint">Fecha de nacimiento (YYYY-MM-DD)</string>
     <string name="save">Guardar</string>
     <string name="happy_birthday">¡Feliz cumpleaños!</string>
-
 </resources>

@@ -39,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,10 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -64,13 +61,9 @@ private fun safeNavigate(context: Context, activityClass: Class<*>) {
     try {
         val intent = Intent(context, activityClass)
         context.startActivity(intent)
-    } catch (e: Exception) {
+    } catch (ignored: Exception) {
         Toast.makeText(context, "Error al abrir: ${activityClass.simpleName}", Toast.LENGTH_SHORT).show()
     }
-}
-
-private fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
@@ -183,6 +176,10 @@ fun TorqueDashboardScreen(
 fun DashboardHeader(onProfileClick: () -> Unit) {
     val context = LocalContext.current
     var showSettingsMenu by rememberSaveable { mutableStateOf(false) }
+    
+    val menuToast = stringResource(id = R.string.menu_toast)
+    val noNotifications = stringResource(id = R.string.no_notifications)
+    val loggedOut = stringResource(id = R.string.logged_out)
 
     Row(
         modifier = Modifier
@@ -193,7 +190,7 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { showToast(context, stringResource(id = R.string.menu_toast)) }) {
+            IconButton(onClick = { showToast(context, menuToast) }) {
                 Icon(Icons.Default.Menu, contentDescription = stringResource(id = R.string.menu), tint = TorqueColors.OnSurface)
             }
             Text(
@@ -204,7 +201,7 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { showToast(context, stringResource(id = R.string.no_notifications)) }) {
+            IconButton(onClick = { showToast(context, noNotifications) }) {
                 Icon(
                     Icons.Default.Notifications,
                     contentDescription = stringResource(id = R.string.notifications),
@@ -251,7 +248,7 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                         text = { Text(stringResource(id = R.string.logout), color = Color.Red) },
                         onClick = {
                             showSettingsMenu = false
-                            showToast(context, stringResource(id = R.string.logged_out))
+                            showToast(context, loggedOut)
                         }
                     )
                 }
@@ -263,13 +260,6 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
 
 @Composable
 fun NextServiceCard(onClick: () -> Unit) {
-    // intenta cargar una imagen de ejemplo de drawable si existe
-    val motoPainter: Painter? = try {
-        painterResource(id = R.drawable.sample_moto_1)
-    } catch (e: Exception) {
-        null
-    }
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -283,26 +273,17 @@ fun NextServiceCard(onClick: () -> Unit) {
                 .height(160.dp)
                 .background(TorqueColors.SurfaceVariant)) {
 
-                // Imagen de moto (si existe)
-                if (motoPainter != null) {
-                    Image(
-                        painter = motoPainter,
-                        contentDescription = stringResource(id = R.string.next_service_image),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else {
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    TorqueColors.SurfaceContainerHigh
-                                )
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                TorqueColors.SurfaceContainerHigh
                             )
                         )
                     )
-                }
+                )
 
                 Box(
                     modifier = Modifier
@@ -378,7 +359,7 @@ fun NextServiceCard(onClick: () -> Unit) {
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     LinearProgressIndicator(
-                        progress = 0.85f,
+                        progress = { 0.85f },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(10.dp)
@@ -478,30 +459,5 @@ fun StatsCard() {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
-    }
-}
-
-@Composable
-fun DashboardBottomNav(modifier: Modifier = Modifier) {
-    // Puedes implementar aquí la barra de navegación inferior si la necesitas
-}
-
-@Composable
-fun TorqueButton(text: String, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(TorqueColors.Primary)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = TorqueColors.OnPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }

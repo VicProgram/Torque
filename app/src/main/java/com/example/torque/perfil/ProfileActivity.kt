@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import com.example.torque.R
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.ajustes.dataStore
 
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

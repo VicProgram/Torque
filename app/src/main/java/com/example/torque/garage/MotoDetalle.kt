@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.torque.components.ui.dashboard.TorqueButton
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.database.TorqueDatabaseHelper
@@ -64,9 +62,10 @@ class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val idMoto = intent.getIntExtra("idMoto", -1)
+        // FIX: Changed getIntExtra to getLongExtra and -1 to -1L
+        val idMoto = intent.getLongExtra("idMoto", -1L)
         val dbHelper = TorqueDatabaseHelper(this)
-        val moto = if (idMoto != -1) dbHelper.getMotoById(idMoto) else null
+        val moto = if (idMoto != -1L) dbHelper.getMotoById(idMoto) else null
 
         setContent {
             com.example.torque.ui.theme.TorqueTheme {
@@ -162,7 +161,6 @@ fun MotoDetalleView(
                                     )
                                 },
                                 onClick = {
-                                    // CORRECCIÓN: Quitar .toString()
                                     dbHelper.setPrincipal(moto.idMoto)
                                     showToast(context, "Moto principal actualizada")
                                     showMenu = false
@@ -178,7 +176,6 @@ fun MotoDetalleView(
                                     )
                                 },
                                 onClick = {
-                                    // CORRECCIÓN: Quitar .toString()
                                     if (dbHelper.deleteMoto(moto.idMoto)) {
                                         activity.setResult(Activity.RESULT_OK)
                                         activity.finish()
@@ -277,16 +274,6 @@ fun MotoDetalleView(
                             }
                         }
                     }
-
-                    TorqueButton(
-                        text = "Añadir Foto",
-                        icon = Icons.Default.AddAPhoto,
-                        onClick = { launcher.launch("image/*") },
-                        color = TorqueColors.SurfaceDark,
-                        contentColor = Color.White
-                    )
-
-                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
@@ -294,30 +281,44 @@ fun MotoDetalleView(
 }
 
 @Composable
-fun DetailRow(label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
-        Text(value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+fun DetailRow(label: String, value: String?) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
+        Text(
+            text = value ?: "N/A",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
 fun copyImageToInternal(context: Context, uri: Uri): String? {
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
-        val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            cursor.getString(nameIndex)
-        } ?: "bike_image_${System.currentTimeMillis()}.jpg"
-
-        val outputFile = File(context.filesDir, fileName)
+        val fileName = getFileName(context, uri) ?: "img_${System.currentTimeMillis()}.jpg"
+        val file = File(context.filesDir, fileName)
         inputStream?.use { input ->
-            outputFile.outputStream().use { output ->
+            file.outputStream().use { output ->
                 input.copyTo(output)
             }
         }
-        outputFile.absolutePath
+        file.absolutePath
     } catch (e: Exception) {
         null
     }
+}
+
+fun getFileName(context: Context, uri: Uri): String? {
+    var name: String? = null
+    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (cursor.moveToFirst()) {
+            name = cursor.getString(nameIndex)
+        }
+    }
+    return name
 }

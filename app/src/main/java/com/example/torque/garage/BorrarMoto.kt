@@ -7,9 +7,9 @@ import com.example.torque.database.TorqueDatabaseHelper
 class BorrarMoto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val motoId = intent.getIntExtra("idMoto", -1)
+        val motoId = intent.getLongExtra("idMoto", -1L)
 
-        if (motoId != -1) {
+        if (motoId != -1L) {
             // Lógica para eliminar la moto de la base de datos
             val dbHelper = TorqueDatabaseHelper(this)
             val success = dbHelper.deleteMoto(motoId)
