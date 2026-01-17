@@ -55,7 +55,12 @@ import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.components.ui.dashboard.TorqueTextField
 import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AgregarMoto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -248,21 +253,30 @@ fun AgregarMotoView() {
                 text = "Save Motorcycle",
                 icon = Icons.Default.Save,
                 onClick = {
-                    val moto = Moto(
-                        idMoto = 0L,
-                        marca = marca.trim(),
-                        modelo = modelo.trim(),
-                        anno = anno.toIntOrNull() ?: 0,
-                        matricula = matricula.trim(),
-                        colorMoto = colorMoto.trim(),
-                        cilindrada = cilindrada.trim(),
-                        cv = cv.trim(),
-                      //  estilo = estilo.trim(),
-                       // kms = kms.toIntOrNull() ?: 0,
-                        //fechaCompra = fechaCompra.trim(),
-                        //esPrincipal = 0,
-                        //fotoMoto = imageUri?.toString()
-                    )
+                    val repo = AppRepository.getInstance(context)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val motoEntity = MotoEntity(
+                            marca = marca.trim(),
+                            modelo = modelo.trim(),
+                            anno = anno.toIntOrNull() ?: 0,
+                            matricula = matricula.trim().ifBlank { null },
+                            colorMoto = colorMoto.trim().ifBlank { null },
+                            cilindrada = cilindrada.trim().ifBlank { null },
+                            cv = cv.trim().ifBlank { null },
+                            estilo = estilo.trim().ifBlank { null },
+                            kms = kms.toIntOrNull() ?: 0,
+                            fechaCompra = fechaCompra.trim().ifBlank { null },
+                            esPrincipal = 0,
+                            fotoUri = imageUri?.toString(),
+                            createdAt = java.time.LocalDateTime.now().toString(),
+                            updatedAt = java.time.LocalDateTime.now().toString()
+                        )
+                        val newId = repo.insertMoto(motoEntity)
+                        // llamar al hilo principal para UI
+                        kotlinx.coroutines.Dispatchers.Main.run {
+                            // show toast and finish
+                        }
+                    }
                     if (dbHelper.addMoto(moto)) {
                         showToast(context, "Motorcycle saved successfully!")
                         (context as? Activity)?.apply {

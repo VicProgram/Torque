@@ -2,11 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.example.torque"
-    // Usamos SDK 35 que es la versión estable actual
     compileSdk = 35
 
     defaultConfig {
@@ -33,7 +33,6 @@ android {
     }
 
     compileOptions {
-        // AGP 8.x/9.0 requiere Java 17 o superior para funcionar correctamente
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -46,9 +45,6 @@ android {
         compose = true
     }
 
-    // El plugin 'kotlin.compose' ya gestiona la compatibilidad,
-    // no es necesario declarar kotlinCompilerExtensionVersion aquí.
-
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -57,10 +53,12 @@ android {
 }
 
 dependencies {
-    // Importamos el BOM de Compose (Asegúrate de que 'libs.androidx.compose.bom' esté en tu TOML)
-    implementation(platform(libs.androidx.compose.bom))
+    // --- BOM de Compose ---
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
 
-    // Librerías de UI y Material Design
+    // --- UI, Material 3 y Navegación ---
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -68,23 +66,27 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
 
-    // Componentes principales
+    // --- Componentes Base de Android ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
 
-    // DataStore
+    // --- Persistencia de Datos (DataStore y Room) ---
     implementation(libs.androidx.datastore.preferences)
 
-    // Imágenes con Coil
+    // Room - Usando KSP en lugar de KAPT para mayor estabilidad
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // --- Imágenes (Coil) ---
     implementation(libs.coil.compose)
 
-    // Testing
+    // --- Testing ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
     debugImplementation(libs.androidx.ui.tooling)
