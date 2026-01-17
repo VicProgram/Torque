@@ -1,5 +1,3 @@
-//val org.gradle.accessors.dm.LibrariesForLibs.coil: Any
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,7 +6,8 @@ plugins {
 
 android {
     namespace = "com.example.torque"
-    compileSdk = 36
+    // Usamos SDK 35 que es la versión estable actual
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.torque"
@@ -32,17 +31,24 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // AGP 8.x/9.0 requiere Java 17 o superior para funcionar correctamente
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
-    }
+
+    // El plugin 'kotlin.compose' ya gestiona la compatibilidad,
+    // no es necesario declarar kotlinCompilerExtensionVersion aquí.
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -51,28 +57,33 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom.v20250501))
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.navigation.compose)
+    // Importamos el BOM de Compose (Asegúrate de que 'libs.androidx.compose.bom' esté en tu TOML)
+    implementation(platform(libs.androidx.compose.bom))
 
-    implementation(libs.androidx.activity.compose)
+    // Librerías de UI y Material Design
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
 
+    // Componentes principales
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
+
+    // Imágenes con Coil
     implementation(libs.coil.compose)
 
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom.v20260100))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
