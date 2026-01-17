@@ -1,4 +1,4 @@
-cat > app/src/main/java/com/example/torque/ui/theme/Theme.kt <<'EOF'
+
 package com.example.torque.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
