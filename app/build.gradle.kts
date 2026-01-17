@@ -33,12 +33,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "11"
     }
 
     buildFeatures {
@@ -74,6 +74,9 @@ dependencies {
 
     // --- Persistencia de Datos (DataStore y Room) ---
     implementation(libs.androidx.datastore.preferences)
+
+    // Material Components (Fixing syntax: using parentheses for Kotlin DSL)
+    implementation("com.google.android.material:material:1.9.0")
 
     // Room - Usando KSP en lugar de KAPT para mayor estabilidad
     implementation(libs.androidx.room.runtime)
