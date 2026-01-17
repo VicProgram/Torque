@@ -70,6 +70,7 @@ class AgregarMoto : ComponentActivity() {
 
 @Composable
 fun AgregarMotoView() {
+
     val context = LocalContext.current
     val dbHelper = remember { TorqueDatabaseHelper(context) }
     val scrollState = rememberScrollState()
@@ -248,19 +249,19 @@ fun AgregarMotoView() {
                 icon = Icons.Default.Save,
                 onClick = {
                     val moto = Moto(
-                        idMoto = 0,
-                        marca = marca,
-                        modelo = modelo,
+                        idMoto = 0L,
+                        marca = marca.trim(),
+                        modelo = modelo.trim(),
                         anno = anno.toIntOrNull() ?: 0,
-                        matricula = matricula,
-                        colorMoto = colorMoto,
-                        cilindrada = cilindrada,
-                        cv = cv,
-                        estilo = estilo,
-                        kms = kms.toIntOrNull() ?: 0,
-                        fechaCompra = fechaCompra,
-                        esPrincipal = 0,
-                        fotoMoto = imageUri?.toString() ?: ""
+                        matricula = matricula.trim(),
+                        colorMoto = colorMoto.trim(),
+                        cilindrada = cilindrada.trim(),
+                        cv = cv.trim(),
+                      //  estilo = estilo.trim(),
+                       // kms = kms.toIntOrNull() ?: 0,
+                        //fechaCompra = fechaCompra.trim(),
+                        //esPrincipal = 0,
+                        //fotoMoto = imageUri?.toString()
                     )
                     if (dbHelper.addMoto(moto)) {
                         showToast(context, "Motorcycle saved successfully!")

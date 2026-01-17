@@ -3,6 +3,7 @@ package com.example.torque.components.ui.dashboard
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,17 +40,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
 import com.example.torque.garage.AgregarMoto
 
@@ -69,9 +75,9 @@ private fun showToast(context: Context, message: String) {
 
 @Composable
 fun TorqueDashboardScreen(
-    onIrGaraje: () -> Unit,
-    onIrMantenimientos: () -> Unit,
-    onIrPerfil: () -> Unit
+    onIrGaraje: () -> Unit = {},
+    onIrMantenimientos: () -> Unit = {},
+    onIrPerfil: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -92,13 +98,13 @@ fun TorqueDashboardScreen(
                 item {
                     Column(modifier = Modifier.padding(top = 16.dp)) {
                         Text(
-                            text = "Bienvenido,",
+                            text = stringResource(id = R.string.welcome_prefix), // "Bienvenido,"
                             color = TorqueColors.OnSurfaceVariant,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "Rider",
+                            text = stringResource(id = R.string.welcome_name), // "Rider"
                             color = Color.White,
                             fontSize = 32.sp,
                             fontWeight = FontWeight.Bold
@@ -113,7 +119,7 @@ fun TorqueDashboardScreen(
                 item {
                     Column {
                         Text(
-                            text = "ACCIONES RÁPIDAS",
+                            text = stringResource(id = R.string.quick_actions_title), // "ACCIONES RÁPIDAS"
                             color = TorqueColors.OnSurfaceVariant,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -125,8 +131,8 @@ fun TorqueDashboardScreen(
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             QuickActionCard(
-                                title = "Garaje",
-                                subtitle = "Mis Motos",
+                                title = stringResource(id = R.string.garage_title),
+                                subtitle = stringResource(id = R.string.garage_subtitle),
                                 icon = Icons.Default.Motorcycle,
                                 containerColor = TorqueColors.SecondaryContainer,
                                 contentColor = TorqueColors.OnSecondaryContainer,
@@ -134,8 +140,8 @@ fun TorqueDashboardScreen(
                                 onClick = onIrGaraje
                             )
                             QuickActionCard(
-                                title = "Mantenimiento",
-                                subtitle = "Logs & Más",
+                                title = stringResource(id = R.string.maintenance_title),
+                                subtitle = stringResource(id = R.string.maintenance_subtitle),
                                 icon = Icons.Default.History,
                                 containerColor = TorqueColors.PrimaryContainer,
                                 contentColor = TorqueColors.OnPrimaryContainer,
@@ -156,6 +162,7 @@ fun TorqueDashboardScreen(
 
         FloatingActionButton(
             onClick = {
+                // Abrir activity de agregar moto
                 safeNavigate(context, AgregarMoto::class.java)
             },
             modifier = Modifier
@@ -165,7 +172,7 @@ fun TorqueDashboardScreen(
             contentColor = TorqueColors.OnPrimaryContainer,
             shape = RoundedCornerShape(16.dp)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Add", modifier = Modifier.size(32.dp))
+            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
         }
 
         DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
@@ -175,7 +182,7 @@ fun TorqueDashboardScreen(
 @Composable
 fun DashboardHeader(onProfileClick: () -> Unit) {
     val context = LocalContext.current
-    var showSettingsMenu by remember { mutableStateOf(false) }
+    var showSettingsMenu by rememberSaveable { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -186,21 +193,21 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { showToast(context, "Menú lateral no implementado") }) {
-                Icon(Icons.Default.Menu, contentDescription = "Menu", tint = TorqueColors.OnSurface)
+            IconButton(onClick = { showToast(context, stringResource(id = R.string.menu_toast)) }) {
+                Icon(Icons.Default.Menu, contentDescription = stringResource(id = R.string.menu), tint = TorqueColors.OnSurface)
             }
             Text(
-                text = "Dashboard",
+                text = stringResource(id = R.string.dashboard_title),
                 color = TorqueColors.OnSurface,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Medium
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { showToast(context, "No tienes notificaciones") }) {
+            IconButton(onClick = { showToast(context, stringResource(id = R.string.no_notifications)) }) {
                 Icon(
                     Icons.Default.Notifications,
-                    contentDescription = "Notifications",
+                    contentDescription = stringResource(id = R.string.notifications),
                     tint = TorqueColors.OnSurfaceVariant
                 )
             }
@@ -214,7 +221,7 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Configuración",
+                        contentDescription = stringResource(id = R.string.settings),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(8.dp),
@@ -227,24 +234,24 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                     modifier = Modifier.background(TorqueColors.SurfaceDark)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Mi Perfil", color = Color.White) },
+                        text = { Text(stringResource(id = R.string.my_profile), color = Color.White) },
                         onClick = {
                             showSettingsMenu = false
                             onProfileClick()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Ajustes de App", color = Color.White) },
+                        text = { Text(stringResource(id = R.string.app_settings), color = Color.White) },
                         onClick = {
                             showSettingsMenu = false
                             safeNavigate(context, AjustesActivity::class.java)
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Cerrar Sesión", color = Color.Red) },
+                        text = { Text(stringResource(id = R.string.logout), color = Color.Red) },
                         onClick = {
                             showSettingsMenu = false
-                            showToast(context, "Sesión cerrada")
+                            showToast(context, stringResource(id = R.string.logged_out))
                         }
                     )
                 }
@@ -256,6 +263,13 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
 
 @Composable
 fun NextServiceCard(onClick: () -> Unit) {
+    // intenta cargar una imagen de ejemplo de drawable si existe
+    val motoPainter: Painter? = try {
+        painterResource(id = R.drawable.sample_moto_1)
+    } catch (e: Exception) {
+        null
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -268,8 +282,16 @@ fun NextServiceCard(onClick: () -> Unit) {
             Box(modifier = Modifier
                 .height(160.dp)
                 .background(TorqueColors.SurfaceVariant)) {
-                Box(
-                    modifier = Modifier
+
+                // Imagen de moto (si existe)
+                if (motoPainter != null) {
+                    Image(
+                        painter = motoPainter,
+                        contentDescription = stringResource(id = R.string.next_service_image),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Box(modifier = Modifier
                         .fillMaxSize()
                         .background(
                             Brush.verticalGradient(
@@ -279,7 +301,9 @@ fun NextServiceCard(onClick: () -> Unit) {
                                 )
                             )
                         )
-                )
+                    )
+                }
+
                 Box(
                     modifier = Modifier
                         .padding(16.dp)
@@ -288,7 +312,7 @@ fun NextServiceCard(onClick: () -> Unit) {
                         .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "PRÓXIMO",
+                        text = stringResource(id = R.string.upcoming_label),
                         color = TorqueColors.OnPrimary,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
@@ -304,13 +328,13 @@ fun NextServiceCard(onClick: () -> Unit) {
                 ) {
                     Column {
                         Text(
-                            text = "Mantenimiento",
+                            text = stringResource(id = R.string.maintenance_title),
                             color = Color.White,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Tu Moto Principal",
+                            text = stringResource(id = R.string.your_primary_bike),
                             color = TorqueColors.OnSurfaceVariant,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
@@ -324,7 +348,7 @@ fun NextServiceCard(onClick: () -> Unit) {
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "DÍAS REST.",
+                            text = stringResource(id = R.string.days_left),
                             color = TorqueColors.Outline,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
@@ -339,7 +363,7 @@ fun NextServiceCard(onClick: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "CAMBIO DE ACEITE",
+                            text = stringResource(id = R.string.oil_change),
                             color = TorqueColors.OnSurfaceVariant,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
@@ -365,7 +389,7 @@ fun NextServiceCard(onClick: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 TorqueButton(
-                    text = "Agendar Servicio",
+                    text = stringResource(id = R.string.schedule_service),
                     onClick = onClick
                 )
             }
@@ -428,7 +452,7 @@ fun StatsCard() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "ESTADÍSTICAS",
+                text = stringResource(id = R.string.stats_title),
                 color = TorqueColors.Tertiary,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -447,7 +471,7 @@ fun StatsCard() {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Kilómetros",
+                text = stringResource(id = R.string.kilometers),
                 color = TorqueColors.OnSurfaceVariant,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
