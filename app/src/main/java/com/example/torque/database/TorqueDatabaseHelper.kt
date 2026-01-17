@@ -61,7 +61,7 @@ class TorqueDatabaseHelper(private val context: Context) :
                 do {
                     list.add(
                         Moto(
-                            idMoto = it.getInt(it.getColumnIndexOrThrow("idMoto")),
+                            idMoto = it.getLong(it.getColumnIndexOrThrow("idMoto")),
                             marca = it.getString(it.getColumnIndexOrThrow("marca")),
                             modelo = it.getString(it.getColumnIndexOrThrow("modelo")),
                             anno = it.getInt(it.getColumnIndexOrThrow("anno")),
@@ -73,7 +73,7 @@ class TorqueDatabaseHelper(private val context: Context) :
                             kms = it.getInt(it.getColumnIndexOrThrow("kms")),
                             fechaCompra = it.getString(it.getColumnIndexOrThrow("fechaCompra")),
                             esPrincipal = it.getInt(it.getColumnIndexOrThrow("esPrincipal")),
-                            fotoMoto = ""
+                            fotoUri = ""
                         )
                     )
                 } while (it.moveToNext())
@@ -82,14 +82,14 @@ class TorqueDatabaseHelper(private val context: Context) :
         return list
     }
 
-    fun getMotoById(idMoto: Int): Moto? {
+    fun getMotoById(idMoto: Long): Moto? {
         val db = readableDatabase
         val cursor =
             db.rawQuery("SELECT * FROM MiGaraje WHERE idMoto = ?", arrayOf(idMoto.toString()))
         return cursor.use {
             if (it.moveToFirst()) {
                 Moto(
-                    idMoto = it.getInt(it.getColumnIndexOrThrow("idMoto")),
+                    idMoto = it.getLong(it.getColumnIndexOrThrow("idMoto")),
                     marca = it.getString(it.getColumnIndexOrThrow("marca")),
                     modelo = it.getString(it.getColumnIndexOrThrow("modelo")),
                     anno = it.getInt(it.getColumnIndexOrThrow("anno")),
@@ -101,7 +101,7 @@ class TorqueDatabaseHelper(private val context: Context) :
                     kms = it.getInt(it.getColumnIndexOrThrow("kms")),
                     fechaCompra = it.getString(it.getColumnIndexOrThrow("fechaCompra")),
                     esPrincipal = it.getInt(it.getColumnIndexOrThrow("esPrincipal")),
-                    fotoMoto = ""
+                    fotoUri = ""
                 )
             } else null
         }
@@ -125,12 +125,12 @@ class TorqueDatabaseHelper(private val context: Context) :
         return db.insert("MiGaraje", null, values) != -1L
     }
 
-    fun deleteMoto(idMoto: Int): Boolean {
+    fun deleteMoto(idMoto: Long): Boolean {
         val db = writableDatabase
         return db.delete("MiGaraje", "idMoto = ?", arrayOf(idMoto.toString())) > 0
     }
 
-    fun setPrincipal(idMoto: Int): Boolean {
+    fun setPrincipal(idMoto: Long): Boolean {
         val db = writableDatabase
         db.beginTransaction()
         return try {
@@ -152,7 +152,7 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     // ==================== PHOTO OPERATIONS ====================
 
-    fun getPhotosByMotoId(idMoto: Int): List<String> {
+    fun getPhotosByMotoId(idMoto: Long): List<String> {
         val photos = mutableListOf<String>()
         val db = readableDatabase
         val cursor = db.query(
@@ -174,7 +174,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         return photos
     }
 
-    fun insertPhoto(idMoto: Int, path: String): Boolean {
+    fun insertPhoto(idMoto: Long, path: String): Boolean {
         val db = writableDatabase
         val values = ContentValues().apply {
             put("idMoto", idMoto)
@@ -183,7 +183,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         return db.insert("FotosMoto", null, values) != -1L
     }
 
-    fun deletePhoto(idMoto: Int, path: String): Boolean {
+    fun deletePhoto(idMoto: Long, path: String): Boolean {
         val db = writableDatabase
         return db.delete(
             "FotosMoto",

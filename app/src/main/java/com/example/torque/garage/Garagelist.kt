@@ -231,9 +231,10 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
                 .background(TorqueColors.SurfaceContainerLow),
             contentAlignment = Alignment.Center
         ) {
-            if (moto.fotoMoto.isNotEmpty()) {
+            val foto = moto.fotoUri ?: ""
+            if (foto.isNotEmpty()) {
                 Image(
-                    painter = rememberAsyncImagePainter(moto.fotoMoto),
+                    painter = rememberAsyncImagePainter(foto),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -275,15 +276,15 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = if (moto.idMoto % 2 == 0) Icons.Default.CalendarToday else Icons.Default.CheckCircle,
+                        imageVector = if (moto.idMoto % 2L == 0L) Icons.Default.CalendarToday else Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
-                        tint = if (moto.idMoto % 2 == 0) TorqueColors.Primary else Color(0xFF34D399)
+                        tint = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(0xFF34D399)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (moto.idMoto % 2 == 0) "Service in 15d" else "Healthy Status",
-                        color = if (moto.idMoto % 2 == 0) TorqueColors.Primary else Color(0xFF34D399),
+                        text = if (moto.idMoto % 2L == 0L) "Service in 15d" else "Healthy Status",
+                        color = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(0xFF34D399),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
