@@ -18,8 +18,8 @@
         </activity>
 
 
-        <activity android:name=".maintenance.Mantenimiento" />
-        <activity android:name=".mantenimientos.MantenimientoFormulario" />
+        <activity android:name=".maintenance.MaintenanceLog" />
+        <activity android:name=".maintenance.MaintenanceForm" />
         <activity android:name=".maintenance.MantenimientoPreview" />
         <activity android:name=".maintenance.MantenimientoHistorial" />
 
