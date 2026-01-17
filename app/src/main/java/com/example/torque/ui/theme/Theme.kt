@@ -1,9 +1,9 @@
+cat > app/src/main/java/com/example/torque/ui/theme/Theme.kt <<'EOF'
 package com.example.torque.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
-import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val TorqueTypography = Typography(
+val TorqueTypography = androidx.compose.material3.Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
@@ -50,7 +50,8 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = TorqueOnSurface
 )
 
-val Shapes = Shapes(
+// Renamed to avoid shadowing the Shapes type
+val TorqueShapes = Shapes(
     small = RoundedCornerShape(8.dp),
     medium = RoundedCornerShape(16.dp),
     large = RoundedCornerShape(24.dp)
@@ -63,7 +64,7 @@ fun TorqueTheme(
     MaterialTheme(
         colorScheme = DarkColorScheme,
         typography = TorqueTypography,
-        shapes = Shapes,
+        shapes = TorqueShapes,
         content = content
     )
 }

@@ -1,1 +1,19 @@
-<resources></resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Torque</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="preferences_header">PREFERENCIAS</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="notifications_subtitle">Alertas de mantenimiento</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="dark_mode_subtitle">Interfaz de alto contraste</string>
+    <string name="system_header">SISTEMA</string>
+    <string name="privacy">Privacidad</string>
+    <string name="privacy_subtitle">Gestionar tus datos</string>
+    <string name="backup">Copia de Seguridad</string>
+    <string name="backup_subtitle">Backup de la base de datos</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="no_notifications">No tienes notificaciones</string>
+    <string name="menu_toast">Menú lateral no implementado</string>
+    <string name="save_motorcycle">Save Motorcycle</string>
+</resources>
