@@ -110,7 +110,7 @@ fun MotoDetalleView(
         .background(TorqueColors.Background)) {
         if (moto == null) {
             Text(
-                "Moto no encontrada",
+                "Moto no encontrada, puedes añadirla en el perfil",
                 color = Color.White,
                 modifier = Modifier.align(Alignment.Center)
             )
