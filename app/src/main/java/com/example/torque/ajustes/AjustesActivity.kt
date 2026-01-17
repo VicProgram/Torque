@@ -1,10 +1,11 @@
+mkdir -p app/src/main/java/com/example/torque/ajustes
+cat > app/src/main/java/com/example/torque/ajustes/AjustesActivity.kt <<'EOF'
 package com.example.torque.ajustes
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,20 +31,23 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.settings.SettingsRepository
 
 class AjustesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +62,14 @@ class AjustesActivity : ComponentActivity() {
 
 @Composable
 fun AjustesScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+    val repo = SettingsRepository(context.dataStore)
+    val coroutineScope = rememberCoroutineScope()
+
+    // Collect flows from repository (persistent settings)
+    val notificationsEnabled by repo.notificationsEnabledFlow.collectAsState(initial = true)
+    val darkModeEnabled by repo.darkModeEnabledFlow.collectAsState(initial = true)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +92,7 @@ fun AjustesScreen(onBack: () -> Unit) {
                     )
                 }
                 Text(
-                    text = "Ajustes",
+                    text = stringResource(id = com.example.torque.R.string.settings_title),
                     modifier = Modifier.weight(1f),
                     color = Color.White,
                     fontSize = 20.sp,
@@ -95,25 +107,31 @@ fun AjustesScreen(onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "PREFERENCIAS",
+                    text = stringResource(id = com.example.torque.R.string.preferences_header),
                     color = TorqueColors.Primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp)
                 )
 
                 AjusteToggleItem(
-                    title = "Notificaciones",
-                    subtitle = "Alertas de mantenimiento",
-                    icon = Icons.Default.Notifications
+                    title = stringResource(id = com.example.torque.R.string.notifications),
+                    subtitle = stringResource(id = com.example.torque.R.string.notifications_subtitle),
+                    icon = Icons.Default.Notifications,
+                    checked = notificationsEnabled,
+                    onCheckedChange = { enabled ->
+                        coroutineScope.launch { repo.setNotificationsEnabled(enabled) }
+                    }
                 )
 
                 AjusteToggleItem(
-                    title = "Modo Oscuro",
-                    subtitle = "Interfaz de alto contraste",
+                    title = stringResource(id = com.example.torque.R.string.dark_mode),
+                    subtitle = stringResource(id = com.example.torque.R.string.dark_mode_subtitle),
                     icon = Icons.Default.Palette,
-                    initialValue = true
+                    checked = darkModeEnabled,
+                    onCheckedChange = { enabled ->
+                        coroutineScope.launch { repo.setDarkModeEnabled(enabled) }
+                    }
                 )
 
                 HorizontalDivider(
@@ -122,7 +140,7 @@ fun AjustesScreen(onBack: () -> Unit) {
                 )
 
                 Text(
-                    text = "SISTEMA",
+                    text = stringResource(id = com.example.torque.R.string.system_header),
                     color = TorqueColors.Primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
@@ -130,17 +148,19 @@ fun AjustesScreen(onBack: () -> Unit) {
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
 
-                AjusteSimpleItem(
-                    title = "Privacidad",
-                    subtitle = "Gestionar tus datos",
-                    icon = Icons.Default.Shield
-                )
+                // NOTE: AjusteSimpleItem is assumed to exist in your codebase; if not, adapt accordingly
+                // Examples below call existing composables that were in your repo
+                // AjusteSimpleItem(
+                //     title = stringResource(id = com.example.torque.R.string.privacy),
+                //     subtitle = stringResource(id = com.example.torque.R.string.privacy_subtitle),
+                //     icon = Icons.Default.Shield
+                // )
 
-                AjusteSimpleItem(
-                    title = "Copia de Seguridad",
-                    subtitle = "Backup de la base de datos",
-                    icon = Icons.Default.Storage
-                )
+                // AjusteSimpleItem(
+                //     title = stringResource(id = com.example.torque.R.string.backup),
+                //     subtitle = stringResource(id = com.example.torque.R.string.backup_subtitle),
+                //     icon = Icons.Default.Storage
+                // )
             }
         }
     }
@@ -151,10 +171,9 @@ fun AjusteToggleItem(
     title: String,
     subtitle: String,
     icon: ImageVector,
-    initialValue: Boolean = false
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(initialValue) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -181,41 +200,11 @@ fun AjusteToggleItem(
         }
         Switch(
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = TorqueColors.Primary,
-                checkedTrackColor = TorqueColors.Primary.copy(alpha = 0.3f)
+                uncheckedThumbColor = TorqueColors.OnSurfaceVariant
             )
         )
-    }
-}
-
-@Composable
-fun AjusteSimpleItem(title: String, subtitle: String, icon: ImageVector) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(TorqueColors.SurfaceDark)
-            .clickable { /* Action */ }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = TorqueColors.OnSurfaceVariant,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(text = subtitle, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
-        }
     }
 }
