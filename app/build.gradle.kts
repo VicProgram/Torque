@@ -74,6 +74,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
 
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
     // Imágenes con Coil
     implementation(libs.coil.compose)
 

@@ -1,6 +1,8 @@
 package com.example.torque.components.ui.dashboard
 
+import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,8 +50,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.torque.ajustes.AjustesActivity
 import com.example.torque.garage.AgregarMoto
 
+// Función de utilidad para navegar de forma segura
+private fun safeNavigate(context: Context, activityClass: Class<*>) {
+    try {
+        val intent = Intent(context, activityClass)
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "Error al abrir: ${activityClass.simpleName}", Toast.LENGTH_SHORT).show()
+    }
+}
+
+private fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
 
 @Composable
 fun TorqueDashboardScreen(
@@ -91,10 +107,7 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    // "Agendar Servicio" now navigates directly to creating maintenance
-                    NextServiceCard(onClick = {
-                        context.startActivity(Intent(context, onIrMantenimientos::class.java))
-                    })
+                    NextServiceCard(onClick = onIrMantenimientos)
                 }
 
                 item {
@@ -143,7 +156,7 @@ fun TorqueDashboardScreen(
 
         FloatingActionButton(
             onClick = {
-                context.startActivity(Intent(context, AgregarMoto::class.java))
+                safeNavigate(context, AgregarMoto::class.java)
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -224,7 +237,7 @@ fun DashboardHeader(onProfileClick: () -> Unit) {
                         text = { Text("Ajustes de App", color = Color.White) },
                         onClick = {
                             showSettingsMenu = false
-                            showToast(context, "Ajustes abiertos")
+                            safeNavigate(context, AjustesActivity::class.java)
                         }
                     )
                     DropdownMenuItem(
@@ -441,5 +454,30 @@ fun StatsCard() {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
+    }
+}
+
+@Composable
+fun DashboardBottomNav(modifier: Modifier = Modifier) {
+    // Puedes implementar aquí la barra de navegación inferior si la necesitas
+}
+
+@Composable
+fun TorqueButton(text: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(TorqueColors.Primary)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            color = TorqueColors.OnPrimary,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
