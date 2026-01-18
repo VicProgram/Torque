@@ -37,6 +37,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    // Kotlin options — Android Gradle plugin exposes kotlinOptions here
     kotlinOptions {
         jvmTarget = "11"
     }
@@ -45,10 +46,22 @@ android {
         compose = true
     }
 
+    // Optional: set the Compose compiler extension version if your version catalog exposes it
+    // composeOptions {
+    //     kotlinCompilerExtensionVersion = "1.5.3" // ajusta si lo necesitas
+    // }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+// Forcera jvmTarget en todas las compilaciones Kotlin (segunda defensa)
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
     }
 }
 
@@ -75,10 +88,10 @@ dependencies {
     // --- Persistencia de Datos (DataStore y Room) ---
     implementation(libs.androidx.datastore.preferences)
 
-    // Material Components (Fixing syntax: using parentheses for Kotlin DSL)
+    // Material Components
     implementation("com.google.android.material:material:1.9.0")
 
-    // Room - Usando KSP en lugar de KAPT para mayor estabilidad
+    // Room - usando KSP (asegúrate de que libs.androidx.room.compiler apunta a la artifact correcta)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
