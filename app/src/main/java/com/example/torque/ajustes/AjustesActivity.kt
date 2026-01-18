@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,14 +36,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.ui.theme.TorqueTheme
-import kotlinx.coroutines.launch
+import com.example.torque.settings.SettingsRepository
 
 class AjustesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +72,6 @@ fun AjustesScreen(onBack: () -> Unit) {
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // --- Header ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -78,14 +80,10 @@ fun AjustesScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
-                        tint = Color.White
-                    )
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
                 }
                 Text(
-                    text = "Ajustes",
+                    text = stringResource(id = com.example.torque.R.string.settings_title),
                     modifier = Modifier.weight(1f),
                     color = Color.White,
                     fontSize = 20.sp,
@@ -100,81 +98,57 @@ fun AjustesScreen(onBack: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "PREFERENCIAS",
+                    text = stringResource(id = com.example.torque.R.string.preferences_header),
                     color = TorqueColors.Primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
                 )
 
-                AjusteToggleItem(
-                    title = "Notificaciones",
-                    subtitle = "Recibir avisos de mantenimiento",
-                    icon = Icons.Default.Notifications,
-                    checked = notificationsEnabled,
-                    onCheckedChange = { enabled ->
-                        coroutineScope.launch { repo.setNotificationsEnabled(enabled) }
+                // Notifications toggle
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(TorqueColors.SurfaceDark)
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Notifications, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = stringResource(id = com.example.torque.R.string.notifications), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(text = stringResource(id = com.example.torque.R.string.notifications_subtitle), color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
                     }
-                )
+                    Switch(
+                        checked = notificationsEnabled,
+                        onCheckedChange = { enabled -> coroutineScope.launch { repo.setNotificationsEnabled(enabled) } },
+                        colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary, uncheckedThumbColor = TorqueColors.OnSurfaceVariant)
+                    )
+                }
 
-                AjusteToggleItem(
-                    title = "Modo Oscuro",
-                    subtitle = "Cambiar el tema de la aplicación",
-                    icon = Icons.Default.Palette,
-                    checked = darkModeEnabled,
-                    onCheckedChange = { enabled ->
-                        coroutineScope.launch { repo.setDarkModeEnabled(enabled) }
+                // Dark mode toggle
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(TorqueColors.SurfaceDark)
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Palette, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = stringResource(id = com.example.torque.R.string.dark_mode), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(text = stringResource(id = com.example.torque.R.string.dark_mode_subtitle), color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
                     }
-                )
-
-                HorizontalDivider(
-                    color = TorqueColors.SurfaceVariant.copy(alpha = 0.2f),
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                    Switch(
+                        checked = darkModeEnabled,
+                        onCheckedChange = { enabled -> coroutineScope.launch { repo.setDarkModeEnabled(enabled) } },
+                        colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary, uncheckedThumbColor = TorqueColors.OnSurfaceVariant)
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-fun AjusteToggleItem(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(TorqueColors.SurfaceDark)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = TorqueColors.OnSurfaceVariant,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-            Text(text = subtitle, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
-        }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = TorqueColors.Primary,
-                uncheckedThumbColor = TorqueColors.OnSurfaceVariant
-            )
-        )
     }
 }

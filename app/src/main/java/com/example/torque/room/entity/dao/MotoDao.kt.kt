@@ -1,13 +1,8 @@
 package com.example.torque.room.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
-import com.example.torque.room.entity.MotoEntity
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import com.example.torque.room.entity.MotoEntity
 
 @Dao
 interface MotoDao {

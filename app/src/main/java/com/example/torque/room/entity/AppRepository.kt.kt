@@ -1,8 +1,8 @@
 package com.example.torque.room
 
 import android.content.Context
-import com.example.torque.room.entity.MaintenanceEntity
 import com.example.torque.room.entity.MotoEntity
+import com.example.torque.room.entity.MaintenanceEntity
 import com.example.torque.room.entity.PhotoEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -21,8 +21,7 @@ class AppRepository private constructor(private val db: AppDatabase) {
     suspend fun insertPhoto(p: PhotoEntity) = db.photoDao().insert(p)
 
     companion object {
-        @Volatile
-        private var instance: AppRepository? = null
+        @Volatile private var instance: AppRepository? = null
         fun getInstance(context: Context): AppRepository =
             instance ?: synchronized(this) {
                 instance ?: AppRepository(AppDatabase.getInstance(context)).also { instance = it }

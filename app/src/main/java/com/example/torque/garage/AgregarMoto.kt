@@ -55,8 +55,7 @@ import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.components.ui.dashboard.TorqueTextField
 import com.example.torque.components.ui.dashboard.showToast
 import com.example.torque.database.TorqueDatabaseHelper
-import com.example.torque.room.AppRepository
-import com.example.torque.room.entity.MotoEntity
+import com.example.torque.room.`AppRepository.kt`
 import com.example.torque.ui.theme.TorqueTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -253,9 +252,9 @@ fun AgregarMotoView() {
                 text = "Save Motorcycle",
                 icon = Icons.Default.Save,
                 onClick = {
-                    val repo = AppRepository.getInstance(context)
+                    val repo = `AppRepository.kt`.getInstance(context)
                     CoroutineScope(Dispatchers.IO).launch {
-                        val motoEntity = MotoEntity(
+                        val `motoEntity.kt` = `MotoEntity.kt`(
                             marca = marca.trim(),
                             modelo = modelo.trim(),
                             anno = anno.toIntOrNull() ?: 0,
@@ -271,7 +270,7 @@ fun AgregarMotoView() {
                             createdAt = java.time.LocalDateTime.now().toString(),
                             updatedAt = java.time.LocalDateTime.now().toString()
                         )
-                        val newId = repo.insertMoto(motoEntity)
+                        val newId = repo.insertMoto(`motoEntity.kt`)
                         // llamar al hilo principal para UI
                         kotlinx.coroutines.Dispatchers.Main.run {
                             // show toast and finish
