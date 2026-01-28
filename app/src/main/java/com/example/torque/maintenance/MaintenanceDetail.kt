@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DetalleMantenimientoScreen(
-    mantenimiento: MaintenanceDetail,
+    mantenimiento: MaintenanceDetailData,
     onBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()

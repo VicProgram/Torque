@@ -71,8 +71,8 @@ import kotlinx.coroutines.launch
 class MantenimientoHistorialViewModel(application: Application) : AndroidViewModel(application) {
     private val dbHelper = TorqueDatabaseHelper(application)
 
-    private val _historial = MutableStateFlow<List<MaintenanceDetail>>(emptyList())
-    val historial: StateFlow<List<MaintenanceDetail>> = _historial
+    private val _historial = MutableStateFlow<List<MaintenanceDetailData>>(emptyList())
+    val historial: StateFlow<List<MaintenanceDetailData>> = _historial
 
     fun cargarHistorial() {
         viewModelScope.launch {
@@ -269,7 +269,7 @@ fun HistoryFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun HistoryLogItem(item: MaintenanceDetail) {
+fun HistoryLogItem(item: MaintenanceDetailData) {
     // Determine icon based on name (simple logic)
     val icon = when {
         item.maintenanceName.contains("aceite", ignoreCase = true) -> Icons.Default.OilBarrel

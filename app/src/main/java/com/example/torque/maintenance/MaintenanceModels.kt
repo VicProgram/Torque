@@ -1,6 +1,6 @@
 package com.example.torque.maintenance
 
-data class MaintenanceDetail(
+data class MaintenanceDetailData(
     val maintenanceId: Int = 0,
     val maintenanceName: String,
     val date: String,

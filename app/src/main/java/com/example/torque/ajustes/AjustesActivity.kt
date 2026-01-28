@@ -44,7 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.settings.SettingsRepository
+import com.example.torque.ajustes.SettingsRepository
 
 class AjustesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

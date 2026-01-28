@@ -40,17 +40,18 @@ import com.example.torque.components.ui.dashboard.DashboardBottomNav
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.ui.theme.TorqueTheme
 
-class MantenimientoPreview : ComponentActivity() {
+class MaintenancePreview : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
                 SeleccionMantenimientoScreen(
                     onNuevoMantenimiento = {
-                        startActivity(Intent(this, MaintenanceDetail::class.java))
+                        // Abrir MaintenanceLog para seleccionar tareas
+                        startActivity(Intent(this, MaintenanceLog::class.java))
                     },
                     onVerHistorial = {
-                        startActivity(Intent(this, MantenimientoHistorial::class.java))
+                        // startActivity(Intent(this, MantenimientoHistorial::class.java))
                     }
                 )
             }
@@ -88,7 +89,7 @@ fun SeleccionMantenimientoScreen(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(onClick = { /* Basic Settings Placeholder */ }) {
+                IconButton(onClick = { /* Settings */ }) {
                     Icon(Icons.Default.Settings, contentDescription = "Ajustes", tint = Color.White)
                 }
             }

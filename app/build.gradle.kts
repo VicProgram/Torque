@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
@@ -37,31 +36,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    // Kotlin options — Android Gradle plugin exposes kotlinOptions here
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
     buildFeatures {
         compose = true
     }
-
-    // Optional: set the Compose compiler extension version if your version catalog exposes it
-    // composeOptions {
-    //     kotlinCompilerExtensionVersion = "1.5.3" // ajusta si lo necesitas
-    // }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-}
-
-// Forcera jvmTarget en todas las compilaciones Kotlin (segunda defensa)
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "11"
     }
 }
 
@@ -91,7 +73,7 @@ dependencies {
     // Material Components
     implementation("com.google.android.material:material:1.9.0")
 
-    // Room - usando KSP (asegúrate de que libs.androidx.room.compiler apunta a la artifact correcta)
+    // Room - usando KSP
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

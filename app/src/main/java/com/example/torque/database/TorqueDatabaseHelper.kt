@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.torque.garage.Moto
-import com.example.torque.maintenance.MaintenanceDetail
+import com.example.torque.maintenance.MaintenanceDetailData
 import java.io.File
 import java.io.FileOutputStream
 
@@ -194,15 +194,15 @@ class TorqueDatabaseHelper(private val context: Context) :
 
     // ==================== MAINTENANCE OPERATIONS ====================
 
-    fun getMaintenances(): List<MaintenanceDetail> {
-        val list = mutableListOf<MaintenanceDetail>()
+    fun getMaintenances(): List<MaintenanceDetailData> {
+        val list = mutableListOf<MaintenanceDetailData>()
         val db = readableDatabase
         val cursor = db.rawQuery("SELECT * FROM Mantenimientos", null)
         cursor.use {
             if (it.moveToFirst()) {
                 do {
                     list.add(
-                        MaintenanceDetail(
+                        MaintenanceDetailData(
                             maintenanceId = it.getInt(it.getColumnIndexOrThrow("mantenimientoId")),
                             maintenanceName = it.getString(it.getColumnIndexOrThrow("nombreMantenimiento")),
                             date = it.getString(it.getColumnIndexOrThrow("date")),
@@ -222,7 +222,7 @@ class TorqueDatabaseHelper(private val context: Context) :
         return list
     }
 
-    fun insertMaintenance(maintenance: MaintenanceDetail): Boolean {
+    fun insertMaintenance(maintenance: MaintenanceDetailData): Boolean {
         val db = writableDatabase
         val values = ContentValues().apply {
             put("nombreMantenimiento", maintenance.maintenanceName)

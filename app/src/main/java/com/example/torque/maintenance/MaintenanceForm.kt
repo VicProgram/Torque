@@ -161,7 +161,7 @@ fun MaintenanceFormScreen(selectedTasks: List<String>) {
                 text = "Finalizar Registro",
                 icon = Icons.Default.Save,
                 onClick = {
-                    val maintenance = MaintenanceDetail(
+                    val maintenance = MaintenanceDetailData(
                         maintenanceName = if (selectedTasks.size == 1) selectedTasks[0] else "Mantenimiento General",
                         date = currentDate,
                         kilometers = km.toIntOrNull(),
