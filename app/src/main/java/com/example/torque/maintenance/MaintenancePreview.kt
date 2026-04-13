@@ -7,26 +7,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,19 +25,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.torque.components.ui.dashboard.DashboardBottomNav
 import com.example.torque.components.ui.dashboard.TorqueColors
+import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.garage.Moto
 
-class MantenimientoPreview : ComponentActivity() {
+class MaintenancePreview : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dbHelper = TorqueDatabaseHelper(this)
+        var motoId = intent.getLongExtra("motoId", -1L)
+
+        // Si no viene motoId, intentar buscar la principal
+        if (motoId == -1L) {
+            motoId = dbHelper.getPrincipalMoto()?.idMoto ?: -1L
+        }
+
         setContent {
             TorqueTheme {
                 SeleccionMantenimientoScreen(
+                    motoId = motoId,
                     onNuevoMantenimiento = {
-                        startActivity(Intent(this, MaintenanceDetail::class.java))
+                        val intent = Intent(this, MaintenanceLog::class.java).apply {
+                            putExtra("motoId", motoId)
+                        }
+                        startActivity(intent)
                     },
                     onVerHistorial = {
-                        startActivity(Intent(this, MantenimientoHistorial::class.java))
+                        val intent = Intent(this, MantenimientoHistorial::class.java).apply {
+                            putExtra("motoId", motoId)
+                        }
+                        startActivity(intent)
                     }
                 )
             }
@@ -60,10 +64,14 @@ class MantenimientoPreview : ComponentActivity() {
 
 @Composable
 fun SeleccionMantenimientoScreen(
+    motoId: Long,
     onNuevoMantenimiento: () -> Unit,
     onVerHistorial: () -> Unit
 ) {
     val context = LocalContext.current
+    val dbHelper = remember { TorqueDatabaseHelper(context) }
+    val moto = remember(motoId) { if (motoId != -1L) dbHelper.getMotoById(motoId) else null }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -79,7 +87,11 @@ fun SeleccionMantenimientoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Atrás",
+                        tint = Color.White
+                    )
                 }
                 Text(
                     text = "Mantenimiento",
@@ -88,18 +100,36 @@ fun SeleccionMantenimientoScreen(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(onClick = { /* Basic Settings Placeholder */ }) {
-                    Icon(Icons.Default.Settings, contentDescription = "Ajustes", tint = Color.White)
-                }
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Info de la moto seleccionada
+                moto?.let {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = TorqueColors.SurfaceDark),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(Icons.Default.Motorcycle, contentDescription = null, tint = TorqueColors.Primary)
+                            Column {
+                                Text("${it.marca} ${it.modelo}", color = Color.White, fontWeight = FontWeight.Bold)
+                                Text("${it.kms} km", color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+
                 MantenimientoOptionCard(
                     title = "Nuevo Registro",
                     subtitle = "Registrar tareas realizadas",
@@ -107,8 +137,6 @@ fun SeleccionMantenimientoScreen(
                     color = TorqueColors.Primary,
                     onClick = onNuevoMantenimiento
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
 
                 MantenimientoOptionCard(
                     title = "Ver Historial",

@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CarRepair
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SettingsInputComponent
 import androidx.compose.material.icons.filled.TireRepair
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -62,9 +64,10 @@ import com.example.torque.ui.theme.TorqueTheme
 class MaintenanceLog : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val motoId = intent.getLongExtra("motoId", -1L)
         setContent {
             TorqueTheme {
-                //  MaintenanceLogScreen()
+                MaintenanceLogScreen(motoId)
             }
         }
     }
@@ -79,7 +82,7 @@ data class Task(
 )
 
 @Composable
-fun MaintenanceLogScreen() {
+fun MaintenanceLogScreen(motoId: Long) {
     val context = LocalContext.current
     val checkedItems = remember { mutableStateMapOf<String, Boolean>() }
     var searchQuery by remember { mutableStateOf("") }
@@ -134,22 +137,16 @@ fun MaintenanceLogScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                    .height(64.dp)
+                    .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(
-                    onClick = { (context as? ComponentActivity)?.finish() },
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.ChevronLeft,
-                            contentDescription = null,
-                            tint = TorqueColors.Primary,
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Text("Atrás", color = TorqueColors.Primary, fontSize = 18.sp)
-                    }
+                IconButton(onClick = { (context as? android.app.Activity)?.finish() }) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Atrás",
+                        tint = TorqueColors.Primary
+                    )
                 }
                 Text(
                     "Registrar Mantenimiento",
@@ -159,7 +156,7 @@ fun MaintenanceLogScreen() {
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.width(60.dp))
+                Spacer(modifier = Modifier.width(48.dp))
             }
 
             LazyColumn(
@@ -293,6 +290,7 @@ fun MaintenanceLogScreen() {
                         if (selectedList.isNotEmpty()) {
                             val intent = Intent(context, MaintenanceForm::class.java).apply {
                                 putStringArrayListExtra("seleccionados", ArrayList(selectedList))
+                                putExtra("motoId", motoId)
                             }
                             context.startActivity(intent)
                         }

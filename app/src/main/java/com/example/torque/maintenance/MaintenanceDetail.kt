@@ -1,59 +1,66 @@
 package com.example.torque.maintenance
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
 
 @Composable
 fun DetalleMantenimientoScreen(
-    mantenimiento: MaintenanceDetail,
+    mantenimiento: MaintenanceDetailData,
+    kmsActualesMoto: Int,
     onBack: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
+    val kmsRestantes = mantenimiento.kmsRestantes(kmsActualesMoto)
+    val progreso = mantenimiento.progreso(kmsActualesMoto)
+    val vencido = mantenimiento.estaVencido(kmsActualesMoto)
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
-            modifier = Modifier
-                .verticalScroll(scrollState)
-                .padding(16.dp)
+            modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = "Detalles del Mantenimiento",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Text("Detalles del Mantenimiento", style = MaterialTheme.typography.headlineSmall)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // ── Cuenta atrás ──────────────────────────────────────
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = if (vencido) Color(0xFFFFEBEE) else Color(0xFFE8F5E9)
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = if (vencido) "⚠️ VENCIDO por ${-kmsRestantes} km" else "✅ Próximo en $kmsRestantes km",
+                        fontWeight = FontWeight.Bold,
+                        color = if (vencido) Color(0xFFB71C1C) else Color(0xFF1B5E20)
+                    )
+                    LinearProgressIndicator(
+                        progress = { progreso },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = if (vencido) Color(0xFFE53935) else Color(0xFF43A047)
+                    )
+                    Text(
+                        "Realizado a ${mantenimiento.kilometers} km · Cada ${mantenimiento.intervaloKms} km",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+            }
+            // ──────────────────────────────────────────────────────
 
             DetalleCampo("Nombre", mantenimiento.maintenanceName)
             DetalleCampo("Fecha", mantenimiento.date)
-            DetalleCampo("Kilómetros", mantenimiento.kilometers?.toString() ?: "")
-            DetalleCampo("Marca", mantenimiento.brand ?: "")
-            DetalleCampo("Modelo", mantenimiento.model ?: "")
-            DetalleCampo("Año", mantenimiento.year?.toString() ?: "")
-            DetalleCampo("Precio", mantenimiento.price ?: "")
-            DetalleCampo("Tiempo", mantenimiento.time ?: "")
-            DetalleCampo("Notas", mantenimiento.notes ?: "")
-            DetalleCampo("Tareas", mantenimiento.tasks ?: "")
+            DetalleCampo("Precio", mantenimiento.price ?: "-")
+            DetalleCampo("Tiempo", mantenimiento.time ?: "-")
+            DetalleCampo("Notas", mantenimiento.notes ?: "-")
+            DetalleCampo("Tareas", mantenimiento.tasks ?: "-")
 
-            Spacer(modifier = Modifier.height(24.dp))
-
+            Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
                 Text("Volver")
             }
@@ -63,16 +70,8 @@ fun DetalleMantenimientoScreen(
 
 @Composable
 fun DetalleCampo(label: String, value: String) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(
-            text = label,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            style = MaterialTheme.typography.labelSmall
-        )
-        Text(
-            text = value,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyLarge
-        )
+    Column(modifier = Modifier.padding(vertical = 2.dp)) {
+        Text(label, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall)
+        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }

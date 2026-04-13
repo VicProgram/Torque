@@ -20,35 +20,47 @@ object RoomMigrationUtil {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val dbHelper = TorqueDatabaseHelper(context)
-                val oldMotos = dbHelper.getMotos() // uses old helper
+                val oldMotos = dbHelper.getMotos() // Devuelve List<Moto>
                 val repo = AppRepository.getInstance(context)
                 val now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
 
                 for (old in oldMotos) {
+                    // Mapear Moto (no-nullable) a MotoEntity (nullable)
                     val motoEntity = MotoEntity(
-                        marca = old.marca ?: "",
-                        modelo = old.modelo ?: "",
-                        anno = old.anno,
-                        matricula = old.matricula,
-                        colorMoto = old.colorMoto,
-                        cilindrada = old.cilindrada,
-                        cv = old.cv,
-                        estilo = old.estilo,
-                        kms = old.kms,
-                        fechaCompra = old.fechaCompra,
-                        esPrincipal = old.esPrincipal,
-                        fotoUri = old.fotoMoto?.takeIf { it.isNotBlank() },
+                        // idMoto se auto-genera, no lo pasamos
+                        marca = old.marca,  // String → String
+                        modelo = old.modelo, // String → String
+                        anno = old.anno,    // Int → Int
+                        matricula = old.matricula, // String → String?
+                        colorMoto = old.colorMoto, // String? → String?
+                        cilindrada = old.cilindrada, // String? → String?
+                        cv = old.cv,        // String? → String?
+                        estilo = old.estilo, // String → String?
+                        kms = old.kms,      // Int → Int
+                        fechaCompra = old.fechaCompra, // String → String?
+                        esPrincipal = old.esPrincipal, // Int → Int
+                        fotoUri = old.fotoUri, // String? → String?
                         createdAt = now,
                         updatedAt = now
                     )
+
                     val newId = repo.insertMoto(motoEntity)
+
+                    // Migrar fotos asociadas si existen
                     val photos = try {
                         dbHelper.getPhotosByMotoId(old.idMoto)
                     } catch (e: Exception) {
                         emptyList<String>()
                     }
+
                     photos.forEach { path ->
-                        repo.insertPhoto(PhotoEntity(motoId = newId, path = path, createdAt = now))
+                        repo.insertPhoto(
+                            PhotoEntity(
+                                motoId = newId,
+                                path = path,
+                                createdAt = now
+                            )
+                        )
                     }
                 }
             } catch (e: Exception) {

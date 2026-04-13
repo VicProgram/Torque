@@ -1,10 +1,10 @@
 [versions]
-agp = "9.0.0"
+agp = "9.1.0"
 androidxComposeBom = "2026.01.00"
 appcompat = "1.7.1"
 coilCompose = "2.7.0"
 composeBomVersion = "2025.05.01"
-kotlin = "2.1.0"
+kotlin = "2.2.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -15,7 +15,7 @@ composeBom = "2024.09.00"
 navigationCompose = "2.9.6"
 datastore = "1.1.2"
 room = "2.7.0-alpha11"
-ksp = "2.1.0-1.0.29"
+ksp = "2.3.2"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }

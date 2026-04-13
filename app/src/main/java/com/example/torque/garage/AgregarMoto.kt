@@ -11,35 +11,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,16 +31,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.torque.components.ui.dashboard.TorqueButton
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.components.ui.dashboard.TorqueTextField
-import com.example.torque.components.ui.dashboard.showToast
+import com.example.torque.components.ui.dashboard.*
 import com.example.torque.database.TorqueDatabaseHelper
-import com.example.torque.room.`AppRepository.kt`
 import com.example.torque.ui.theme.TorqueTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class AgregarMoto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,9 +50,7 @@ class AgregarMoto : ComponentActivity() {
 
 @Composable
 fun AgregarMotoView() {
-
     val context = LocalContext.current
-    val dbHelper = remember { TorqueDatabaseHelper(context) }
     val scrollState = rememberScrollState()
 
     var marca by remember { mutableStateOf("") }
@@ -93,8 +67,8 @@ fun AgregarMotoView() {
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) {
-        imageUri = it
+    ) { uri ->
+        imageUri = uri
     }
 
     Box(
@@ -113,8 +87,8 @@ fun AgregarMotoView() {
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
                     Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close",
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Atrás",
                         tint = TorqueColors.OnSurface
                     )
                 }
@@ -123,8 +97,8 @@ fun AgregarMotoView() {
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     color = TorqueColors.OnSurface,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Normal
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(48.dp))
             }
@@ -214,17 +188,22 @@ fun AgregarMotoView() {
 
                 // --- Input Fields ---
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(marca, { marca = it }, "Brand")
-                    TorqueTextField(modelo, { modelo = it }, "Model")
+                    TorqueTextField(marca, { marca = it }, "Brand *")
+                    TorqueTextField(modelo, { modelo = it }, "Model *")
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         TorqueTextField(anno, { anno = it }, "Year", modifier = Modifier.weight(1f))
-                        TorqueTextField(
-                            cilindrada,
-                            { cilindrada = it },
-                            "CC",
-                            modifier = Modifier.weight(1f)
-                        )
+                        TorqueTextField(matricula, { matricula = it }, "Plate", modifier = Modifier.weight(1f))
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        TorqueTextField(kms, { kms = it }, "Current Kms", modifier = Modifier.weight(1f))
+                        TorqueTextField(cilindrada, { cilindrada = it }, "CC", modifier = Modifier.weight(1f))
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        TorqueTextField(cv, { cv = it }, "CV", modifier = Modifier.weight(1f))
+                        TorqueTextField(colorMoto, { colorMoto = it }, "Color", modifier = Modifier.weight(1f))
                     }
 
                     TorqueTextField(
@@ -252,30 +231,28 @@ fun AgregarMotoView() {
                 text = "Save Motorcycle",
                 icon = Icons.Default.Save,
                 onClick = {
-                    val repo = `AppRepository.kt`.getInstance(context)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val `motoEntity.kt` = `MotoEntity.kt`(
-                            marca = marca.trim(),
-                            modelo = modelo.trim(),
-                            anno = anno.toIntOrNull() ?: 0,
-                            matricula = matricula.trim().ifBlank { null },
-                            colorMoto = colorMoto.trim().ifBlank { null },
-                            cilindrada = cilindrada.trim().ifBlank { null },
-                            cv = cv.trim().ifBlank { null },
-                            estilo = estilo.trim().ifBlank { null },
-                            kms = kms.toIntOrNull() ?: 0,
-                            fechaCompra = fechaCompra.trim().ifBlank { null },
-                            esPrincipal = 0,
-                            fotoUri = imageUri?.toString(),
-                            createdAt = java.time.LocalDateTime.now().toString(),
-                            updatedAt = java.time.LocalDateTime.now().toString()
-                        )
-                        val newId = repo.insertMoto(`motoEntity.kt`)
-                        // llamar al hilo principal para UI
-                        kotlinx.coroutines.Dispatchers.Main.run {
-                            // show toast and finish
-                        }
+                    if (marca.isBlank() || modelo.isBlank()) {
+                        showToast(context, "Please fill required fields")
+                        return@TorqueButton
                     }
+
+                    val dbHelper = TorqueDatabaseHelper(context)
+                    
+                    val moto = Moto(
+                        marca = marca.trim(),
+                        modelo = modelo.trim(),
+                        anno = anno.toIntOrNull() ?: 0,
+                        matricula = matricula.trim(),
+                        colorMoto = colorMoto.trim(),
+                        cilindrada = cilindrada.trim(),
+                        cv = cv.trim(),
+                        estilo = estilo.trim(),
+                        kms = kms.toIntOrNull() ?: 0,
+                        fechaCompra = fechaCompra.trim(),
+                        esPrincipal = if (dbHelper.getMotos().isEmpty()) 1 else 0,
+                        fotoUri = imageUri?.toString()
+                    )
+
                     if (dbHelper.addMoto(moto)) {
                         showToast(context, "Motorcycle saved successfully!")
                         (context as? Activity)?.apply {

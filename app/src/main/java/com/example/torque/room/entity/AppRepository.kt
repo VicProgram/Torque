@@ -21,10 +21,14 @@ class AppRepository private constructor(private val db: AppDatabase) {
     suspend fun insertPhoto(p: PhotoEntity) = db.photoDao().insert(p)
 
     companion object {
-        @Volatile private var instance: AppRepository? = null
+        @Volatile
+        private var instance: AppRepository? = null
+
         fun getInstance(context: Context): AppRepository =
             instance ?: synchronized(this) {
-                instance ?: AppRepository(AppDatabase.getInstance(context)).also { instance = it }
+                instance ?: AppRepository(
+                    AppDatabase.getInstance(context)
+                ).also { instance = it }
             }
     }
 }
