@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,14 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.components.ui.dashboard.*
-import com.example.torque.room.AppRepository
-import com.example.torque.room.entity.MotoEntity
+import com.example.torque.database.TorqueDatabaseHelper
 import com.example.torque.ui.theme.TorqueTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class AgregarMoto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,8 +87,8 @@ fun AgregarMotoView() {
             ) {
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
                     Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close",
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Atrás",
                         tint = TorqueColors.OnSurface
                     )
                 }
@@ -100,8 +97,8 @@ fun AgregarMotoView() {
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     color = TorqueColors.OnSurface,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Normal
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(48.dp))
             }
@@ -191,17 +188,22 @@ fun AgregarMotoView() {
 
                 // --- Input Fields ---
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(marca, { marca = it }, "Brand")
-                    TorqueTextField(modelo, { modelo = it }, "Model")
+                    TorqueTextField(marca, { marca = it }, "Brand *")
+                    TorqueTextField(modelo, { modelo = it }, "Model *")
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         TorqueTextField(anno, { anno = it }, "Year", modifier = Modifier.weight(1f))
-                        TorqueTextField(
-                            cilindrada,
-                            { cilindrada = it },
-                            "CC",
-                            modifier = Modifier.weight(1f)
-                        )
+                        TorqueTextField(matricula, { matricula = it }, "Plate", modifier = Modifier.weight(1f))
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        TorqueTextField(kms, { kms = it }, "Current Kms", modifier = Modifier.weight(1f))
+                        TorqueTextField(cilindrada, { cilindrada = it }, "CC", modifier = Modifier.weight(1f))
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        TorqueTextField(cv, { cv = it }, "CV", modifier = Modifier.weight(1f))
+                        TorqueTextField(colorMoto, { colorMoto = it }, "Color", modifier = Modifier.weight(1f))
                     }
 
                     TorqueTextField(
@@ -234,40 +236,31 @@ fun AgregarMotoView() {
                         return@TorqueButton
                     }
 
-                    val repo = AppRepository.getInstance(context)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val now = LocalDateTime.now().toString()
-                        val motoEntity = MotoEntity(
-                            marca = marca.trim(),
-                            modelo = modelo.trim(),
-                            anno = anno.toIntOrNull() ?: 0,
-                            matricula = matricula.trim().ifBlank { null },
-                            colorMoto = colorMoto.trim().ifBlank { null },
-                            cilindrada = cilindrada.trim().ifBlank { null },
-                            cv = cv.trim().ifBlank { null },
-                            estilo = estilo.trim().ifBlank { null },
-                            kms = kms.toIntOrNull() ?: 0,
-                            fechaCompra = fechaCompra.trim().ifBlank { null },
-                            esPrincipal = 0,
-                            fotoUri = imageUri?.toString(),
-                            createdAt = now,
-                            updatedAt = now
-                        )
+                    val dbHelper = TorqueDatabaseHelper(context)
+                    
+                    val moto = Moto(
+                        marca = marca.trim(),
+                        modelo = modelo.trim(),
+                        anno = anno.toIntOrNull() ?: 0,
+                        matricula = matricula.trim(),
+                        colorMoto = colorMoto.trim(),
+                        cilindrada = cilindrada.trim(),
+                        cv = cv.trim(),
+                        estilo = estilo.trim(),
+                        kms = kms.toIntOrNull() ?: 0,
+                        fechaCompra = fechaCompra.trim(),
+                        esPrincipal = if (dbHelper.getMotos().isEmpty()) 1 else 0,
+                        fotoUri = imageUri?.toString()
+                    )
 
-                        try {
-                            repo.insertMoto(motoEntity)
-                            withContext(Dispatchers.Main) {
-                                showToast(context, "Motorcycle saved successfully!")
-                                (context as? Activity)?.apply {
-                                    setResult(Activity.RESULT_OK)
-                                    finish()
-                                }
-                            }
-                        } catch (e: Exception) {
-                            withContext(Dispatchers.Main) {
-                                showToast(context, "Error saving motorcycle")
-                            }
+                    if (dbHelper.addMoto(moto)) {
+                        showToast(context, "Motorcycle saved successfully!")
+                        (context as? Activity)?.apply {
+                            setResult(Activity.RESULT_OK)
+                            finish()
                         }
+                    } else {
+                        showToast(context, "Error saving motorcycle")
                     }
                 }
             )

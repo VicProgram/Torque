@@ -20,15 +20,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
@@ -70,7 +73,7 @@ class MotoDetalle : ComponentActivity() {
         setContent {
             com.example.torque.ui.theme.TorqueTheme {
                 MotoDetalleView(
-                    moto = moto, dbHelper = dbHelper, context = this, activity = this
+                    initialMoto = moto, dbHelper = dbHelper, context = this, activity = this
                 )
             }
         }
@@ -79,8 +82,9 @@ class MotoDetalle : ComponentActivity() {
 
 @Composable
 fun MotoDetalleView(
-    moto: Moto?, dbHelper: TorqueDatabaseHelper, context: Context, activity: Activity
+    initialMoto: Moto?, dbHelper: TorqueDatabaseHelper, context: Context, activity: Activity
 ) {
+    var moto by remember { mutableStateOf(initialMoto) }
     val photos = remember { mutableStateListOf<String>() }
     var showMenu by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -92,13 +96,13 @@ fun MotoDetalleView(
         }
     }
 
-    val launcher = rememberLauncherForActivityResult(
+    rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             val path = copyImageToInternal(context, it)
             if (path != null && moto != null) {
-                dbHelper.insertPhoto(moto.idMoto, path)
+                dbHelper.insertPhoto(moto!!.idMoto, path)
                 photos.add(path)
                 showToast(context, "¡Foto añadida!")
             }
@@ -128,18 +132,27 @@ fun MotoDetalleView(
                 ) {
                     IconButton(onClick = { activity.finish() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
                             tint = Color.White
                         )
                     }
                     Text(
-                        text = moto.modelo,
-                        modifier = Modifier.weight(1f),
+                        text = moto!!.modelo,
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
+                    if (moto!!.esPrincipal == 1) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "Principal",
+                            tint = TorqueColors.Primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(
@@ -163,8 +176,11 @@ fun MotoDetalleView(
                                     )
                                 },
                                 onClick = {
-                                    dbHelper.setPrincipal(moto.idMoto)
-                                    showToast(context, "Moto principal actualizada")
+                                    if (dbHelper.setPrincipal(moto!!.idMoto)) {
+                                        moto = dbHelper.getMotoById(moto!!.idMoto)
+                                        showToast(context, "Moto principal actualizada")
+                                        activity.setResult(Activity.RESULT_OK)
+                                    }
                                     showMenu = false
                                 }
                             )
@@ -178,7 +194,7 @@ fun MotoDetalleView(
                                     )
                                 },
                                 onClick = {
-                                    if (dbHelper.deleteMoto(moto.idMoto)) {
+                                    if (dbHelper.deleteMoto(moto!!.idMoto)) {
                                         activity.setResult(Activity.RESULT_OK)
                                         activity.finish()
                                     }
@@ -245,12 +261,12 @@ fun MotoDetalleView(
                             letterSpacing = 1.sp
                         )
 
-                        DetailRow("Marca", moto.marca)
-                        DetailRow("Año", moto.anno.toString())
-                        DetailRow("Matrícula", moto.matricula)
-                        DetailRow("Cilindrada", moto.cilindrada)
-                        DetailRow("Potencia", "${moto.cv} CV")
-                        DetailRow("Estilo", moto.estilo)
+                        DetailRow("Marca", moto!!.marca)
+                        DetailRow("Año", moto!!.anno.toString())
+                        DetailRow("Matrícula", moto!!.matricula)
+                        DetailRow("Cilindrada", moto!!.cilindrada)
+                        DetailRow("Potencia", "${moto!!.cv} CV")
+                        DetailRow("Estilo", moto!!.estilo)
                     }
 
                     // --- Photos Row ---

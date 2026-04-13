@@ -28,12 +28,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Motorcycle
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Search
+import com.example.torque.components.ui.dashboard.showToast
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -152,20 +155,28 @@ fun ListaGarageView() {
 
 @Composable
 fun GarageHeader() {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
             .background(TorqueColors.Background.copy(alpha = 0.95f))
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        IconButton(onClick = { (context as? android.app.Activity)?.finish() }) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Atrás",
+                tint = TorqueColors.OnSurface
+            )
+        }
         Text(
             text = "My Garage",
             color = TorqueColors.OnSurface,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Normal
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
         )
         Row {
             IconButton(onClick = { /* Search */ }) {
@@ -252,13 +263,28 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
         }
 
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = moto.modelo,
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 36.sp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = moto.modelo,
+                    color = Color.White,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                if (moto.esPrincipal == 1) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Principal",
+                        tint = TorqueColors.Primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
             Text(
                 text = "${moto.marca} • ${moto.anno}",
                 color = TorqueColors.OnSurfaceVariant,

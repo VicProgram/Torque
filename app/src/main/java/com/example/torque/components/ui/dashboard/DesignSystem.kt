@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -337,7 +336,6 @@ fun DashboardBottomNav(modifier: Modifier = Modifier) {
         ) {
             BottomNavItem("Inicio", Icons.Default.GridView, true)
             BottomNavItem("Stats", Icons.Default.Analytics, false)
-            BottomNavItem("Rutas", Icons.Default.Explore, false)
             BottomNavItem("Ajustes", Icons.Default.Settings, false)
         }
     }
