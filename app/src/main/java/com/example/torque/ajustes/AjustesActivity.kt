@@ -44,7 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.ajustes.SettingsRepository
+import com.example.torque.ajustes.AjustesRepository
 
 class AjustesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,11 +60,11 @@ class AjustesActivity : ComponentActivity() {
 @Composable
 fun AjustesScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-    val repo = SettingsRepository(context.dataStore)
+    val repo = AjustesRepository(context.dataStore)
     val coroutineScope = rememberCoroutineScope()
 
-    val notificationsEnabled by repo.notificationsEnabledFlow.collectAsState(initial = true)
-    val darkModeEnabled by repo.darkModeEnabledFlow.collectAsState(initial = true)
+    val notificacionesActivadas by repo.notificacionesActivadasFlow.collectAsState(initial = true)
+    val modoOscuroActivado by repo.modoOscuroActivadoFlow.collectAsState(initial = true)
 
     Box(
         modifier = Modifier
@@ -121,8 +121,8 @@ fun AjustesScreen(onBack: () -> Unit) {
                         Text(text = stringResource(id = com.example.torque.R.string.notifications_subtitle), color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
                     }
                     Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = { enabled -> coroutineScope.launch { repo.setNotificationsEnabled(enabled) } },
+                        checked = notificacionesActivadas,
+                        onCheckedChange = { activado -> coroutineScope.launch { repo.establecerNotificacionesActivadas(activado) } },
                         colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary, uncheckedThumbColor = TorqueColors.OnSurfaceVariant)
                     )
                 }
@@ -143,8 +143,8 @@ fun AjustesScreen(onBack: () -> Unit) {
                         Text(text = stringResource(id = com.example.torque.R.string.dark_mode_subtitle), color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
                     }
                     Switch(
-                        checked = darkModeEnabled,
-                        onCheckedChange = { enabled -> coroutineScope.launch { repo.setDarkModeEnabled(enabled) } },
+                        checked = modoOscuroActivado,
+                        onCheckedChange = { activado -> coroutineScope.launch { repo.establecerModoOscuroActivado(activado) } },
                         colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary, uncheckedThumbColor = TorqueColors.OnSurfaceVariant)
                     )
                 }

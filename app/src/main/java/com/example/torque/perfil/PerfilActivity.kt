@@ -36,6 +36,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.torque.ajustes.dataStore
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.ui.theme.TorqueTheme
 
@@ -52,6 +56,12 @@ class PerfilActivity : ComponentActivity() {
 
 @Composable
 fun PerfilScreen(onBack: () -> Unit) {
+    val contexto = LocalContext.current
+    val repositorio = PerfilRepository(contexto.dataStore)
+    
+    val nombre by repositorio.nombreFlow.collectAsState(initial = "Usuario")
+    val fechaNacimiento by repositorio.fechaNacimientoFlow.collectAsState(initial = "")
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -104,16 +114,18 @@ fun PerfilScreen(onBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Lars Rider", // Nombre fijo por ahora
+                    text = nombre ?: "Usuario",
                     color = Color.White,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = "24 años", // Edad fija por ahora
-                    color = TorqueColors.OnSurfaceVariant,
-                    fontSize = 16.sp
-                )
+                if (fechaNacimiento?.isNotEmpty() == true) {
+                    Text(
+                        text = fechaNacimiento!!,
+                        color = TorqueColors.OnSurfaceVariant,
+                        fontSize = 16.sp
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
