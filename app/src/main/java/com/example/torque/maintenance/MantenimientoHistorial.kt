@@ -5,9 +5,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,24 +34,29 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.torque.components.ui.dashboard.DashboardBottomNav
 import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MantenimientoHistorialViewModel(application: Application) : AndroidViewModel(application) {
-    private val dbHelper = TorqueDatabaseHelper(application)
+    private val repositorio = AppRepository.obtenerInstancia(application)
 
-    private val _historial = MutableStateFlow<List<MaintenanceDetailData>>(emptyList())
-    val historial: StateFlow<List<MaintenanceDetailData>> = _historial
+    private val _historial = MutableStateFlow<List<MantenimientoEntity>>(emptyList())
+    val historial: StateFlow<List<MantenimientoEntity>> = _historial
 
-    fun cargarHistorial(motoId: Long? = null) {
+    fun cargarHistorial(idMoto: Long? = null) {
         viewModelScope.launch {
-            _historial.value = if (motoId != null)
-                dbHelper.getMantenimientosByMoto(motoId)
-            else
-                dbHelper.getAllMantenimientos()
+            if (idMoto != null) {
+                repositorio.obtenerMantenimientosPorMoto(idMoto).collect {
+                    _historial.value = it
+                }
+            } else {
+                // TODO: Implementar obtener todos los mantenimientos en el repositorio si es necesario
+                _historial.value = emptyList()
+            }
         }
     }
 }
@@ -61,42 +64,36 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
 class MantenimientoHistorial : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val motoId = intent.getLongExtra("motoId", -1L).takeIf { it != -1L }
+        val idMoto = intent.getLongExtra("motoId", -1L).takeIf { it != -1L }
         setContent {
             TorqueTheme {
-                MantenimientoHistorialPantalla(motoId)
+                PantallaHistorialMantenimiento(idMoto)
             }
         }
     }
 }
 
 @Composable
-fun MantenimientoHistorialPantalla(motoId: Long? = null) {
-    val context = LocalContext.current
+fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
+    val contexto = LocalContext.current
     val viewModel: MantenimientoHistorialViewModel = viewModel()
     val historial by viewModel.historial.collectAsState()
-    var selectedFilter by remember { mutableStateOf("Todos") }
-    var selectedItem by remember { mutableStateOf<MaintenanceDetailData?>(null) }
+    var filtroSeleccionado by remember { mutableStateOf("Todos") }
+    var itemSeleccionado by remember { mutableStateOf<MantenimientoEntity?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        viewModel.cargarHistorial(motoId)
-    }
+    LaunchedEffect(idMoto) { viewModel.cargarHistorial(idMoto) }
 
-    LaunchedEffect(Unit) { viewModel.cargarHistorial(motoId) }
-
-    val filteredHistorial = remember(historial, selectedFilter) {
-        if (selectedFilter == "Todos") historial
+    val historialFiltrado = remember(historial, filtroSeleccionado) {
+        if (filtroSeleccionado == "Todos") historial
         else historial.filter {
-            it.maintenanceName.contains(selectedFilter, ignoreCase = true) ||
-                    (it.notes?.contains(selectedFilter, ignoreCase = true) ?: false) ||
-                    (it.tasks?.contains(selectedFilter, ignoreCase = true) ?: false)
+            it.nombreMantenimiento.contains(filtroSeleccionado, ignoreCase = true) ||
+                    (it.notas?.contains(filtroSeleccionado, ignoreCase = true) ?: false) ||
+                    (it.tareas?.contains(filtroSeleccionado, ignoreCase = true) ?: false)
         }
     }
 
-    if (selectedItem != null) {
-        Dialog(onDismissRequest = { selectedItem = null }) {
+    if (itemSeleccionado != null) {
+        Dialog(onDismissRequest = { itemSeleccionado = null }) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,10 +101,10 @@ fun MantenimientoHistorialPantalla(motoId: Long? = null) {
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = TorqueColors.SurfaceDark)
             ) {
-                DetalleMantenimientoScreen(
-                    mantenimiento = selectedItem!!,
-                    kmsActualesMoto = 0, // TODO: Pasarlo si es necesario
-                    onBack = { selectedItem = null }
+                // Adaptar DetalleMantenimientoScreen para usar MantenimientoEntity
+                DetalleMantenimientoEntityScreen(
+                    mantenimiento = itemSeleccionado!!,
+                    onBack = { itemSeleccionado = null }
                 )
             }
         }
@@ -115,12 +112,12 @@ fun MantenimientoHistorialPantalla(motoId: Long? = null) {
 
     Box(modifier = Modifier.fillMaxSize().background(TorqueColors.Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header
+            // Cabecera
             Row(
                 modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (context as? Activity)?.finish() }) {
+                IconButton(onClick = { (contexto as? Activity)?.finish() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -143,12 +140,12 @@ fun MantenimientoHistorialPantalla(motoId: Long? = null) {
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val filters = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos")
-                        items(filters) { filter ->
-                            HistoryFilterChip(
-                                text = filter,
-                                isSelected = selectedFilter == filter,
-                                onClick = { selectedFilter = filter }
+                        val filtros = listOf("Todos", "Aceite", "Filtro", "Neumático", "Cadena", "Frenos")
+                        items(filtros) { filtro ->
+                            FiltroHistorialChip(
+                                texto = filtro,
+                                estaSeleccionado = filtroSeleccionado == filtro,
+                                onClick = { filtroSeleccionado = filtro }
                             )
                         }
                     }
@@ -164,18 +161,18 @@ fun MantenimientoHistorialPantalla(motoId: Long? = null) {
                     )
                 }
 
-                if (filteredHistorial.isEmpty()) {
+                if (historialFiltrado.isEmpty()) {
                     item {
                         Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                             Text(
-                                text = if (historial.isEmpty()) "Sin mantenimientos registrados" else "Sin resultados para \"$selectedFilter\"",
+                                text = if (historial.isEmpty()) "Sin mantenimientos registrados" else "Sin resultados para \"$filtroSeleccionado\"",
                                 color = TorqueColors.OnSurfaceVariant
                             )
                         }
                     }
                 } else {
-                    items(filteredHistorial) { item ->
-                        HistoryLogItem(item, onClick = { selectedItem = item })
+                    items(historialFiltrado) { item ->
+                        ItemLogHistorial(item, onClick = { itemSeleccionado = item })
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             color = TorqueColors.SurfaceVariant.copy(alpha = 0.3f)
@@ -187,10 +184,10 @@ fun MantenimientoHistorialPantalla(motoId: Long? = null) {
 
         FloatingActionButton(
             onClick = {
-                val intent = Intent(context, MaintenanceLog::class.java).apply {
-                    putExtra("motoId", motoId ?: -1L)
+                val intent = Intent(contexto, RegistroMantenimiento::class.java).apply {
+                    putExtra("idMoto", idMoto ?: -1L)
                 }
-                launcher.launch(intent)
+                contexto.startActivity(intent)
             },
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 110.dp),
             containerColor = TorqueColors.PrimaryContainer,
@@ -205,48 +202,48 @@ fun MantenimientoHistorialPantalla(motoId: Long? = null) {
 }
 
 @Composable
-fun HistoryFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
-    val bgColor = if (isSelected) TorqueColors.SecondaryContainer else Color.Transparent
-    val contentColor = if (isSelected) TorqueColors.OnSecondaryContainer else TorqueColors.OnSurfaceVariant
-    val borderColor = if (isSelected) Color.Transparent else TorqueColors.Outline.copy(alpha = 0.5f)
+fun FiltroHistorialChip(texto: String, estaSeleccionado: Boolean, onClick: () -> Unit) {
+    val colorFondo = if (estaSeleccionado) TorqueColors.SecondaryContainer else Color.Transparent
+    val colorContenido = if (estaSeleccionado) TorqueColors.OnSecondaryContainer else TorqueColors.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else TorqueColors.Outline.copy(alpha = 0.5f)
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(bgColor)
-            .border(if (isSelected) 0.dp else 1.dp, borderColor, RoundedCornerShape(8.dp))
+            .background(colorFondo)
+            .border(if (estaSeleccionado) 0.dp else 1.dp, colorBorde, RoundedCornerShape(8.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (isSelected) {
-                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = contentColor)
+            if (estaSeleccionado) {
+                Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp), tint = colorContenido)
                 Spacer(modifier = Modifier.width(6.dp))
             }
-            Text(text, color = contentColor, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text(texto, color = colorContenido, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
 
 @Composable
-fun HistoryLogItem(item: MaintenanceDetailData, onClick: () -> Unit) {
-        val icon = when {
-            item.maintenanceName.contains("aceite", ignoreCase = true) || 
-            (item.tasks?.contains("aceite", ignoreCase = true) ?: false) -> Icons.Default.OilBarrel
-            item.maintenanceName.contains("neumático", ignoreCase = true) || 
-            item.maintenanceName.contains("rueda", ignoreCase = true) ||
-            (item.tasks?.contains("neumático", ignoreCase = true) ?: false) -> Icons.Default.TireRepair
-            item.maintenanceName.contains("cadena", ignoreCase = true) || 
-            item.maintenanceName.contains("kit", ignoreCase = true) ||
-            (item.tasks?.contains("cadena", ignoreCase = true) ?: false) -> Icons.Default.SettingsSuggest
-            item.maintenanceName.contains("luz", ignoreCase = true) ||
-            item.maintenanceName.contains("eléctrico", ignoreCase = true) ||
-            item.maintenanceName.contains("batería", ignoreCase = true) ||
-            (item.tasks?.contains("eléctrico", ignoreCase = true) ?: false) -> Icons.Default.Bolt
-            item.maintenanceName.contains("freno", ignoreCase = true) ||
-            (item.tasks?.contains("freno", ignoreCase = true) ?: false) -> Icons.Default.BackHand
-            else -> Icons.Default.Build
-        }
+fun ItemLogHistorial(item: MantenimientoEntity, onClick: () -> Unit) {
+    val icono = when {
+        item.nombreMantenimiento.contains("aceite", ignoreCase = true) || 
+        (item.tareas?.contains("aceite", ignoreCase = true) ?: false) -> Icons.Default.OilBarrel
+        item.nombreMantenimiento.contains("neumático", ignoreCase = true) || 
+        item.nombreMantenimiento.contains("rueda", ignoreCase = true) ||
+        (item.tareas?.contains("neumático", ignoreCase = true) ?: false) -> Icons.Default.TireRepair
+        item.nombreMantenimiento.contains("cadena", ignoreCase = true) || 
+        item.nombreMantenimiento.contains("kit", ignoreCase = true) ||
+        (item.tareas?.contains("cadena", ignoreCase = true) ?: false) -> Icons.Default.SettingsSuggest
+        item.nombreMantenimiento.contains("luz", ignoreCase = true) ||
+        item.nombreMantenimiento.contains("eléctrico", ignoreCase = true) ||
+        item.nombreMantenimiento.contains("batería", ignoreCase = true) ||
+        (item.tareas?.contains("eléctrico", ignoreCase = true) ?: false) -> Icons.Default.Bolt
+        item.nombreMantenimiento.contains("freno", ignoreCase = true) ||
+        (item.tareas?.contains("freno", ignoreCase = true) ?: false) -> Icons.Default.BackHand
+        else -> Icons.Default.Build
+    }
 
     Row(
         modifier = Modifier
@@ -260,17 +257,68 @@ fun HistoryLogItem(item: MaintenanceDetailData, onClick: () -> Unit) {
             modifier = Modifier.size(40.dp).clip(CircleShape).background(TorqueColors.SurfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, contentDescription = null, tint = TorqueColors.OnSurfaceVariant)
+            Icon(icono, contentDescription = null, tint = TorqueColors.OnSurfaceVariant)
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(item.maintenanceName, color = TorqueColors.OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-            Text("${item.date} · ${item.price ?: "Sin precio"}", color = TorqueColors.OnSurfaceVariant, fontSize = 13.sp)
+            Text(item.nombreMantenimiento, color = TorqueColors.OnSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text("${item.fecha} · ${item.precio ?: "Sin precio"}", color = TorqueColors.OnSurfaceVariant, fontSize = 13.sp)
         }
 
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF81C784), modifier = Modifier.size(20.dp))
-            Text("${item.kilometers} km", color = TorqueColors.Outline, fontSize = 11.sp)
+            Text("${item.kms} km", color = TorqueColors.Outline, fontSize = 11.sp)
+        }
+    }
+}
+
+@Composable
+fun DetalleMantenimientoEntityScreen(
+    mantenimiento: MantenimientoEntity,
+    onBack: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Detalle del Mantenimiento",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.Close, contentDescription = "Cerrar", tint = Color.White)
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Text(text = mantenimiento.nombreMantenimiento, color = TorqueColors.Primary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+        Text(text = "${mantenimiento.fecha} · ${mantenimiento.kms} kms", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
+        
+        if (!mantenimiento.notas.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "NOTAS", color = TorqueColors.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = mantenimiento.notas, color = Color.White, fontSize = 16.sp)
+        }
+
+        if (!mantenimiento.tareas.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "TAREAS REALIZADAS", color = TorqueColors.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = mantenimiento.tareas, color = Color.White, fontSize = 16.sp)
+        }
+
+        if (!mantenimiento.precio.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "COSTE", color = TorqueColors.Outline, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(text = mantenimiento.precio, color = Color(0xFF81C784), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

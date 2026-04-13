@@ -1,6 +1,5 @@
 package com.example.torque.maintenance
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,37 +24,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.torque.components.ui.dashboard.DashboardBottomNav
 import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.garage.Moto
+import kotlinx.coroutines.launch
 
-class MaintenancePreview : ComponentActivity() {
+class OpcionesMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dbHelper = TorqueDatabaseHelper(this)
-        var motoId = intent.getLongExtra("motoId", -1L)
-
-        // Si no viene motoId, intentar buscar la principal
-        if (motoId == -1L) {
-            motoId = dbHelper.getPrincipalMoto()?.idMoto ?: -1L
-        }
+        val motoIdIntent = intent.getLongExtra("idMoto", -1L)
 
         setContent {
             TorqueTheme {
-                SeleccionMantenimientoScreen(
-                    motoId = motoId,
-                    onNuevoMantenimiento = {
-                        val intent = Intent(this, MaintenanceLog::class.java).apply {
-                            putExtra("motoId", motoId)
+                PantallaOpcionesMantenimiento(
+                    motoIdInicial = motoIdIntent,
+                    onNuevoMantenimiento = { id ->
+                        val intent = Intent(this, RegistroMantenimiento::class.java).apply {
+                            putExtra("idMoto", id)
                         }
                         startActivity(intent)
                     },
-                    onVerHistorial = {
+                    onVerHistorial = { id ->
                         val intent = Intent(this, MantenimientoHistorial::class.java).apply {
-                            putExtra("motoId", motoId)
+                            putExtra("idMoto", id)
                         }
                         startActivity(intent)
-                    }
+                    },
+                    onAtras = { finish() }
                 )
             }
         }
@@ -63,14 +58,28 @@ class MaintenancePreview : ComponentActivity() {
 }
 
 @Composable
-fun SeleccionMantenimientoScreen(
-    motoId: Long,
-    onNuevoMantenimiento: () -> Unit,
-    onVerHistorial: () -> Unit
+fun PantallaOpcionesMantenimiento(
+    motoIdInicial: Long,
+    onNuevoMantenimiento: (Long) -> Unit,
+    onVerHistorial: (Long) -> Unit,
+    onAtras: () -> Unit
 ) {
-    val context = LocalContext.current
-    val dbHelper = remember { TorqueDatabaseHelper(context) }
-    val moto = remember(motoId) { if (motoId != -1L) dbHelper.getMotoById(motoId) else null }
+    val contexto = LocalContext.current
+    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val coroutineScope = rememberCoroutineScope()
+    
+    var motoSeleccionada by remember { mutableStateOf<MotoEntity?>(null) }
+
+    LaunchedEffect(motoIdInicial) {
+        if (motoIdInicial != -1L) {
+            motoSeleccionada = repositorio.obtenerMotoPorId(motoIdInicial)
+        } else {
+            // Si no hay ID, intentamos pillar la principal
+            repositorio.obtenerMotoPrincipalFlow().collect { principal ->
+                motoSeleccionada = principal
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -86,7 +95,7 @@ fun SeleccionMantenimientoScreen(
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (context as? Activity)?.finish() }) {
+                IconButton(onClick = onAtras) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -110,7 +119,7 @@ fun SeleccionMantenimientoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Info de la moto seleccionada
-                moto?.let {
+                motoSeleccionada?.let { moto ->
                     Card(
                         colors = CardDefaults.cardColors(containerColor = TorqueColors.SurfaceDark),
                         shape = RoundedCornerShape(16.dp),
@@ -123,28 +132,30 @@ fun SeleccionMantenimientoScreen(
                         ) {
                             Icon(Icons.Default.Motorcycle, contentDescription = null, tint = TorqueColors.Primary)
                             Column {
-                                Text("${it.marca} ${it.modelo}", color = Color.White, fontWeight = FontWeight.Bold)
-                                Text("${it.kms} km", color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
+                                Text("${moto.marca} ${moto.modelo}", color = Color.White, fontWeight = FontWeight.Bold)
+                                Text("${moto.kilometros} km", color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
                             }
                         }
                     }
+
+                    TarjetaOpcionMantenimiento(
+                        titulo = "Nuevo Registro",
+                        subtitulo = "Registrar tareas realizadas",
+                        icono = Icons.Default.Build,
+                        color = TorqueColors.Primary,
+                        onClick = { onNuevoMantenimiento(moto.idMoto) }
+                    )
+
+                    TarjetaOpcionMantenimiento(
+                        titulo = "Ver Historial",
+                        subtitulo = "Consulta registros pasados",
+                        icono = Icons.Default.History,
+                        color = TorqueColors.Accent,
+                        onClick = { onVerHistorial(moto.idMoto) }
+                    )
+                } ?: run {
+                    Text("No hay ninguna moto seleccionada", color = Color.White)
                 }
-
-                MantenimientoOptionCard(
-                    title = "Nuevo Registro",
-                    subtitle = "Registrar tareas realizadas",
-                    icon = Icons.Default.Build,
-                    color = TorqueColors.Primary,
-                    onClick = onNuevoMantenimiento
-                )
-
-                MantenimientoOptionCard(
-                    title = "Ver Historial",
-                    subtitle = "Consulta registros pasados",
-                    icon = Icons.Default.History,
-                    color = TorqueColors.Accent,
-                    onClick = onVerHistorial
-                )
             }
         }
 
@@ -153,10 +164,10 @@ fun SeleccionMantenimientoScreen(
 }
 
 @Composable
-fun MantenimientoOptionCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
+fun TarjetaOpcionMantenimiento(
+    titulo: String,
+    subtitulo: String,
+    icono: ImageVector,
     color: Color,
     onClick: () -> Unit
 ) {
@@ -177,11 +188,11 @@ fun MantenimientoOptionCard(
                 .background(color.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(32.dp))
+            Icon(icono, contentDescription = null, tint = color, modifier = Modifier.size(32.dp))
         }
         Column {
-            Text(title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(subtitle, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
+            Text(titulo, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
         }
     }
 }

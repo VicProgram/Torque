@@ -10,8 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.torque.components.ui.dashboard.TorqueDashboardScreen
-import com.example.torque.garage.ListaGarage
-import com.example.torque.maintenance.MaintenancePreview
+import com.example.torque.garage.ListaGaraje
+import com.example.torque.maintenance.OpcionesMantenimiento
+import com.example.torque.perfil.PerfilActivity
 import com.example.torque.ui.theme.TorqueTheme
 
 class MenuPrincipal : ComponentActivity() {
@@ -28,7 +29,7 @@ class MenuPrincipal : ComponentActivity() {
 @Composable
 fun TorqueNavHost() {
     val navController = rememberNavController()
-    val context = LocalContext.current
+    val contexto = LocalContext.current
 
     NavHost(
         navController = navController,
@@ -38,12 +39,14 @@ fun TorqueNavHost() {
         composable("dashboard") {
             TorqueDashboardScreen(
                 onIrGaraje = {
-                    context.startActivity(Intent(context, ListaGarage::class.java))
+                    contexto.startActivity(Intent(contexto, ListaGaraje::class.java))
                 },
                 onIrMantenimientos = {
-                    context.startActivity(Intent(context, MaintenancePreview::class.java))
+                    contexto.startActivity(Intent(contexto, OpcionesMantenimiento::class.java))
                 },
-                onIrPerfil = { /* Aún no implementado */ }
+                onIrPerfil = {
+                    contexto.startActivity(Intent(contexto, PerfilActivity::class.java))
+                }
             )
         }
     }

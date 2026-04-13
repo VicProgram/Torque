@@ -2,26 +2,12 @@ package com.example.torque.garage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -29,22 +15,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Motorcycle
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Search
-import com.example.torque.components.ui.dashboard.showToast
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -58,41 +31,27 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.components.ui.dashboard.DashboardBottomNav
 import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.components.ui.dashboard.launchActivity
-import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import android.content.Intent
 
-class ListaGarage : ComponentActivity() {
+class ListaGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TorqueTheme {
-                ListaGarageView()
+                VistaListaGaraje()
             }
         }
     }
 }
 
 @Composable
-fun ListaGarageView() {
-    val context = LocalContext.current
-    val dbHelper = remember { TorqueDatabaseHelper(context) }
-    val motos = remember { mutableStateListOf<Moto>() }
-
-    fun reloadMotos() {
-        motos.clear()
-        motos.addAll(dbHelper.getMotos())
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        reloadMotos()
-    }
-
-    LaunchedEffect(Unit) {
-        reloadMotos()
-    }
+fun VistaListaGaraje() {
+    val contexto = LocalContext.current
+    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val motos by repositorio.obtenerMotosFlow().collectAsState(initial = emptyList())
 
     Box(
         modifier = Modifier
@@ -100,7 +59,7 @@ fun ListaGarageView() {
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            GarageHeader()
+            CabeceraGaraje()
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -112,19 +71,20 @@ fun ListaGarageView() {
                         modifier = Modifier.padding(vertical = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item { FilterChip("All", isSelected = true) }
-                        item { FilterChip("Maintenance", isSelected = false) }
-                        item { FilterChip("Archive", isSelected = false) }
+                        item { FiltroChip("Todas", estaSeleccionado = true) }
+                        item { FiltroChip("Mantenimiento", estaSeleccionado = false) }
+                        item { FiltroChip("Archivo", estaSeleccionado = false) }
                     }
                 }
 
                 items(motos) { moto ->
-                    MotoCard(
+                    TarjetaMoto(
                         moto = moto,
                         onClick = {
-                            launchActivity(launcher, context, MotoDetalle::class.java) {
+                            val intent = Intent(contexto, MotoDetalle::class.java).apply {
                                 putExtra("idMoto", moto.idMoto)
                             }
+                            contexto.startActivity(intent)
                         }
                     )
                 }
@@ -133,7 +93,7 @@ fun ListaGarageView() {
 
         FloatingActionButton(
             onClick = {
-                launchActivity(launcher, context, AgregarMoto::class.java)
+                contexto.startActivity(Intent(contexto, AgregarMoto::class.java))
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -144,7 +104,7 @@ fun ListaGarageView() {
         ) {
             Icon(
                 Icons.Default.Add,
-                contentDescription = "New Moto",
+                contentDescription = "Nueva Moto",
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -154,8 +114,8 @@ fun ListaGarageView() {
 }
 
 @Composable
-fun GarageHeader() {
-    val context = LocalContext.current
+fun CabeceraGaraje() {
+    val contexto = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -164,7 +124,7 @@ fun GarageHeader() {
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { (context as? android.app.Activity)?.finish() }) {
+        IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Atrás",
@@ -172,24 +132,24 @@ fun GarageHeader() {
             )
         }
         Text(
-            text = "My Garage",
+            text = "Mi Garaje",
             color = TorqueColors.OnSurface,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
         Row {
-            IconButton(onClick = { /* Search */ }) {
+            IconButton(onClick = { /* Buscar */ }) {
                 Icon(
                     Icons.Default.Search,
-                    contentDescription = "Search",
+                    contentDescription = "Buscar",
                     tint = TorqueColors.OnSurfaceVariant
                 )
             }
-            IconButton(onClick = { /* More */ }) {
+            IconButton(onClick = { /* Más */ }) {
                 Icon(
                     Icons.Default.MoreVert,
-                    contentDescription = "More",
+                    contentDescription = "Más",
                     tint = TorqueColors.OnSurfaceVariant
                 )
             }
@@ -198,27 +158,27 @@ fun GarageHeader() {
 }
 
 @Composable
-fun FilterChip(text: String, isSelected: Boolean) {
-    val bgColor = if (isSelected) TorqueColors.PrimaryContainer else Color.Transparent
-    val contentColor =
-        if (isSelected) TorqueColors.OnPrimaryContainer else TorqueColors.OnSurfaceVariant
-    val borderColor = if (isSelected) Color.Transparent else TorqueColors.Outline
+fun FiltroChip(texto: String, estaSeleccionado: Boolean) {
+    val colorFondo = if (estaSeleccionado) TorqueColors.PrimaryContainer else Color.Transparent
+    val colorContenido =
+        if (estaSeleccionado) TorqueColors.OnPrimaryContainer else TorqueColors.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else TorqueColors.Outline
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(bgColor)
+            .background(colorFondo)
             .border(
-                width = if (isSelected) 0.dp else 1.dp,
-                color = borderColor,
+                width = if (estaSeleccionado) 0.dp else 1.dp,
+                color = colorBorde,
                 shape = RoundedCornerShape(8.dp)
             )
-            .clickable { /* Select */ }
+            .clickable { /* Seleccionar */ }
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(
-            text = text,
-            color = contentColor,
+            text = texto,
+            color = colorContenido,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium
         )
@@ -226,7 +186,7 @@ fun FilterChip(text: String, isSelected: Boolean) {
 }
 
 @Composable
-fun MotoCard(moto: Moto, onClick: () -> Unit) {
+fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -242,7 +202,7 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
                 .background(TorqueColors.SurfaceContainerLow),
             contentAlignment = Alignment.Center
         ) {
-            val foto = moto.fotoUri ?: ""
+            val foto = moto.uriFoto ?: ""
             if (foto.isNotEmpty()) {
                 Image(
                     painter = rememberAsyncImagePainter(foto),
@@ -286,7 +246,7 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
                 }
             }
             Text(
-                text = "${moto.marca} • ${moto.anno}",
+                text = "${moto.marca} • ${moto.anio}",
                 color = TorqueColors.OnSurfaceVariant,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Normal,
@@ -302,19 +262,15 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = if (moto.idMoto % 2L == 0L) Icons.Default.CalendarToday else Icons.Default.CheckCircle,
+                        imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(18.dp),
-                        tint = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(
-                            0xFF34D399
-                        )
+                        tint = Color(0xFF34D399)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (moto.idMoto % 2L == 0L) "Service in 15d" else "Healthy Status",
-                        color = if (moto.idMoto % 2L == 0L) TorqueColors.Primary else Color(
-                            0xFF34D399
-                        ),
+                        text = "Estado Saludable",
+                        color = Color(0xFF34D399),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -327,7 +283,7 @@ fun MotoCard(moto: Moto, onClick: () -> Unit) {
                         .padding(horizontal = 24.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "View Details",
+                        text = "Ver Detalles",
                         color = TorqueColors.Primary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold

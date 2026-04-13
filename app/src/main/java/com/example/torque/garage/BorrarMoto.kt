@@ -2,27 +2,34 @@ package com.example.torque.garage
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import com.example.torque.database.TorqueDatabaseHelper
+import androidx.lifecycle.lifecycleScope
+import com.example.torque.room.AppRepository
+import kotlinx.coroutines.launch
 
 class BorrarMoto : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val motoId = intent.getLongExtra("idMoto", -1L)
+        val idMoto = intent.getLongExtra("idMoto", -1L)
 
-        if (motoId != -1L) {
-            // Lógica para eliminar la moto de la base de datos
-            val dbHelper = TorqueDatabaseHelper(this)
-            val success = dbHelper.deleteMoto(motoId)
-
-            if (success) {
-                // Si la eliminación fue exitosa, devolver RESULT_OK
-                setResult(RESULT_OK)
-            } else {
-                // Si hubo algún problema, devolver un error
-                setResult(RESULT_CANCELED)
+        if (idMoto != -1L) {
+            val repositorio = AppRepository.obtenerInstancia(this)
+            
+            lifecycleScope.launch {
+                try {
+                    val moto = repositorio.obtenerMotoPorId(idMoto)
+                    if (moto != null) {
+                        repositorio.eliminarMoto(moto)
+                        setResult(RESULT_OK)
+                    } else {
+                        setResult(RESULT_CANCELED)
+                    }
+                } catch (e: Exception) {
+                    setResult(RESULT_CANCELED)
+                } finally {
+                    finish()
+                }
             }
-
-            // Finalizar la actividad
+        } else {
             finish()
         }
     }

@@ -5,25 +5,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -31,80 +20,78 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.components.ui.dashboard.showToast
-import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.FotoEntity
+import com.example.torque.room.entity.MotoEntity
+import com.example.torque.ui.theme.TorqueTheme
+import kotlinx.coroutines.launch
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Fix: Use getLongExtra to match the expected Long type for idMoto
         val idMoto = intent.getLongExtra("idMoto", -1L)
-        val dbHelper = TorqueDatabaseHelper(this)
-        val moto = if (idMoto != -1L) dbHelper.getMotoById(idMoto) else null
 
         setContent {
-            com.example.torque.ui.theme.TorqueTheme {
-                MotoDetalleView(
-                    initialMoto = moto, dbHelper = dbHelper, context = this, activity = this
-                )
+            TorqueTheme {
+                VistaMotoDetalle(idMoto)
             }
         }
     }
 }
 
 @Composable
-fun MotoDetalleView(
-    initialMoto: Moto?, dbHelper: TorqueDatabaseHelper, context: Context, activity: Activity
-) {
-    var moto by remember { mutableStateOf(initialMoto) }
-    val photos = remember { mutableStateListOf<String>() }
-    var showMenu by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
+fun VistaMotoDetalle(idMoto: Long) {
+    val contexto = LocalContext.current
+    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val scope = rememberCoroutineScope()
+    
+    var moto by remember { mutableStateOf<MotoEntity?>(null) }
+    val fotos = remember { mutableStateListOf<FotoEntity>() }
+    var mostrarMenu by remember { mutableStateOf(false) }
+    val estadoScroll = rememberScrollState()
 
-    LaunchedEffect(moto?.idMoto) {
-        moto?.idMoto?.let {
-            photos.clear()
-            photos.addAll(dbHelper.getPhotosByMotoId(it))
+    LaunchedEffect(idMoto) {
+        if (idMoto != -1L) {
+            moto = repositorio.obtenerMotoPorId(idMoto)
+            repositorio.obtenerFotosPorMoto(idMoto).collect { listaFotos ->
+                fotos.clear()
+                fotos.addAll(listaFotos)
+            }
         }
     }
 
-    rememberLauncherForActivityResult(
+    val selectorImagen = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val path = copyImageToInternal(context, it)
-            if (path != null && moto != null) {
-                dbHelper.insertPhoto(moto!!.idMoto, path)
-                photos.add(path)
-                showToast(context, "¡Foto añadida!")
+            val ruta = copiarImagenAInterno(contexto, it)
+            if (ruta != null && idMoto != -1L) {
+                scope.launch {
+                    val nuevaFoto = FotoEntity(
+                        idMoto = idMoto,
+                        ruta = ruta,
+                        creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                    )
+                    repositorio.insertarFoto(nuevaFoto)
+                    Toast.makeText(contexto, "¡Foto añadida!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -115,14 +102,12 @@ fun MotoDetalleView(
             .background(TorqueColors.Background)
     ) {
         if (moto == null) {
-            Text(
-                "Moto no encontrada, puedes añadirla en el perfil",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center)
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = TorqueColors.Primary)
+            }
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
-                // --- Header ---
+                // --- Cabecera ---
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -130,7 +115,7 @@ fun MotoDetalleView(
                         .padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { activity.finish() }) {
+                    IconButton(onClick = { (contexto as? Activity)?.finish() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
@@ -154,7 +139,7 @@ fun MotoDetalleView(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Box {
-                        IconButton(onClick = { showMenu = true }) {
+                        IconButton(onClick = { mostrarMenu = true }) {
                             Icon(
                                 Icons.Default.MoreVert,
                                 contentDescription = "Menú",
@@ -162,8 +147,8 @@ fun MotoDetalleView(
                             )
                         }
                         DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false },
+                            expanded = mostrarMenu,
+                            onDismissRequest = { mostrarMenu = false },
                             modifier = Modifier.background(TorqueColors.SurfaceDark)
                         ) {
                             DropdownMenuItem(
@@ -176,12 +161,15 @@ fun MotoDetalleView(
                                     )
                                 },
                                 onClick = {
-                                    if (dbHelper.setPrincipal(moto!!.idMoto)) {
-                                        moto = dbHelper.getMotoById(moto!!.idMoto)
-                                        showToast(context, "Moto principal actualizada")
-                                        activity.setResult(Activity.RESULT_OK)
+                                    scope.launch {
+                                        repositorio.establecerMotoPrincipal(idMoto)
+                                        moto = repositorio.obtenerMotoPorId(idMoto)
+                                        launch(kotlinx.coroutines.Dispatchers.Main) {
+                                            Toast.makeText(contexto, "Moto principal actualizada", Toast.LENGTH_SHORT).show()
+                                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
+                                        }
                                     }
-                                    showMenu = false
+                                    mostrarMenu = false
                                 }
                             )
                             DropdownMenuItem(
@@ -194,11 +182,14 @@ fun MotoDetalleView(
                                     )
                                 },
                                 onClick = {
-                                    if (dbHelper.deleteMoto(moto!!.idMoto)) {
-                                        activity.setResult(Activity.RESULT_OK)
-                                        activity.finish()
+                                    scope.launch {
+                                        repositorio.eliminarMoto(moto!!)
+                                        launch(kotlinx.coroutines.Dispatchers.Main) {
+                                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
+                                            (contexto as? Activity)?.finish()
+                                        }
                                     }
-                                    showMenu = false
+                                    mostrarMenu = false
                                 }
                             )
                         }
@@ -208,21 +199,24 @@ fun MotoDetalleView(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .verticalScroll(scrollState)
+                        .verticalScroll(estadoScroll)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    // --- Image Gallery ---
+                    // --- Galería de Imágenes ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(16f / 10f)
                             .clip(RoundedCornerShape(24.dp))
                             .background(TorqueColors.SurfaceDark)
+                            .clickable { selectorImagen.launch("image/*") }
                     ) {
-                        if (photos.isNotEmpty()) {
+                        val imagenAMostrar = if (fotos.isNotEmpty()) fotos.last().ruta else moto?.uriFoto
+                        
+                        if (!imagenAMostrar.isNullOrEmpty()) {
                             Image(
-                                painter = rememberAsyncImagePainter(photos.last()),
+                                painter = rememberAsyncImagePainter(imagenAMostrar),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
@@ -244,7 +238,7 @@ fun MotoDetalleView(
                         }
                     }
 
-                    // --- Basic Info Card ---
+                    // --- Tarjeta de Información Básica ---
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -261,16 +255,17 @@ fun MotoDetalleView(
                             letterSpacing = 1.sp
                         )
 
-                        DetailRow("Marca", moto!!.marca)
-                        DetailRow("Año", moto!!.anno.toString())
-                        DetailRow("Matrícula", moto!!.matricula)
-                        DetailRow("Cilindrada", moto!!.cilindrada)
-                        DetailRow("Potencia", "${moto!!.cv} CV")
-                        DetailRow("Estilo", moto!!.estilo)
+                        FilaDetalle("Marca", moto!!.marca)
+                        FilaDetalle("Año", moto!!.anio.toString())
+                        FilaDetalle("Matrícula", moto!!.matricula ?: "N/A")
+                        FilaDetalle("Cilindrada", moto!!.cilindrada ?: "N/A")
+                        FilaDetalle("Potencia", if (moto!!.caballos != null) "${moto!!.caballos} CV" else "N/A")
+                        FilaDetalle("Kilómetros", "${moto!!.kilometros} km")
+                        FilaDetalle("Estilo", moto!!.estilo ?: "N/A")
                     }
 
-                    // --- Photos Row ---
-                    if (photos.size > 1) {
+                    // --- Fila de Fotos ---
+                    if (fotos.size > 1) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Text(
                                 "GALERÍA",
@@ -279,9 +274,9 @@ fun MotoDetalleView(
                                 fontWeight = FontWeight.Bold
                             )
                             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                items(photos) { path ->
+                                items(fotos) { foto ->
                                     Image(
-                                        painter = rememberAsyncImagePainter(path),
+                                        painter = rememberAsyncImagePainter(foto.ruta),
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
@@ -299,14 +294,14 @@ fun MotoDetalleView(
 }
 
 @Composable
-fun DetailRow(label: String, value: String?) {
+fun FilaDetalle(etiqueta: String, valor: String?) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = label, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
+        Text(text = etiqueta, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
         Text(
-            text = value ?: "N/A",
+            text = valor ?: "N/A",
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium
@@ -314,29 +309,29 @@ fun DetailRow(label: String, value: String?) {
     }
 }
 
-fun copyImageToInternal(context: Context, uri: Uri): String? {
+fun copiarImagenAInterno(contexto: Context, uri: Uri): String? {
     return try {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val fileName = getFileName(context, uri) ?: "img_${System.currentTimeMillis()}.jpg"
-        val file = File(context.filesDir, fileName)
-        inputStream?.use { input ->
-            file.outputStream().use { output ->
-                input.copyTo(output)
+        val flujoEntrada = contexto.contentResolver.openInputStream(uri)
+        val nombreArchivo = obtenerNombreArchivo(contexto, uri) ?: "img_${System.currentTimeMillis()}.jpg"
+        val archivo = File(contexto.filesDir, nombreArchivo)
+        flujoEntrada?.use { entrada ->
+            archivo.outputStream().use { salida ->
+                entrada.copyTo(salida)
             }
         }
-        file.absolutePath
+        archivo.absolutePath
     } catch (e: Exception) {
         null
     }
 }
 
-fun getFileName(context: Context, uri: Uri): String? {
-    var name: String? = null
-    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+fun obtenerNombreArchivo(contexto: Context, uri: Uri): String? {
+    var nombre: String? = null
+    contexto.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        val indiceNombre = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         if (cursor.moveToFirst()) {
-            name = cursor.getString(nameIndex)
+            nombre = cursor.getString(indiceNombre)
         }
     }
-    return name
+    return nombre
 }

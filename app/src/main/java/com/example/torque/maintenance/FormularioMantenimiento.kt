@@ -2,6 +2,7 @@ package com.example.torque.maintenance
 
 import android.app.Activity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -10,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,37 +24,39 @@ import androidx.compose.ui.unit.sp
 import com.example.torque.components.ui.dashboard.TorqueButton
 import com.example.torque.components.ui.dashboard.TorqueColors
 import com.example.torque.components.ui.dashboard.TorqueTextField
-import com.example.torque.components.ui.dashboard.showToast
-import com.example.torque.database.TorqueDatabaseHelper
+import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MaintenanceForm : ComponentActivity() {
+class FormularioMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val selectedTasks = intent.getStringArrayListExtra("seleccionados") ?: arrayListOf()
-        val motoId = intent.getLongExtra("motoId", 0L)
+        val tareasSeleccionadas = intent.getStringArrayListExtra("seleccionados") ?: arrayListOf()
+        val idMoto = intent.getLongExtra("idMoto", -1L)
         setContent {
             TorqueTheme {
-                MaintenanceFormScreen(selectedTasks, motoId)
+                VistaFormularioMantenimiento(tareasSeleccionadas, idMoto)
             }
         }
     }
 }
 
 @Composable
-fun MaintenanceFormScreen(selectedTasks: List<String>, motoId: Long) {
-    val context = LocalContext.current
-    val dbHelper = remember { TorqueDatabaseHelper(context) }
+fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long) {
+    val contexto = LocalContext.current
+    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val scope = rememberCoroutineScope()
 
-    var km by remember { mutableStateOf("") }
+    var kms by remember { mutableStateOf("") }
     var intervalo by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
+    var precio by remember { mutableStateOf("") }
+    var tiempo by remember { mutableStateOf("") }
+    var notas by remember { mutableStateOf("") }
 
-    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+    val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
     Box(
         modifier = Modifier
@@ -62,7 +64,7 @@ fun MaintenanceFormScreen(selectedTasks: List<String>, motoId: Long) {
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header
+            // Cabecera
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -70,7 +72,7 @@ fun MaintenanceFormScreen(selectedTasks: List<String>, motoId: Long) {
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (context as? Activity)?.finish() }) {
+                IconButton(onClick = { (contexto as? Activity)?.finish() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -105,7 +107,7 @@ fun MaintenanceFormScreen(selectedTasks: List<String>, motoId: Long) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text("Tareas", color = TorqueColors.Slate500, fontSize = 12.sp)
                         Text(
-                            selectedTasks.joinToString(" · "),
+                            tareasSeleccionadas.joinToString(" · "),
                             color = Color.White,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
@@ -114,18 +116,18 @@ fun MaintenanceFormScreen(selectedTasks: List<String>, motoId: Long) {
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(km, { km = it }, "Kms actuales", modifier = Modifier.weight(1f))
+                    TorqueTextField(kms, { kms = it }, "Kms actuales", modifier = Modifier.weight(1f))
                     TorqueTextField(intervalo, { intervalo = it }, "Cada X kms", modifier = Modifier.weight(1f))
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(price, { price = it }, "Precio (€)", modifier = Modifier.weight(1f))
-                    TorqueTextField(time, { time = it }, "Tiempo", modifier = Modifier.weight(1f))
+                    TorqueTextField(precio, { precio = it }, "Precio (€)", modifier = Modifier.weight(1f))
+                    TorqueTextField(tiempo, { tiempo = it }, "Tiempo", modifier = Modifier.weight(1f))
                 }
 
                 TorqueTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
+                    value = notas,
+                    onValueChange = { notas = it },
                     label = "Notas",
                     singleLine = false,
                     modifier = Modifier.height(120.dp)
@@ -146,20 +148,31 @@ fun MaintenanceFormScreen(selectedTasks: List<String>, motoId: Long) {
                 text = "Guardar Mantenimiento",
                 icon = Icons.Default.Save,
                 onClick = {
-                    val maintenance = MaintenanceDetailData(
-                        motoId = motoId,
-                        maintenanceName = if (selectedTasks.size == 1) selectedTasks[0] else "Mantenimiento General",
-                        date = currentDate,
-                        kilometers = km.toIntOrNull() ?: 0,
-                        intervaloKms = intervalo.toIntOrNull() ?: 0,
-                        price = price,
-                        time = time,
-                        notes = notes,
-                        tasks = selectedTasks.joinToString(", ")
-                    )
-                    dbHelper.insertMaintenance(maintenance)
-                    showToast(context, "¡Mantenimiento guardado!")
-                    (context as? Activity)?.finish()
+                    if (idMoto == -1L) {
+                        Toast.makeText(contexto, "Error: No se identificó la moto", Toast.LENGTH_SHORT).show()
+                        return@TorqueButton
+                    }
+
+                    scope.launch {
+                        val mantenimiento = MantenimientoEntity(
+                            idMoto = idMoto,
+                            nombreMantenimiento = if (tareasSeleccionadas.size == 1) tareasSeleccionadas[0] else "Mantenimiento General",
+                            fecha = fechaActual,
+                            kms = kms.toIntOrNull() ?: 0,
+                            intervaloKms = intervalo.toIntOrNull() ?: 0,
+                            precio = precio,
+                            tiempo = tiempo,
+                            notas = notas,
+                            tareas = tareasSeleccionadas.joinToString(", "),
+                            creadoEn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                        )
+                        repositorio.insertarMantenimiento(mantenimiento)
+                        
+                        launch(kotlinx.coroutines.Dispatchers.Main) {
+                            Toast.makeText(contexto, "¡Mantenimiento guardado!", Toast.LENGTH_SHORT).show()
+                            (contexto as? Activity)?.finish()
+                        }
+                    }
                 }
             )
         }

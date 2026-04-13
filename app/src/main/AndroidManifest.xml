@@ -23,9 +23,9 @@
         </activity>
 
         <!-- Activities de Maintenance -->
-        <activity android:name=".maintenance.MaintenanceLog" />
-        <activity android:name=".maintenance.MaintenanceForm" />
-        <activity android:name=".maintenance.MaintenancePreview" />
+        <activity android:name=".maintenance.RegistroMantenimiento" />
+        <activity android:name=".maintenance.FormularioMantenimiento" />
+        <activity android:name=".maintenance.OpcionesMantenimiento" />
         <activity android:name=".maintenance.MantenimientoHistorial" />
         <!-- MaintenanceDetailData is a data class, not an activity -->
 
@@ -33,7 +33,7 @@
         <activity android:name=".garage.MotoDetalle" />
         <activity android:name=".garage.AgregarMoto" />
         <activity android:name=".garage.BorrarMoto" />
-        <activity android:name=".garage.ListaGarage" />
+        <activity android:name=".garage.ListaGaraje" />
 
         <!-- Perfil y Ajustes -->
         <activity android:name=".perfil.PerfilActivity" />

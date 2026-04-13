@@ -6,18 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -25,26 +14,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CarRepair
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.OilBarrel
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SettingsInputComponent
-import androidx.compose.material.icons.filled.TireRepair
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,78 +25,76 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.torque.components.ui.dashboard.MotoKeepCheckItem
-import com.example.torque.components.ui.dashboard.SectionHeader
-import com.example.torque.components.ui.dashboard.TorqueButton
-import com.example.torque.components.ui.dashboard.TorqueColors
+import com.example.torque.components.ui.dashboard.*
 import com.example.torque.ui.theme.TorqueTheme
 
-class MaintenanceLog : ComponentActivity() {
+class RegistroMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val motoId = intent.getLongExtra("motoId", -1L)
+        val idMoto = intent.getLongExtra("motoId", -1L)
         setContent {
             TorqueTheme {
-                MaintenanceLogScreen(motoId)
+                PantallaRegistroMantenimiento(idMoto)
             }
         }
     }
 }
 
-data class Task(
-    val name: String,
-    val description: String,
-    val icon: ImageVector,
-    val iconColor: Color,
-    val category: String
+data class Tarea(
+    val nombre: String,
+    val descripcion: String,
+    val icono: ImageVector,
+    val colorIcono: Color,
+    val categoria: String
 )
 
 @Composable
-fun MaintenanceLogScreen(motoId: Long) {
-    val context = LocalContext.current
-    val checkedItems = remember { mutableStateMapOf<String, Boolean>() }
-    var searchQuery by remember { mutableStateOf("") }
+fun PantallaRegistroMantenimiento(idMoto: Long) {
+    val contexto = LocalContext.current
+    val itemsSeleccionados = remember { mutableStateMapOf<String, Boolean>() }
+    var consultaBusqueda by remember { mutableStateOf("") }
 
-    val commonTasks = listOf(
-        Task(
+    val tareasComunes = listOf(
+        Tarea(
             "Cambio de Aceite Motor",
             "Recomendado cada 5,000 km",
             Icons.Default.OilBarrel,
             Color(0xFF3B82F6),
-            "Engine"
+            "Motor"
         ),
-        Task(
+        Tarea(
             "Filtro de Aceite",
             "Incluido en servicio estándar",
             Icons.Default.FilterAlt,
             Color(0xFFF97316),
-            "Engine"
+            "Motor"
         ),
-        Task(
+        Tarea(
             "Limpieza y Engrase de Cadena",
             "Mantenimiento regular",
             Icons.Default.SettingsInputComponent,
             Color(0xFF6366F1),
-            "Drivetrain"
+            "Transmisión"
         )
     )
 
-    val safetyTasks = listOf(
-        Task(
+    val tareasSeguridad = listOf(
+        Tarea(
             "Presión de Neumáticos",
             "Esencial para seguridad",
             Icons.Default.TireRepair,
             Color(0xFF10B981),
-            "Tires"
+            "Neumáticos"
         ),
-        Task(
+        Tarea(
             "Inspección Pastillas Freno",
             "Revisar indicadores de desgaste",
             Icons.Default.CarRepair,
             Color(0xFFEF4444),
-            "Brakes"
+            "Frenos"
         )
     )
 
@@ -141,7 +111,7 @@ fun MaintenanceLogScreen(motoId: Long) {
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (context as? android.app.Activity)?.finish() }) {
+                IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -151,7 +121,7 @@ fun MaintenanceLogScreen(motoId: Long) {
                 Text(
                     "Registrar Mantenimiento",
                     modifier = Modifier.weight(1f),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    textAlign = TextAlign.Center,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
@@ -169,8 +139,8 @@ fun MaintenanceLogScreen(motoId: Long) {
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         TextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
+                            value = consultaBusqueda,
+                            onValueChange = { consultaBusqueda = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -200,39 +170,39 @@ fun MaintenanceLogScreen(motoId: Long) {
                         )
 
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            item { FilterChip("Todas", true) }
-                            item { FilterChip("Motor", false) }
-                            item { FilterChip("Transmisión", false) }
-                            item { FilterChip("Frenos", false) }
-                            item { FilterChip("Ruedas", false) }
+                            item { ChipFiltro("Todas", true) }
+                            item { ChipFiltro("Motor", false) }
+                            item { ChipFiltro("Transmisión", false) }
+                            item { ChipFiltro("Frenos", false) }
+                            item { ChipFiltro("Ruedas", false) }
                         }
                     }
                 }
 
                 item { SectionHeader("Mantenimiento Común") }
-                items(commonTasks) { task ->
+                items(tareasComunes) { tarea ->
                     Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
                         MotoKeepCheckItem(
-                            title = task.name,
-                            description = task.description,
-                            icon = task.icon,
-                            iconColor = task.iconColor,
-                            isChecked = checkedItems[task.name] == true,
-                            onCheckedChange = { checkedItems[task.name] = it }
+                            title = tarea.nombre,
+                            description = tarea.descripcion,
+                            icon = tarea.icono,
+                            iconColor = tarea.colorIcono,
+                            isChecked = itemsSeleccionados[tarea.nombre] == true,
+                            onCheckedChange = { itemsSeleccionados[tarea.nombre] = it }
                         )
                     }
                 }
 
                 item { SectionHeader("Inspección de Seguridad") }
-                items(safetyTasks) { task ->
+                items(tareasSeguridad) { tarea ->
                     Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
                         MotoKeepCheckItem(
-                            title = task.name,
-                            description = task.description,
-                            icon = task.icon,
-                            iconColor = task.iconColor,
-                            isChecked = checkedItems[task.name] == true,
-                            onCheckedChange = { checkedItems[task.name] = it }
+                            title = tarea.nombre,
+                            description = tarea.descripcion,
+                            icon = tarea.icono,
+                            iconColor = tarea.colorIcono,
+                            isChecked = itemsSeleccionados[tarea.nombre] == true,
+                            onCheckedChange = { itemsSeleccionados[tarea.nombre] = it }
                         )
                     }
                 }
@@ -263,13 +233,13 @@ fun MaintenanceLogScreen(motoId: Long) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                val selectedCount = checkedItems.values.count { it }
+                val cantidadSeleccionada = itemsSeleccionados.values.count { it }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "$selectedCount tareas seleccionadas",
+                        "$cantidadSeleccionada tareas seleccionadas",
                         color = TorqueColors.Slate500,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -282,17 +252,17 @@ fun MaintenanceLogScreen(motoId: Long) {
                     )
                 }
                 TorqueButton(
-                    text = "Registrar Mantenimiento",
+                    text = "Continuar",
                     color = TorqueColors.Accent,
-                    icon = Icons.Default.CheckCircle,
+                    icon = Icons.Default.ArrowForward,
                     onClick = {
-                        val selectedList = checkedItems.filterValues { it }.keys.toList()
-                        if (selectedList.isNotEmpty()) {
-                            val intent = Intent(context, MaintenanceForm::class.java).apply {
-                                putStringArrayListExtra("seleccionados", ArrayList(selectedList))
-                                putExtra("motoId", motoId)
+                        val listaSeleccionados = itemsSeleccionados.filterValues { it }.keys.toList()
+                        if (listaSeleccionados.isNotEmpty()) {
+                            val intent = Intent(contexto, FormularioMantenimiento::class.java).apply {
+                                putStringArrayListExtra("seleccionados", ArrayList(listaSeleccionados))
+                                putExtra("idMoto", idMoto)
                             }
-                            context.startActivity(intent)
+                            contexto.startActivity(intent)
                         }
                     }
                 )
@@ -302,23 +272,23 @@ fun MaintenanceLogScreen(motoId: Long) {
 }
 
 @Composable
-fun FilterChip(text: String, isSelected: Boolean) {
-    val bgColor = if (isSelected) TorqueColors.Primary else TorqueColors.SurfaceDark
-    val contentColor = if (isSelected) Color.White else TorqueColors.OnSurfaceVariant
-    val borderColor = if (isSelected) Color.Transparent else TorqueColors.BorderDark
+fun ChipFiltro(texto: String, estaSeleccionado: Boolean) {
+    val colorFondo = if (estaSeleccionado) TorqueColors.Primary else TorqueColors.SurfaceDark
+    val colorContenido = if (estaSeleccionado) Color.White else TorqueColors.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else TorqueColors.BorderDark
 
     Box(
         modifier = Modifier
             .clip(CircleShape)
-            .background(bgColor)
-            .border(1.dp, borderColor, CircleShape)
+            .background(colorFondo)
+            .border(1.dp, colorBorde, CircleShape)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = text,
-            color = contentColor,
+            text = texto,
+            color = colorContenido,
             fontSize = 14.sp,
-            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
+            fontWeight = if (estaSeleccionado) FontWeight.SemiBold else FontWeight.Medium
         )
     }
 }
