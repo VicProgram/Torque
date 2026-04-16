@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -87,26 +88,27 @@ fun PantallaOpcionesMantenimiento(
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // --- Header ---
+            // --- Header (Compacto) ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
-                    .padding(horizontal = 8.dp),
+                    .height(56.dp)
+                    .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onAtras) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = Color.White
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Text(
                     text = "Mantenimiento",
                     modifier = Modifier.weight(1f),
                     color = Color.White,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -114,8 +116,8 @@ fun PantallaOpcionesMantenimiento(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top), // Cambiado a Top y menos espacio
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Info de la moto seleccionada
@@ -154,7 +156,9 @@ fun PantallaOpcionesMantenimiento(
                         onClick = { onVerHistorial(moto.idMoto) }
                     )
                 } ?: run {
-                    Text("No hay ninguna moto seleccionada", color = Color.White)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No hay ninguna moto seleccionada", color = Color.White)
+                    }
                 }
             }
         }
@@ -174,25 +178,26 @@ fun TarjetaOpcionMantenimiento(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(20.dp))
             .background(TorqueColors.SurfaceDark)
+            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(20.dp))
             .clickable(onClick = onClick)
-            .padding(24.dp),
+            .padding(16.dp), // Reducido de 24.dp
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .size(48.dp) // Reducido de 56.dp
+                .clip(RoundedCornerShape(12.dp))
                 .background(color.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icono, contentDescription = null, tint = color, modifier = Modifier.size(32.dp))
+            Icon(icono, contentDescription = null, tint = color, modifier = Modifier.size(24.dp)) // Reducido de 32.dp
         }
         Column {
-            Text(titulo, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
+            Text(titulo, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold) // Reducido de 18.sp
+            Text(subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp) // Reducido de 14.sp
         }
     }
 }

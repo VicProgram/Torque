@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.ComponentActivity
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -323,30 +325,34 @@ fun MotoKeepCheckItem(
 
 @Composable
 fun DashboardBottomNav(modifier: Modifier = Modifier) {
+    val contexto = LocalContext.current
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(TorqueColors.Surface.copy(alpha = 0.9f))
-            .padding(bottom = 32.dp, top = 12.dp)
+            .background(TorqueColors.Surface.copy(alpha = 0.85f))
+            .padding(vertical = 8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BottomNavItem("Inicio", Icons.Default.GridView, true)
-            BottomNavItem("Stats", Icons.Default.Analytics, false)
-            BottomNavItem("Ajustes", Icons.Default.Settings, false)
+            BottomNavItem("Atrás", Icons.AutoMirrored.Filled.ArrowBack, false) {
+                (contexto as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
+            }
+            BottomNavItem("Inicio", Icons.Default.GridView, true) {
+                // Ya estamos en una actividad que suele tener el NavHost o es el Dashboard
+            }
         }
     }
 }
 
 @Composable
-fun BottomNavItem(label: String, icon: ImageVector, isSelected: Boolean) {
+fun BottomNavItem(label: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.clickable { /* Navigate */ }
+        modifier = Modifier.clickable { onClick() }
     ) {
         Box(
             modifier = Modifier

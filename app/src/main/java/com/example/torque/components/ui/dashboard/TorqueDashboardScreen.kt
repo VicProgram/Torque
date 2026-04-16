@@ -49,27 +49,32 @@ fun TorqueDashboardScreen(
             .fillMaxSize()
             .background(TorqueColors.Background)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 64.dp) // Espacio para la barra de navegación reducida
+        ) {
             CabeceraDashboard(onIrPerfil)
 
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp), // Reducido el espacio entre tarjetas
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 item {
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Column(modifier = Modifier.padding(top = 8.dp)) {
                         Text(
                             text = stringResource(id = R.string.welcome_prefix),
                             color = TorqueColors.OnSurfaceVariant,
-                            fontSize = 14.sp,
+                            fontSize = 12.sp, // Ligeramente más pequeño
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = stringResource(id = R.string.welcome_name),
                             color = Color.White,
-                            fontSize = 32.sp,
+                            fontSize = 28.sp, // Reducido de 32sp
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -84,14 +89,14 @@ fun TorqueDashboardScreen(
                         Text(
                             text = stringResource(id = R.string.quick_actions_title),
                             color = TorqueColors.OnSurfaceVariant,
-                            fontSize = 12.sp,
+                            fontSize = 10.sp, // Reducido
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 2.sp,
-                            modifier = Modifier.padding(bottom = 16.dp, start = 4.dp)
+                            letterSpacing = 1.5.sp,
+                            modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp) // Reducido
                         ) {
                             TarjetaAccionRapida(
                                 titulo = stringResource(id = R.string.garage_title),
@@ -118,8 +123,6 @@ fun TorqueDashboardScreen(
                 item {
                     TarjetaEstadisticas(moto = motoPrincipal)
                 }
-
-                item { Spacer(modifier = Modifier.height(100.dp)) }
             }
         }
 
@@ -129,7 +132,7 @@ fun TorqueDashboardScreen(
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 24.dp, bottom = 110.dp),
+                .padding(end = 16.dp, bottom = 80.dp), // Ajustada la posición del FAB
             containerColor = TorqueColors.PrimaryContainer,
             contentColor = TorqueColors.OnPrimaryContainer,
             shape = RoundedCornerShape(16.dp)
@@ -149,8 +152,8 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .padding(horizontal = 8.dp),
+            .height(56.dp)
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -159,14 +162,15 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 Icon(
                     Icons.Default.Menu,
                     contentDescription = "Menú",
-                    tint = TorqueColors.OnSurface
+                    tint = TorqueColors.OnSurface,
+                    modifier = Modifier.size(24.dp)
                 )
             }
             Text(
                 text = "Torque",
                 color = TorqueColors.OnSurface,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -174,15 +178,16 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 Icon(
                     Icons.Default.Notifications,
                     contentDescription = "Notificaciones",
-                    tint = TorqueColors.OnSurfaceVariant
+                    tint = TorqueColors.OnSurfaceVariant,
+                    modifier = Modifier.size(22.dp)
                 )
             }
             Box {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .border(1.dp, TorqueColors.Outline, CircleShape)
+                        .border(1.dp, TorqueColors.Outline.copy(alpha = 0.5f), CircleShape)
                         .clickable { mostrarMenuAjustes = true }
                 ) {
                     Icon(
@@ -225,15 +230,15 @@ fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(24.dp)) // Reducido de 28.dp
             .background(TorqueColors.SurfaceContainerHigh)
-            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(28.dp))
+            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(24.dp))
             .clickable { onClick() }
     ) {
         Column {
             Box(
                 modifier = Modifier
-                    .height(160.dp)
+                    .height(140.dp) // Reducido de 160.dp
                     .background(TorqueColors.SurfaceVariant)
             ) {
                 if (moto?.uriFoto != null) {
@@ -260,21 +265,21 @@ fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
 
                 Box(
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(12.dp) // Reducido de 16.dp
                         .clip(CircleShape)
                         .background(TorqueColors.Primary)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 10.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "PRÓXIMO SERVICIO",
                         color = TorqueColors.OnPrimary,
-                        fontSize = 11.sp,
+                        fontSize = 10.sp, // Reducido de 11.sp
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     )
                 }
             }
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(20.dp)) { // Reducido de 24.dp
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -284,13 +289,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
                         Text(
                             text = moto?.modelo ?: "Sin Moto",
                             color = Color.White,
-                            fontSize = 24.sp,
+                            fontSize = 20.sp, // Reducido de 24.sp
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = if (moto != null) "Tu moto principal" else "Añade una moto",
                             color = TorqueColors.OnSurfaceVariant,
-                            fontSize = 14.sp,
+                            fontSize = 12.sp, // Reducido de 14.sp
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -298,19 +303,19 @@ fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
                         Text(
                             text = "12",
                             color = TorqueColors.Primary,
-                            fontSize = 32.sp,
+                            fontSize = 28.sp, // Reducido de 32.sp
                             fontWeight = FontWeight.Black
                         )
                         Text(
                             text = "DÍAS",
                             color = TorqueColors.Outline,
-                            fontSize = 10.sp,
+                            fontSize = 9.sp, // Reducido de 10.sp
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp)) // Reducido de 20.dp
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -319,32 +324,33 @@ fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
                         Text(
                             text = "ESTADO GENERAL",
                             color = TorqueColors.OnSurfaceVariant,
-                            fontSize = 10.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )
                         Text(
                             text = "85%",
                             color = TorqueColors.Primary,
-                            fontSize = 10.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp)) // Reducido de 12.dp
                     LinearProgressIndicator(
                         progress = { 0.85f },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(10.dp)
+                            .height(8.dp) // Reducido de 10.dp
                             .clip(CircleShape),
                         color = TorqueColors.Primary,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 TorqueButton(
                     text = "Ver Mantenimiento",
-                    onClick = onClick
+                    onClick = onClick,
+                    modifier = Modifier.height(48.dp) // Reducido de 56.dp (vía default en TorqueButton, aquí forzamos)
                 )
             }
         }
@@ -363,17 +369,17 @@ fun TarjetaAccionRapida(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp)) // Reducido de 16.dp
             .background(TorqueColors.SurfaceContainer)
-            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
             .clickable { onClick() }
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(12.dp), // Reducido de 20.dp
+        verticalArrangement = Arrangement.spacedBy(8.dp) // Reducido de 16.dp
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .size(40.dp) // Reducido de 48.dp
+                .clip(RoundedCornerShape(12.dp))
                 .background(colorContenedor),
             contentAlignment = Alignment.Center
         ) {
@@ -381,12 +387,12 @@ fun TarjetaAccionRapida(
                 icono,
                 contentDescription = null,
                 tint = colorContenido,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(24.dp) // Reducido de 28.dp
             )
         }
         Column {
-            Text(text = titulo, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(text = subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
+            Text(text = titulo, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) // Reducido de 16.sp
+            Text(text = subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 11.sp) // Reducido de 12.sp
         }
     }
 }

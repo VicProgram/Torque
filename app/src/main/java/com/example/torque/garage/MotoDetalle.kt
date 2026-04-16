@@ -112,34 +112,35 @@ fun VistaMotoDetalle(idMoto: Long) {
             }
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
-                // --- Cabecera ---
+                // --- Cabecera (Compacta) ---
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp)
-                        .padding(horizontal = 8.dp),
+                        .height(56.dp)
+                        .padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { (contexto as? Activity)?.finish() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                     Text(
                         text = moto!!.modelo,
                         color = Color.White,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                     if (moto!!.esPrincipal == 1) {
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Icon(
                             Icons.Default.Star,
                             contentDescription = "Principal",
                             tint = TorqueColors.Primary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -148,7 +149,8 @@ fun VistaMotoDetalle(idMoto: Long) {
                             Icon(
                                 Icons.Default.MoreVert,
                                 contentDescription = "Menú",
-                                tint = Color.White
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                         DropdownMenu(
@@ -239,15 +241,15 @@ fun VistaMotoDetalle(idMoto: Long) {
                     modifier = Modifier
                         .weight(1f)
                         .verticalScroll(estadoScroll)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // --- Galería de Imágenes ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(16f / 10f)
-                            .clip(RoundedCornerShape(24.dp))
+                            .aspectRatio(16f / 9f) // Un poco más horizontal
+                            .clip(RoundedCornerShape(20.dp))
                             .background(TorqueColors.SurfaceDark)
                             .clickable { selectorImagen.launch("image/*") }
                     ) {
@@ -281,15 +283,15 @@ fun VistaMotoDetalle(idMoto: Long) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(16.dp))
                             .background(TorqueColors.SurfaceDark)
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
                             "ESPECIFICACIONES",
                             color = TorqueColors.Primary,
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )

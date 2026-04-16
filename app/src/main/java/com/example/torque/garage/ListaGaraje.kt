@@ -64,17 +64,17 @@ fun VistaListaGaraje() {
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 140.dp, start = 16.dp, end = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                contentPadding = PaddingValues(bottom = 80.dp, start = 16.dp, end = 16.dp), // Reducido bottom padding
+                verticalArrangement = Arrangement.spacedBy(16.dp) // Reducido de 24.dp
             ) {
                 item {
                     LazyRow(
-                        modifier = Modifier.padding(vertical = 16.dp),
+                        modifier = Modifier.padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         item { FiltroChip("Todas", estaSeleccionado = true) }
-                        item { FiltroChip("Mantenimiento", estaSeleccionado = false) }
-                        item { FiltroChip("Archivo", estaSeleccionado = false) }
+                        item { FiltroChip("En Uso", estaSeleccionado = false) } // Renombrado
+                        item { FiltroChip("Históricas", estaSeleccionado = false) } // Renombrado
                     }
                 }
 
@@ -98,7 +98,7 @@ fun VistaListaGaraje() {
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 24.dp, bottom = 110.dp),
+                .padding(end = 16.dp, bottom = 80.dp), // Ajustado al nuevo padding
             containerColor = TorqueColors.Primary,
             contentColor = TorqueColors.OnPrimary,
             shape = RoundedCornerShape(16.dp)
@@ -120,22 +120,23 @@ fun CabeceraGaraje() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(56.dp) // Reducido de 64.dp
             .background(TorqueColors.Background.copy(alpha = 0.95f))
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 4.dp), // Reducido de 8.dp
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Atrás",
-                tint = TorqueColors.OnSurface
+                tint = TorqueColors.OnSurface,
+                modifier = Modifier.size(24.dp)
             )
         }
         Text(
             text = "Mi Garaje",
             color = TorqueColors.OnSurface,
-            fontSize = 20.sp,
+            fontSize = 18.sp, // Reducido de 20.sp
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
@@ -144,14 +145,16 @@ fun CabeceraGaraje() {
                 Icon(
                     Icons.Default.Search,
                     contentDescription = "Buscar",
-                    tint = TorqueColors.OnSurfaceVariant
+                    tint = TorqueColors.OnSurfaceVariant,
+                    modifier = Modifier.size(22.dp)
                 )
             }
             IconButton(onClick = { /* Más */ }) {
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = "Más",
-                    tint = TorqueColors.OnSurfaceVariant
+                    tint = TorqueColors.OnSurfaceVariant,
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
@@ -223,7 +226,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
             }
         }
 
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) { // Reducido de 16.dp
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -232,9 +235,9 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                 Text(
                     text = moto.modelo,
                     color = Color.White,
-                    fontSize = 32.sp,
+                    fontSize = 22.sp, // Mucho más compacto (era 32sp)
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 36.sp,
+                    lineHeight = 26.sp,
                     modifier = Modifier.weight(1f)
                 )
                 if (moto.esPrincipal == 1) {
@@ -242,19 +245,19 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                         imageVector = Icons.Default.Star,
                         contentDescription = "Principal",
                         tint = TorqueColors.Primary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(20.dp) // Reducido de 28.dp
                     )
                 }
             }
             Text(
                 text = "${moto.marca} • ${moto.anio}",
                 color = TorqueColors.OnSurfaceVariant,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Normal,
-                lineHeight = 32.sp
+                fontSize = 14.sp, // Reducido de 24.sp
+                fontWeight = FontWeight.Medium,
+                lineHeight = 18.sp
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -265,14 +268,14 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(16.dp),
                         tint = Color(0xFF34D399)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Estado Saludable",
                         color = Color(0xFF34D399),
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -280,13 +283,13 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .border(1.dp, TorqueColors.Outline, CircleShape)
-                        .padding(horizontal = 24.dp, vertical = 8.dp)
+                        .border(1.dp, TorqueColors.Outline.copy(alpha = 0.5f), CircleShape)
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "Ver Detalles",
                         color = TorqueColors.Primary,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
