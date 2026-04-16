@@ -41,8 +41,11 @@ fun TorqueNavHost() {
                 onIrGaraje = {
                     contexto.startActivity(Intent(contexto, ListaGaraje::class.java))
                 },
-                onIrMantenimientos = {
-                    contexto.startActivity(Intent(contexto, OpcionesMantenimiento::class.java))
+                onIrMantenimientos = { idMoto ->
+                    val intent = Intent(contexto, OpcionesMantenimiento::class.java).apply {
+                        if (idMoto != null) putExtra("idMoto", idMoto)
+                    }
+                    contexto.startActivity(intent)
                 },
                 onIrPerfil = {
                     contexto.startActivity(Intent(contexto, PerfilActivity::class.java))

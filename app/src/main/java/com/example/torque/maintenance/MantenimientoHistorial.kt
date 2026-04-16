@@ -64,7 +64,7 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
 class MantenimientoHistorial : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val idMoto = intent.getLongExtra("motoId", -1L).takeIf { it != -1L }
+        val idMoto = intent.getLongExtra("idMoto", -1L).takeIf { it != -1L }
         setContent {
             TorqueTheme {
                 PantallaHistorialMantenimiento(idMoto)

@@ -31,8 +31,7 @@
 
         <!-- Activities de Garage -->
         <activity android:name=".garage.MotoDetalle" />
-        <activity android:name=".garage.AgregarMoto" />
-        <activity android:name=".garage.BorrarMoto" />
+        <activity android:name=".garage.AnadirMotoActivity" />
         <activity android:name=".garage.ListaGaraje" />
 
         <!-- Perfil y Ajustes -->

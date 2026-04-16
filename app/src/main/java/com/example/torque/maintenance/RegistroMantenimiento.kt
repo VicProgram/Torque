@@ -34,7 +34,7 @@ import com.example.torque.ui.theme.TorqueTheme
 class RegistroMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val idMoto = intent.getLongExtra("motoId", -1L)
+        val idMoto = intent.getLongExtra("idMoto", -1L)
         setContent {
             TorqueTheme {
                 PantallaRegistroMantenimiento(idMoto)

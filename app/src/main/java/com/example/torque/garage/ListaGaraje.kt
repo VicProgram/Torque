@@ -35,6 +35,7 @@ import com.example.torque.room.AppRepository
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import android.content.Intent
+import com.example.torque.garage.AnadirMotoActivity
 
 class ListaGaraje : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +94,7 @@ fun VistaListaGaraje() {
 
         FloatingActionButton(
             onClick = {
-                contexto.startActivity(Intent(contexto, AgregarMoto::class.java))
+                contexto.startActivity(Intent(contexto, AnadirMotoActivity::class.java))
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)

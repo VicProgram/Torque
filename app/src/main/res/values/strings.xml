@@ -15,7 +15,7 @@
     <string name="dashboard_title">Dashboard</string>
     <string name="no_notifications">No tienes notificaciones</string>
     <string name="menu_toast">Menú lateral no implementado</string>
-    <string name="save_motorcycle">Save Motorcycle</string>
+    <string name="save_motorcycle">Guardar Moto</string>
     <string name="welcome_prefix">Bienvenido,</string>
     <string name="welcome_name">Rider</string>
     <string name="quick_actions_title">ACCIONES RÁPIDAS</string>

@@ -21,6 +21,9 @@ interface MotoDao {
     @Query("SELECT * FROM motos WHERE idMoto = :id")
     suspend fun obtenerPorId(id: Long): MotoEntity?
 
+    @Query("SELECT COUNT(*) FROM motos")
+    suspend fun contarMotos(): Int
+
     @Query("SELECT * FROM motos WHERE esPrincipal = 1 LIMIT 1")
     fun obtenerPrincipalFlow(): Flow<MotoEntity?>
 

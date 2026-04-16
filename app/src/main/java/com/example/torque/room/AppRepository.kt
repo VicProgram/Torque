@@ -14,6 +14,7 @@ class AppRepository private constructor(private val db: AppDatabase) {
     suspend fun actualizarMoto(moto: MotoEntity) = db.motoDao().actualizar(moto)
     suspend fun eliminarMoto(moto: MotoEntity) = db.motoDao().eliminar(moto)
     suspend fun obtenerMotoPorId(id: Long) = db.motoDao().obtenerPorId(id)
+    suspend fun contarMotos(): Int = db.motoDao().contarMotos()
 
     fun obtenerMotoPrincipalFlow(): Flow<MotoEntity?> = db.motoDao().obtenerPrincipalFlow()
 

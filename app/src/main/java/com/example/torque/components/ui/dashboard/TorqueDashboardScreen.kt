@@ -30,14 +30,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
-import com.example.torque.garage.AgregarMoto
+import com.example.torque.garage.AnadirMotoActivity
 import com.example.torque.room.AppRepository
 import com.example.torque.room.entity.MotoEntity
 
 @Composable
 fun TorqueDashboardScreen(
     onIrGaraje: () -> Unit = {},
-    onIrMantenimientos: () -> Unit = {},
+    onIrMantenimientos: (Long?) -> Unit = {},
     onIrPerfil: () -> Unit = {}
 ) {
     val contexto = LocalContext.current
@@ -76,7 +76,7 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    TarjetaProximoServicio(moto = motoPrincipal, onClick = onIrMantenimientos)
+                    TarjetaProximoServicio(moto = motoPrincipal, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
                 }
 
                 item {
@@ -109,7 +109,7 @@ fun TorqueDashboardScreen(
                                 colorContenedor = TorqueColors.PrimaryContainer,
                                 colorContenido = TorqueColors.OnPrimaryContainer,
                                 modifier = Modifier.weight(1f),
-                                onClick = onIrMantenimientos
+                                onClick = { onIrMantenimientos(motoPrincipal?.idMoto) }
                             )
                         }
                     }
@@ -125,7 +125,7 @@ fun TorqueDashboardScreen(
 
         FloatingActionButton(
             onClick = {
-                contexto.startActivity(Intent(contexto, AgregarMoto::class.java))
+                contexto.startActivity(Intent(contexto, AnadirMotoActivity::class.java))
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)

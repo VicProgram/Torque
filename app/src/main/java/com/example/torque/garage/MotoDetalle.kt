@@ -38,10 +38,15 @@ import com.example.torque.room.AppRepository
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
+import com.example.torque.utils.FileUtils
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.Intent
+import androidx.compose.foundation.clickable
+import com.example.torque.maintenance.MantenimientoHistorial
+import com.example.torque.maintenance.RegistroMantenimiento
 
 class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +86,7 @@ fun VistaMotoDetalle(idMoto: Long) {
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val ruta = copiarImagenAInterno(contexto, it)
+            val ruta = FileUtils.copiarImagenAInterno(contexto, it)
             if (ruta != null && idMoto != -1L) {
                 scope.launch {
                     val nuevaFoto = FotoEntity(
@@ -169,6 +174,40 @@ fun VistaMotoDetalle(idMoto: Long) {
                                             (contexto as? Activity)?.setResult(Activity.RESULT_OK)
                                         }
                                     }
+                                    mostrarMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Registrar Mantenimiento", color = Color.White) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Build,
+                                        contentDescription = null,
+                                        tint = TorqueColors.Primary
+                                    )
+                                },
+                                onClick = {
+                                    val intent = Intent(contexto, RegistroMantenimiento::class.java).apply {
+                                        putExtra("idMoto", idMoto)
+                                    }
+                                    contexto.startActivity(intent)
+                                    mostrarMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Ver Historial", color = Color.White) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.History,
+                                        contentDescription = null,
+                                        tint = TorqueColors.Primary
+                                    )
+                                },
+                                onClick = {
+                                    val intent = Intent(contexto, MantenimientoHistorial::class.java).apply {
+                                        putExtra("idMoto", idMoto)
+                                    }
+                                    contexto.startActivity(intent)
                                     mostrarMenu = false
                                 }
                             )
@@ -309,29 +348,3 @@ fun FilaDetalle(etiqueta: String, valor: String?) {
     }
 }
 
-fun copiarImagenAInterno(contexto: Context, uri: Uri): String? {
-    return try {
-        val flujoEntrada = contexto.contentResolver.openInputStream(uri)
-        val nombreArchivo = obtenerNombreArchivo(contexto, uri) ?: "img_${System.currentTimeMillis()}.jpg"
-        val archivo = File(contexto.filesDir, nombreArchivo)
-        flujoEntrada?.use { entrada ->
-            archivo.outputStream().use { salida ->
-                entrada.copyTo(salida)
-            }
-        }
-        archivo.absolutePath
-    } catch (e: Exception) {
-        null
-    }
-}
-
-fun obtenerNombreArchivo(contexto: Context, uri: Uri): String? {
-    var nombre: String? = null
-    contexto.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-        val indiceNombre = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (cursor.moveToFirst()) {
-            nombre = cursor.getString(indiceNombre)
-        }
-    }
-    return nombre
-}
