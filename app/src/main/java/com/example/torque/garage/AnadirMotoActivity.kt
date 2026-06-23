@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.components.ui.dashboard.*
-import com.example.torque.room.AppRepository
+import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.utils.FileUtils
+import com.example.torque.utils.ArchivoUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,7 +57,7 @@ class AnadirMotoActivity : ComponentActivity() {
 @Composable
 fun VistaAnadirMoto() {
     val contexto = LocalContext.current
-    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
@@ -71,6 +71,8 @@ fun VistaAnadirMoto() {
     var kilometros by remember { mutableStateOf("") }
     var uriImagen by remember { mutableStateOf<android.net.Uri?>(null) }
     var esPrincipal by remember { mutableStateOf(false) }
+    var errorMarca by remember { mutableStateOf(false) }
+    var errorModelo by remember { mutableStateOf(false) }
 
     val selectorImagen = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -82,7 +84,7 @@ fun VistaAnadirMoto() {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -96,7 +98,7 @@ fun VistaAnadirMoto() {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = Color.White
+                        tint = ColoresTorque.Primary
                     )
                 }
                 Text(
@@ -124,7 +126,7 @@ fun VistaAnadirMoto() {
                         .aspectRatio(16f / 9f)
                         .padding(top = 16.dp)
                         .clip(RoundedCornerShape(24.dp))
-                        .background(TorqueColors.SurfaceDark)
+                        .background(ColoresTorque.SurfaceDark)
                         .clickable { selectorImagen.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
@@ -137,24 +139,30 @@ fun VistaAnadirMoto() {
                         )
                     } else {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(48.dp))
-                            Text("Añadir Foto", color = TorqueColors.OnSurfaceVariant)
+                            Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(48.dp))
+                            Text("Añadir Foto", color = ColoresTorque.OnSurfaceVariant)
                         }
                     }
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(marca, { marca = it }, "Marca *")
-                    TorqueTextField(modelo, { modelo = it }, "Modelo *")
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        TorqueTextField(anio, { anio = it }, "Año", modifier = Modifier.weight(1f))
-                        TorqueTextField(matricula, { matricula = it }, "Matrícula", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(marca, { marca = it; errorMarca = false }, "Marca *")
+                    if (errorMarca) {
+                        Text("La marca es obligatoria", color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                    }
+                    CampoTextoTorque(modelo, { modelo = it; errorModelo = false }, "Modelo *")
+                    if (errorModelo) {
+                        Text("El modelo es obligatorio", color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        TorqueTextField(kilometros, { kilometros = it }, "Kms Actuales", modifier = Modifier.weight(1f))
-                        TorqueTextField(cilindrada, { cilindrada = it }, "Cilindrada", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(anio, { anio = it }, "Año", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(matricula, { matricula = it }, "Matrícula", modifier = Modifier.weight(1f))
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        CampoTextoTorque(kilometros, { kilometros = it }, "Kms Actuales", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(cilindrada, { cilindrada = it }, "Cilindrada", modifier = Modifier.weight(1f))
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -162,11 +170,11 @@ fun VistaAnadirMoto() {
                         Switch(
                             checked = esPrincipal,
                             onCheckedChange = { esPrincipal = it },
-                            colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary)
+                            colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary)
                         )
                     }
 
-                    TorqueTextField(
+                    CampoTextoTorque(
                         value = estilo,
                         onValueChange = { estilo = it },
                         label = "Notas",
@@ -184,17 +192,19 @@ fun VistaAnadirMoto() {
                 .fillMaxWidth()
                 .padding(24.dp)
         ) {
-            TorqueButton(
+            BotonTorque(
                 text = "Guardar Moto",
                 icon = Icons.Default.Save,
                 onClick = {
-                    if (marca.isBlank() || modelo.isBlank()) {
+                    errorMarca = marca.isBlank()
+                    errorModelo = modelo.isBlank()
+                    if (errorMarca || errorModelo) {
                         Toast.makeText(contexto, "Rellena los campos obligatorios", Toast.LENGTH_SHORT).show()
-                        return@TorqueButton
+                        return@BotonTorque
                     }
 
                     scope.launch {
-                        val rutaFoto = uriImagen?.let { FileUtils.copiarImagenAInterno(contexto, it) }
+                        val rutaFoto = uriImagen?.let { ArchivoUtils.copiarImagenAInterno(contexto, it) }
                         
                         // Obtenemos el conteo antes de insertar
                         val numMotos = repositorio.contarMotos()

@@ -6,10 +6,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.torque.ajustes.AjustesRepositorio
+import com.example.torque.ajustes.dataStore
 import com.example.torque.components.ui.dashboard.TorqueDashboardScreen
 import com.example.torque.garage.ListaGaraje
 import com.example.torque.maintenance.OpcionesMantenimiento
@@ -21,7 +26,9 @@ class MenuPrincipal : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TorqueTheme {
+            val repositorio = remember { AjustesRepositorio(this.dataStore) }
+            val modoOscuro by repositorio.modoOscuroActivadoFlow.collectAsState(initial = true)
+            TorqueTheme(darkMode = modoOscuro) {
                 TorqueNavHost()
             }
         }

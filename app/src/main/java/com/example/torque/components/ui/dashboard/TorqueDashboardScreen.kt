@@ -31,7 +31,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
 import com.example.torque.garage.AnadirMotoActivity
-import com.example.torque.room.AppRepository
+import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
 
@@ -42,7 +42,7 @@ fun TorqueDashboardScreen(
     onIrPerfil: () -> Unit = {}
 ) {
     val contexto = LocalContext.current
-    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
     var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
 
@@ -66,7 +66,7 @@ fun TorqueDashboardScreen(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(
             modifier = Modifier
@@ -86,7 +86,7 @@ fun TorqueDashboardScreen(
                     Column(modifier = Modifier.padding(top = 8.dp)) {
                         Text(
                             text = stringResource(id = R.string.welcome_prefix),
-                            color = TorqueColors.OnSurfaceVariant,
+                            color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 12.sp, // Ligeramente más pequeño
                             fontWeight = FontWeight.Medium
                         )
@@ -107,7 +107,7 @@ fun TorqueDashboardScreen(
                     Column {
                         Text(
                             text = stringResource(id = R.string.quick_actions_title),
-                            color = TorqueColors.OnSurfaceVariant,
+                            color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 10.sp, // Reducido
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.5.sp,
@@ -121,8 +121,8 @@ fun TorqueDashboardScreen(
                                 titulo = stringResource(id = R.string.garage_title),
                                 subtitulo = stringResource(id = R.string.garage_subtitle),
                                 icono = Icons.Default.Motorcycle,
-                                colorContenedor = TorqueColors.SecondaryContainer,
-                                colorContenido = TorqueColors.OnSecondaryContainer,
+                                colorContenedor = ColoresTorque.SecondaryContainer,
+                                colorContenido = ColoresTorque.OnSecondaryContainer,
                                 modifier = Modifier.weight(1f),
                                 onClick = onIrGaraje
                             )
@@ -130,8 +130,8 @@ fun TorqueDashboardScreen(
                                 titulo = stringResource(id = R.string.maintenance_title),
                                 subtitulo = stringResource(id = R.string.maintenance_subtitle),
                                 icono = Icons.Default.History,
-                                colorContenedor = TorqueColors.PrimaryContainer,
-                                colorContenido = TorqueColors.OnPrimaryContainer,
+                                colorContenedor = ColoresTorque.PrimaryContainer,
+                                colorContenido = ColoresTorque.OnPrimaryContainer,
                                 modifier = Modifier.weight(1f),
                                 onClick = { onIrMantenimientos(motoPrincipal?.idMoto) }
                             )
@@ -152,14 +152,13 @@ fun TorqueDashboardScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 80.dp), // Ajustada la posición del FAB
-            containerColor = TorqueColors.PrimaryContainer,
-            contentColor = TorqueColors.OnPrimaryContainer,
+            containerColor = ColoresTorque.PrimaryContainer,
+            contentColor = ColoresTorque.OnPrimaryContainer,
             shape = RoundedCornerShape(16.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.add))
         }
 
-        DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -181,13 +180,13 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 Icon(
                     Icons.Default.Menu,
                     contentDescription = "Menú",
-                    tint = TorqueColors.OnSurface,
+                    tint = ColoresTorque.OnSurface,
                     modifier = Modifier.size(24.dp)
                 )
             }
             Text(
                 text = "Torque",
-                color = TorqueColors.OnSurface,
+                color = ColoresTorque.OnSurface,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -197,7 +196,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                 Icon(
                     Icons.Default.Notifications,
                     contentDescription = "Notificaciones",
-                    tint = TorqueColors.OnSurfaceVariant,
+                    tint = ColoresTorque.OnSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -206,7 +205,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .border(1.dp, TorqueColors.Outline.copy(alpha = 0.5f), CircleShape)
+                        .border(1.dp, ColoresTorque.Outline.copy(alpha = 0.5f), CircleShape)
                         .clickable { mostrarMenuAjustes = true }
                 ) {
                     Icon(
@@ -215,13 +214,13 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(8.dp),
-                        tint = TorqueColors.OnSurfaceVariant
+                        tint = ColoresTorque.OnSurfaceVariant
                     )
                 }
                 DropdownMenu(
                     expanded = mostrarMenuAjustes,
                     onDismissRequest = { mostrarMenuAjustes = false },
-                    modifier = Modifier.background(TorqueColors.SurfaceDark)
+                    modifier = Modifier.background(ColoresTorque.SurfaceDark)
                 ) {
                     DropdownMenuItem(
                         text = { Text("Mi Perfil", color = Color.White) },
@@ -250,7 +249,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp)) // Reducido de 28.dp
-            .background(TorqueColors.SurfaceContainerHigh)
+            .background(ColoresTorque.SurfaceContainerHigh)
             .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(24.dp))
             .clickable { onClick() }
     ) {
@@ -258,7 +257,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
             Box(
                 modifier = Modifier
                     .height(140.dp) // Reducido de 160.dp
-                    .background(TorqueColors.SurfaceVariant)
+                    .background(ColoresTorque.SurfaceVariant)
             ) {
                 if (moto?.uriFoto != null) {
                     Image(
@@ -276,7 +275,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                             Brush.verticalGradient(
                                 colors = listOf(
                                     Color.Transparent,
-                                    TorqueColors.SurfaceContainerHigh
+                                    ColoresTorque.SurfaceContainerHigh
                                 )
                             )
                         )
@@ -286,12 +285,12 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                     modifier = Modifier
                         .padding(12.dp) // Reducido de 16.dp
                         .clip(CircleShape)
-                        .background(TorqueColors.Primary)
+                        .background(ColoresTorque.Primary)
                         .padding(horizontal = 10.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "PRÓXIMO SERVICIO",
-                        color = TorqueColors.OnPrimary,
+                        color = ColoresTorque.OnPrimary,
                         fontSize = 10.sp, // Reducido de 11.sp
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
@@ -313,7 +312,7 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                         )
                         Text(
                             text = if (moto != null) "Tu moto principal" else "Añade una moto",
-                            color = TorqueColors.OnSurfaceVariant,
+                            color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 12.sp, // Reducido de 14.sp
                             fontWeight = FontWeight.Medium
                         )
@@ -322,13 +321,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                         if (kmRestantes != null) {
                             Text(
                                 text = if (kmRestantes < 0) "¡VENCIDO!" else kmRestantes.toString(),
-                                color = if (kmRestantes < 0) Color(0xFFEF4444) else TorqueColors.Primary,
+                                color = if (kmRestantes < 0) Color(0xFFEF4444) else ColoresTorque.Primary,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Black
                             )
                             Text(
                                 text = if (kmRestantes < 0) "KM DE SERVICIO" else "KM RESTANTES",
-                                color = TorqueColors.Outline,
+                                color = ColoresTorque.Outline,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp
@@ -336,13 +335,13 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                         } else {
                             Text(
                                 text = "—",
-                                color = TorqueColors.OnSurfaceVariant,
+                                color = ColoresTorque.OnSurfaceVariant,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Black
                             )
                             Text(
                                 text = "SIN DATOS",
-                                color = TorqueColors.Outline,
+                                color = ColoresTorque.Outline,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp
@@ -358,14 +357,14 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                     ) {
                         Text(
                             text = "ESTADO GENERAL",
-                            color = TorqueColors.OnSurfaceVariant,
+                            color = ColoresTorque.OnSurfaceVariant,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         )
                         Text(
                             text = "85%",
-                            color = TorqueColors.Primary,
+                            color = ColoresTorque.Primary,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -377,15 +376,15 @@ fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick:
                             .fillMaxWidth()
                             .height(8.dp) // Reducido de 10.dp
                             .clip(CircleShape),
-                        color = TorqueColors.Primary,
+                        color = ColoresTorque.Primary,
                         trackColor = Color.White.copy(alpha = 0.1f)
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                TorqueButton(
+                BotonTorque(
                     text = "Ver Mantenimiento",
                     onClick = onClick,
-                    modifier = Modifier.height(48.dp) // Reducido de 56.dp (vía default en TorqueButton, aquí forzamos)
+                    modifier = Modifier.height(48.dp) // Reducido de 56.dp (vía default en BotonTorque, aquí forzamos)
                 )
             }
         }
@@ -405,7 +404,7 @@ fun TarjetaAccionRapida(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp)) // Reducido de 16.dp
-            .background(TorqueColors.SurfaceContainer)
+            .background(ColoresTorque.SurfaceContainer)
             .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(12.dp), // Reducido de 20.dp
@@ -427,7 +426,7 @@ fun TarjetaAccionRapida(
         }
         Column {
             Text(text = titulo, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) // Reducido de 16.sp
-            Text(text = subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 11.sp) // Reducido de 12.sp
+            Text(text = subtitulo, color = ColoresTorque.OnSurfaceVariant, fontSize = 11.sp) // Reducido de 12.sp
         }
     }
 }
@@ -438,7 +437,7 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(TorqueColors.SurfaceContainer)
+            .background(ColoresTorque.SurfaceContainer)
             .padding(24.dp)
     ) {
         Row(
@@ -448,12 +447,12 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
         ) {
             Text(
                 text = "KILOMETRAJE TOTAL",
-                color = TorqueColors.Tertiary,
+                color = ColoresTorque.Tertiary,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
             )
-            Icon(Icons.Default.TrendingUp, contentDescription = null, tint = TorqueColors.Outline)
+            Icon(Icons.Default.TrendingUp, contentDescription = null, tint = ColoresTorque.Outline)
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.Bottom) {
@@ -467,7 +466,7 @@ fun TarjetaEstadisticas(moto: MotoEntity?) {
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "KILÓMETROS",
-                color = TorqueColors.OnSurfaceVariant,
+                color = ColoresTorque.OnSurfaceVariant,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 8.dp)

@@ -103,7 +103,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -117,7 +117,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = TorqueColors.Primary
+                        tint = ColoresTorque.Primary
                     )
                 }
                 Text(
@@ -149,22 +149,22 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                             placeholder = {
                                 Text(
                                     "Buscar tareas...",
-                                    color = TorqueColors.Slate500
+                                    color = ColoresTorque.Slate500
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Search,
                                     contentDescription = null,
-                                    tint = TorqueColors.Slate500
+                                    tint = ColoresTorque.Slate500
                                 )
                             },
                             colors = TextFieldDefaults.colors(
-                                focusedContainerColor = TorqueColors.SurfaceDark,
-                                unfocusedContainerColor = TorqueColors.SurfaceDark,
+                                focusedContainerColor = ColoresTorque.SurfaceDark,
+                                unfocusedContainerColor = ColoresTorque.SurfaceDark,
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
-                                cursorColor = TorqueColors.Primary,
+                                cursorColor = ColoresTorque.Primary,
                                 focusedTextColor = Color.White,
                                 unfocusedTextColor = Color.White
                             ),
@@ -190,10 +190,10 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     "Suspensión" to tareasSuspension
                 )
                 secciones.forEach { (nombre, lista) ->
-                    item { SectionHeader(nombre) }
+                    item { EncabezadoDeSeccion(nombre) }
                     items(lista) { tarea ->
                         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                            MotoKeepCheckItem(
+                            ElementoCheckMotoKeep(
                                 title = tarea.nombre,
                                 description = tarea.descripcion,
                                 icon = tarea.icono,
@@ -215,8 +215,8 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            TorqueColors.Background.copy(alpha = 0.95f),
-                            TorqueColors.Background
+                            ColoresTorque.Background.copy(alpha = 0.95f),
+                            ColoresTorque.Background
                         )
                     )
                 )
@@ -226,8 +226,8 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
-                    .background(TorqueColors.SurfaceDark)
-                    .border(1.dp, TorqueColors.BorderDark, RoundedCornerShape(20.dp))
+                    .background(ColoresTorque.SurfaceDark)
+                    .border(1.dp, ColoresTorque.BorderDark, RoundedCornerShape(20.dp))
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -238,7 +238,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                 ) {
                     Text(
                         "$cantidadSeleccionada tareas seleccionadas",
-                        color = TorqueColors.Slate500,
+                        color = ColoresTorque.Slate500,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -249,9 +249,9 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                         fontSize = 14.sp
                     )
                 }
-                TorqueButton(
+                BotonTorque(
                     text = "Continuar",
-                    color = TorqueColors.Accent,
+                    color = ColoresTorque.Accent,
                     icon = Icons.Default.ArrowForward,
                     onClick = {
                         val listaSeleccionados = itemsSeleccionados.filterValues { it }.keys.toList()
@@ -271,9 +271,9 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
 
 @Composable
 fun ChipFiltro(texto: String, estaSeleccionado: Boolean) {
-    val colorFondo = if (estaSeleccionado) TorqueColors.Primary else TorqueColors.SurfaceDark
-    val colorContenido = if (estaSeleccionado) Color.White else TorqueColors.OnSurfaceVariant
-    val colorBorde = if (estaSeleccionado) Color.Transparent else TorqueColors.BorderDark
+    val colorFondo = if (estaSeleccionado) ColoresTorque.Primary else ColoresTorque.SurfaceDark
+    val colorContenido = if (estaSeleccionado) Color.White else ColoresTorque.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else ColoresTorque.BorderDark
 
     Box(
         modifier = Modifier

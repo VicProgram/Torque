@@ -35,10 +35,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.vector.ImageVector
 import coil.compose.rememberAsyncImagePainter
 import com.example.torque.ajustes.dataStore
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.components.ui.dashboard.TorqueTextField
+import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.components.ui.dashboard.CampoTextoTorque
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.utils.FileUtils
+import com.example.torque.utils.ArchivoUtils
 import kotlinx.coroutines.launch
 
 class PerfilActivity : ComponentActivity() {
@@ -56,7 +56,7 @@ class PerfilActivity : ComponentActivity() {
 @Composable
 fun PerfilScreen(onBack: () -> Unit) {
     val contexto = LocalContext.current
-    val repositorio = PerfilRepository(contexto.dataStore)
+    val repositorio = PerfilRepositorio(contexto.dataStore)
     val scope = rememberCoroutineScope()
 
     val nombre by repositorio.nombreFlow.collectAsState(initial = "")
@@ -82,7 +82,7 @@ fun PerfilScreen(onBack: () -> Unit) {
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val ruta = FileUtils.copiarImagenAInterno(contexto, it)
+            val ruta = ArchivoUtils.copiarImagenAInterno(contexto, it)
             if (ruta != null) {
                 scope.launch { repositorio.establecerFoto(ruta) }
             }
@@ -93,7 +93,7 @@ fun PerfilScreen(onBack: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -104,7 +104,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = ColoresTorque.Primary)
                 }
                 Text(
                     text = "Mi Perfil",
@@ -128,7 +128,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                     Icon(
                         if (editando) Icons.Default.Save else Icons.Default.Edit,
                         contentDescription = if (editando) "Guardar" else "Editar",
-                        tint = TorqueColors.Primary
+                        tint = ColoresTorque.Primary
                     )
                 }
             }
@@ -144,8 +144,8 @@ fun PerfilScreen(onBack: () -> Unit) {
                     modifier = Modifier
                         .size(120.dp)
                         .clip(CircleShape)
-                        .background(TorqueColors.SurfaceDark)
-                        .border(2.dp, TorqueColors.Primary, CircleShape)
+                        .background(ColoresTorque.SurfaceDark)
+                        .border(2.dp, ColoresTorque.Primary, CircleShape)
                         .clickable { if (editando) selectorImagen.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
@@ -161,7 +161,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                             Icons.Default.Person,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = TorqueColors.OnSurfaceVariant
+                            tint = ColoresTorque.OnSurfaceVariant
                         )
                     }
                     if (editando) {
@@ -170,7 +170,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                                 .align(Alignment.BottomEnd)
                                 .size(32.dp)
                                 .clip(CircleShape)
-                                .background(TorqueColors.Primary),
+                                .background(ColoresTorque.Primary),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -190,10 +190,10 @@ fun PerfilScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (editando) {
-                        TorqueTextField(value = editNombre, onValueChange = { editNombre = it }, label = "Nombre")
-                        TorqueTextField(value = editEmail, onValueChange = { editEmail = it }, label = "Correo electrónico")
-                        TorqueTextField(value = editTelefono, onValueChange = { editTelefono = it }, label = "Teléfono")
-                        TorqueTextField(value = editFecha, onValueChange = { editFecha = it }, label = "Fecha nacimiento (YYYY-MM-DD)")
+                        CampoTextoTorque(value = editNombre, onValueChange = { editNombre = it }, label = "Nombre")
+                        CampoTextoTorque(value = editEmail, onValueChange = { editEmail = it }, label = "Correo electrónico")
+                        CampoTextoTorque(value = editTelefono, onValueChange = { editTelefono = it }, label = "Teléfono")
+                        CampoTextoTorque(value = editFecha, onValueChange = { editFecha = it }, label = "Fecha nacimiento (YYYY-MM-DD)")
                     } else {
                         if (nombre.isNullOrBlank().not()) {
                             Text(text = nombre!!, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -216,7 +216,7 @@ fun PerfilScreen(onBack: () -> Unit) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "MIS CARNETS",
-                        color = TorqueColors.Primary,
+                        color = ColoresTorque.Primary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
@@ -233,12 +233,12 @@ fun PerfilScreen(onBack: () -> Unit) {
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(TorqueColors.SurfaceDark)
-                                    .border(1.dp, TorqueColors.BorderDark, RoundedCornerShape(12.dp))
+                                    .background(ColoresTorque.SurfaceDark)
+                                    .border(1.dp, ColoresTorque.BorderDark, RoundedCornerShape(12.dp))
                                     .padding(horizontal = 20.dp, vertical = 12.dp)
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Badge, contentDescription = null, tint = TorqueColors.Primary, modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Default.Badge, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(text = carnet, color = Color.White, fontWeight = FontWeight.Bold)
                                 }
@@ -257,12 +257,12 @@ fun FilaPerfil(icono: ImageVector, texto: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(TorqueColors.SurfaceDark)
+            .background(ColoresTorque.SurfaceDark)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(icono, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(20.dp))
+        Icon(icono, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(20.dp))
         Text(text = texto, color = Color.White, fontSize = 16.sp)
     }
 }

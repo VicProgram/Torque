@@ -4,6 +4,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -49,7 +50,19 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = TorqueOnSurface
 )
 
-// Renamed to avoid shadowing the Shapes type
+private val LightColorScheme = lightColorScheme(
+    primary = TorquePrimary,
+    secondary = TorqueSecondary,
+    tertiary = TorqueTertiary,
+    background = Color.White,
+    surface = Color(0xFFF5F5F5),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F)
+)
+
 val TorqueShapes = Shapes(
     small = RoundedCornerShape(8.dp),
     medium = RoundedCornerShape(16.dp),
@@ -58,10 +71,11 @@ val TorqueShapes = Shapes(
 
 @Composable
 fun TorqueTheme(
+    darkMode: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = if (darkMode) DarkColorScheme else LightColorScheme,
         typography = TorqueTypography,
         shapes = TorqueShapes,
         content = content

@@ -22,10 +22,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.torque.components.ui.dashboard.TorqueButton
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.components.ui.dashboard.TorqueTextField
-import com.example.torque.room.AppRepository
+import com.example.torque.components.ui.dashboard.BotonTorque
+import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.components.ui.dashboard.CampoTextoTorque
+import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import kotlinx.coroutines.launch
@@ -49,7 +49,7 @@ class FormularioMantenimiento : ComponentActivity() {
 @Composable
 fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long) {
     val contexto = LocalContext.current
-    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val scope = rememberCoroutineScope()
 
     var kms by remember { mutableStateOf("") }
@@ -64,7 +64,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Cabecera
@@ -79,7 +79,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = TorqueColors.Primary
+                        tint = ColoresTorque.Primary
                     )
                 }
                 Text(
@@ -104,11 +104,11 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
 
                 // Tareas seleccionadas
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = TorqueColors.SurfaceDark),
+                    colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("Tareas", color = TorqueColors.Slate500, fontSize = 12.sp)
+                        Text("Tareas", color = ColoresTorque.Slate500, fontSize = 12.sp)
                         Text(
                             tareasSeleccionadas.joinToString(" · "),
                             color = Color.White,
@@ -119,16 +119,16 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(kms, { kms = it }, "Kms actuales", modifier = Modifier.weight(1f))
-                    TorqueTextField(intervalo, { intervalo = it }, "Cada X kms", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(kms, { kms = it }, "Kms actuales", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(intervalo, { intervalo = it }, "Cada X kms", modifier = Modifier.weight(1f))
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    TorqueTextField(precio, { precio = it }, "Precio (€)", modifier = Modifier.weight(1f))
-                    TorqueTextField(tiempo, { tiempo = it }, "Tiempo", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(precio, { precio = it }, "Precio (€)", modifier = Modifier.weight(1f))
+                    CampoTextoTorque(tiempo, { tiempo = it }, "Tiempo", modifier = Modifier.weight(1f))
                 }
 
-                TorqueTextField(
+                CampoTextoTorque(
                     value = notas,
                     onValueChange = { notas = it },
                     label = "Notas",
@@ -144,16 +144,16 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(TorqueColors.Background)
+                .background(ColoresTorque.Background)
                 .padding(24.dp)
         ) {
-            TorqueButton(
+            BotonTorque(
                 text = "Guardar Mantenimiento",
                 icon = Icons.Default.Save,
                 onClick = {
                     if (idMoto == -1L) {
                         Toast.makeText(contexto, "Error: No se identificó la moto", Toast.LENGTH_SHORT).show()
-                        return@TorqueButton
+                        return@BotonTorque
                     }
 
                     scope.launch {

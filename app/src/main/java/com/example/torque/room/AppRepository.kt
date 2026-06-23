@@ -7,7 +7,7 @@ import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.FotoEntity
 import kotlinx.coroutines.flow.Flow
 
-class AppRepository private constructor(private val db: AppDatabase) {
+class RepositorioApp private constructor(private val db: BaseDeDatosApp) {
 
     fun obtenerMotosFlow(): Flow<List<MotoEntity>> = db.motoDao().obtenerTodasFlow()
     suspend fun insertarMoto(moto: MotoEntity): Long = db.motoDao().insertar(moto)
@@ -27,6 +27,7 @@ class AppRepository private constructor(private val db: AppDatabase) {
 
     fun obtenerMantenimientosPorMoto(idMoto: Long) = db.mantenimientoDao().obtenerPorMotoFlow(idMoto)
     suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity) = db.mantenimientoDao().insertar(mantenimiento)
+    suspend fun eliminarMantenimiento(mantenimiento: MantenimientoEntity) = db.mantenimientoDao().eliminar(mantenimiento)
 
     suspend fun actualizarKilometros(idMoto: Long, kilometros: Int) = db.motoDao().actualizarKilometros(idMoto, kilometros)
     suspend fun obtenerUltimoMantenimiento(idMoto: Long) = db.mantenimientoDao().obtenerUltimoPorMoto(idMoto)
@@ -36,12 +37,12 @@ class AppRepository private constructor(private val db: AppDatabase) {
 
     companion object {
         @Volatile
-        private var instance: AppRepository? = null
+        private var instance: RepositorioApp? = null
 
-        fun obtenerInstancia(context: Context): AppRepository =
+        fun obtenerInstancia(context: Context): RepositorioApp =
             instance ?: synchronized(this) {
-                instance ?: AppRepository(
-                    AppDatabase.obtenerInstancia(context)
+                instance ?: RepositorioApp(
+                    BaseDeDatosApp.obtenerInstancia(context)
                 ).also { instance = it }
             }
     }

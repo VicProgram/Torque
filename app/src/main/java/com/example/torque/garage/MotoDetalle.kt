@@ -34,12 +34,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.room.AppRepository
+import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.FotoEntity
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.utils.FileUtils
+import com.example.torque.utils.ArchivoUtils
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -65,13 +65,14 @@ class MotoDetalle : ComponentActivity() {
 @Composable
 fun VistaMotoDetalle(idMoto: Long) {
     val contexto = LocalContext.current
-    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val scope = rememberCoroutineScope()
     
     var moto by remember { mutableStateOf<MotoEntity?>(null) }
     val fotos = remember { mutableStateListOf<FotoEntity>() }
     var mostrarMenu by remember { mutableStateOf(false) }
     var mostrarDialogoKm by remember { mutableStateOf(false) }
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
     var nuevoKm by remember { mutableStateOf("") }
     val estadoScroll = rememberScrollState()
 
@@ -89,7 +90,7 @@ fun VistaMotoDetalle(idMoto: Long) {
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val ruta = FileUtils.copiarImagenAInterno(contexto, it)
+            val ruta = ArchivoUtils.copiarImagenAInterno(contexto, it)
             if (ruta != null && idMoto != -1L) {
                 scope.launch {
                     val nuevaFoto = FotoEntity(
@@ -108,11 +109,11 @@ fun VistaMotoDetalle(idMoto: Long) {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         if (moto == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = TorqueColors.Primary)
+                CircularProgressIndicator(color = ColoresTorque.Primary)
             }
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -128,7 +129,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Atrás",
-                            tint = Color.White,
+                            tint = ColoresTorque.Primary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -143,7 +144,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         Icon(
                             Icons.Default.Star,
                             contentDescription = "Principal",
-                            tint = TorqueColors.Primary,
+                            tint = ColoresTorque.Primary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -160,7 +161,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         DropdownMenu(
                             expanded = mostrarMenu,
                             onDismissRequest = { mostrarMenu = false },
-                            modifier = Modifier.background(TorqueColors.SurfaceDark)
+                            modifier = Modifier.background(ColoresTorque.SurfaceDark)
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Hacer Principal", color = Color.White) },
@@ -168,7 +169,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                     Icon(
                                         Icons.Default.Star,
                                         contentDescription = null,
-                                        tint = TorqueColors.Primary
+                                        tint = ColoresTorque.Primary
                                     )
                                 },
                                 onClick = {
@@ -189,7 +190,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                     Icon(
                                         Icons.Default.Build,
                                         contentDescription = null,
-                                        tint = TorqueColors.Primary
+                                        tint = ColoresTorque.Primary
                                     )
                                 },
                                 onClick = {
@@ -206,7 +207,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                     Icon(
                                         Icons.Default.History,
                                         contentDescription = null,
-                                        tint = TorqueColors.Primary
+                                        tint = ColoresTorque.Primary
                                     )
                                 },
                                 onClick = {
@@ -227,13 +228,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                                     )
                                 },
                                 onClick = {
-                                    scope.launch {
-                                        repositorio.eliminarMoto(moto!!)
-                                        launch(kotlinx.coroutines.Dispatchers.Main) {
-                                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
-                                            (contexto as? Activity)?.finish()
-                                        }
-                                    }
+                                    mostrarDialogoEliminar = true
                                     mostrarMenu = false
                                 }
                             )
@@ -254,7 +249,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                             .fillMaxWidth()
                             .aspectRatio(16f / 9f) // Un poco más horizontal
                             .clip(RoundedCornerShape(20.dp))
-                            .background(TorqueColors.SurfaceDark)
+                            .background(ColoresTorque.SurfaceDark)
                             .clickable { selectorImagen.launch("image/*") }
                     ) {
                         val imagenAMostrar = if (fotos.isNotEmpty()) fotos.last().ruta else moto?.uriFoto
@@ -275,10 +270,10 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 Icon(
                                     Icons.Default.AddAPhoto,
                                     contentDescription = null,
-                                    tint = TorqueColors.OnSurfaceVariant,
+                                    tint = ColoresTorque.OnSurfaceVariant,
                                     modifier = Modifier.size(48.dp)
                                 )
-                                Text("Sin fotos aún", color = TorqueColors.OnSurfaceVariant)
+                                Text("Sin fotos aún", color = ColoresTorque.OnSurfaceVariant)
                             }
                         }
                     }
@@ -288,13 +283,13 @@ fun VistaMotoDetalle(idMoto: Long) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(TorqueColors.SurfaceDark)
+                            .background(ColoresTorque.SurfaceDark)
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
                             "ESPECIFICACIONES",
-                            color = TorqueColors.Primary,
+                            color = ColoresTorque.Primary,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
@@ -317,7 +312,7 @@ fun VistaMotoDetalle(idMoto: Long) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Text(
                                 "GALERÍA",
-                                color = TorqueColors.OnSurfaceVariant,
+                                color = ColoresTorque.OnSurfaceVariant,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -342,7 +337,7 @@ fun VistaMotoDetalle(idMoto: Long) {
         if (mostrarDialogoKm) {
             AlertDialog(
                 onDismissRequest = { mostrarDialogoKm = false },
-                containerColor = TorqueColors.SurfaceDark,
+                containerColor = ColoresTorque.SurfaceDark,
                 titleContentColor = Color.White,
                 textContentColor = Color.White,
                 title = { Text("Actualizar Kilometraje") },
@@ -355,10 +350,10 @@ fun VistaMotoDetalle(idMoto: Long) {
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Color.White,
                             unfocusedTextColor = Color.White,
-                            focusedBorderColor = TorqueColors.Primary,
-                            unfocusedBorderColor = TorqueColors.BorderDark,
-                            focusedLabelColor = TorqueColors.Primary,
-                            unfocusedLabelColor = TorqueColors.OnSurfaceVariant
+                            focusedBorderColor = ColoresTorque.Primary,
+                            unfocusedBorderColor = ColoresTorque.BorderDark,
+                            focusedLabelColor = ColoresTorque.Primary,
+                            unfocusedLabelColor = ColoresTorque.OnSurfaceVariant
                         )
                     )
                 },
@@ -373,12 +368,41 @@ fun VistaMotoDetalle(idMoto: Long) {
                         }
                         mostrarDialogoKm = false
                     }) {
-                        Text("Guardar", color = TorqueColors.Primary)
+                        Text("Guardar", color = ColoresTorque.Primary)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { mostrarDialogoKm = false }) {
-                        Text("Cancelar", color = TorqueColors.OnSurfaceVariant)
+                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
+
+        if (mostrarDialogoEliminar) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoEliminar = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                titleContentColor = Color.White,
+                textContentColor = Color.White,
+                icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFEF4444)) },
+                title = { Text("¿Eliminar moto?") },
+                text = { Text("Esta acción no se puede deshacer. Se eliminarán todos los datos y fotos asociados.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        scope.launch {
+                            repositorio.eliminarMoto(moto!!)
+                            (contexto as? Activity)?.setResult(Activity.RESULT_OK)
+                            (contexto as? Activity)?.finish()
+                        }
+                        mostrarDialogoEliminar = false
+                    }) {
+                        Text("Eliminar", color = Color(0xFFEF4444))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoEliminar = false }) {
+                        Text("Cancelar", color = ColoresTorque.OnSurfaceVariant)
                     }
                 }
             )
@@ -395,7 +419,7 @@ fun FilaDetalle(etiqueta: String, valor: String?, editable: Boolean = false, onC
         else Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = etiqueta, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
+        Text(text = etiqueta, color = ColoresTorque.OnSurfaceVariant, fontSize = 14.sp)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = valor ?: "N/A",
@@ -405,7 +429,7 @@ fun FilaDetalle(etiqueta: String, valor: String?, editable: Boolean = false, onC
             )
             if (editable) {
                 Spacer(modifier = Modifier.width(4.dp))
-                Icon(Icons.Default.Edit, contentDescription = null, tint = TorqueColors.Primary, modifier = Modifier.size(14.dp))
+                Icon(Icons.Default.Edit, contentDescription = null, tint = ColoresTorque.Primary, modifier = Modifier.size(14.dp))
             }
         }
     }
