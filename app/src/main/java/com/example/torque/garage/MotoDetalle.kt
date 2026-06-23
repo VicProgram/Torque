@@ -219,6 +219,24 @@ fun VistaMotoDetalle(idMoto: Long) {
                                 }
                             )
                             DropdownMenuItem(
+                                text = { Text("Editar Moto", color = Color.White) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = null,
+                                        tint = ColoresTorque.Primary
+                                    )
+                                },
+                                onClick = {
+                                    val intent = Intent(contexto, AnadirMotoActivity::class.java).apply {
+                                        putExtra("idMoto", idMoto)
+                                        putExtra("editando", true)
+                                    }
+                                    contexto.startActivity(intent)
+                                    mostrarMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Eliminar Moto", color = Color.Red) },
                                 leadingIcon = {
                                     Icon(

@@ -57,6 +57,11 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     var precio by remember { mutableStateOf("") }
     var tiempo by remember { mutableStateOf("") }
     var notas by remember { mutableStateOf("") }
+    var errorKms by remember { mutableStateOf(false) }
+    var mostrarDialogoDescartar by remember { mutableStateOf(false) }
+
+    val hayCambios = kms.isNotBlank() || intervalo.isNotBlank() || precio.isNotBlank() ||
+        tiempo.isNotBlank() || notas.isNotBlank()
 
     val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
@@ -75,7 +80,10 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (contexto as? Activity)?.finish() }) {
+                IconButton(onClick = {
+                    if (hayCambios) mostrarDialogoDescartar = true
+                    else (contexto as? Activity)?.finish()
+                }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -118,9 +126,14 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                     }
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CampoTextoTorque(kms, { kms = it }, "Kms actuales", modifier = Modifier.weight(1f))
-                    CampoTextoTorque(intervalo, { intervalo = it }, "Cada X kms", modifier = Modifier.weight(1f))
+                Column {
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        CampoTextoTorque(kms, { kms = it.filter { c -> c.isDigit() }; errorKms = false }, "Kms actuales *", modifier = Modifier.weight(1f))
+                        CampoTextoTorque(intervalo, { intervalo = it.filter { c -> c.isDigit() } }, "Cada X kms", modifier = Modifier.weight(1f))
+                    }
+                    if (errorKms) {
+                        Text("Los kilómetros son obligatorios", color = Color(0xFFEF4444), fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                    }
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -140,6 +153,28 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
             }
         }
 
+        if (mostrarDialogoDescartar) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoDescartar = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                title = { Text("¿Descartar cambios?") },
+                text = { Text("Los datos introducidos se perderán.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        mostrarDialogoDescartar = false
+                        (contexto as? Activity)?.finish()
+                    }) {
+                        Text("Descartar", color = Color(0xFFEF4444))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoDescartar = false }) {
+                        Text("Seguir editando", color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -153,6 +188,12 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
                 onClick = {
                     if (idMoto == -1L) {
                         Toast.makeText(contexto, "Error: No se identificó la moto", Toast.LENGTH_SHORT).show()
+                        return@BotonTorque
+                    }
+
+                    errorKms = kms.isBlank()
+                    if (errorKms) {
+                        Toast.makeText(contexto, "Rellena los campos obligatorios", Toast.LENGTH_SHORT).show()
                         return@BotonTorque
                     }
 

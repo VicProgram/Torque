@@ -56,6 +56,22 @@ fun VistaListaGaraje() {
     val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val motos by repositorio.obtenerMotosFlow().collectAsState(initial = emptyList())
 
+    var textoBusqueda by remember { mutableStateOf("") }
+    var filtroActivo by remember { mutableStateOf("Todas") }
+    var mostrarBusqueda by remember { mutableStateOf(false) }
+
+    val motosFiltradas = motos.filter { moto ->
+        val coincideBusqueda = textoBusqueda.isBlank() ||
+            moto.marca.contains(textoBusqueda, ignoreCase = true) ||
+            moto.modelo.contains(textoBusqueda, ignoreCase = true)
+        val coincideFiltro = when (filtroActivo) {
+            "En Uso" -> moto.esPrincipal == 1
+            "Históricas" -> moto.esPrincipal == 0
+            else -> true
+        }
+        coincideBusqueda && coincideFiltro
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -63,21 +79,54 @@ fun VistaListaGaraje() {
             .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            CabeceraGaraje()
+            CabeceraGaraje(
+                onSearchToggle = { mostrarBusqueda = !mostrarBusqueda },
+                mostrandoBusqueda = mostrarBusqueda
+            )
+
+            if (mostrarBusqueda) {
+                OutlinedTextField(
+                    value = textoBusqueda,
+                    onValueChange = { textoBusqueda = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    placeholder = { Text("Buscar por marca o modelo...", color = ColoresTorque.OnSurfaceVariant) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant) },
+                    trailingIcon = {
+                        if (textoBusqueda.isNotEmpty()) {
+                            IconButton(onClick = { textoBusqueda = "" }) {
+                                Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = ColoresTorque.OnSurfaceVariant)
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = ColoresTorque.Primary,
+                        unfocusedBorderColor = ColoresTorque.BorderDark,
+                        cursorColor = ColoresTorque.Primary,
+                        focusedContainerColor = ColoresTorque.SurfaceDark,
+                        unfocusedContainerColor = ColoresTorque.SurfaceDark
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 80.dp, start = 16.dp, end = 16.dp), // Reducido bottom padding
-                verticalArrangement = Arrangement.spacedBy(16.dp) // Reducido de 24.dp
+                contentPadding = PaddingValues(bottom = 80.dp, start = 16.dp, end = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
                     LazyRow(
                         modifier = Modifier.padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item { FiltroChip("Todas", estaSeleccionado = true) }
-                        item { FiltroChip("En Uso", estaSeleccionado = false) } // Renombrado
-                        item { FiltroChip("Históricas", estaSeleccionado = false) } // Renombrado
+                        item { FiltroChip("Todas", estaSeleccionado = filtroActivo == "Todas", onClick = { filtroActivo = "Todas" }) }
+                        item { FiltroChip("En Uso", estaSeleccionado = filtroActivo == "En Uso", onClick = { filtroActivo = "En Uso" }) }
+                        item { FiltroChip("Históricas", estaSeleccionado = filtroActivo == "Históricas", onClick = { filtroActivo = "Históricas" }) }
                     }
                 }
 
@@ -110,8 +159,37 @@ fun VistaListaGaraje() {
                             }
                         }
                     }
+                } else if (motosFiltradas.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(48.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.Default.SearchOff,
+                                    contentDescription = null,
+                                    tint = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(72.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    "Sin resultados",
+                                    color = ColoresTorque.OnSurfaceVariant,
+                                    fontSize = 18.sp
+                                )
+                                Text(
+                                    "Prueba con otros términos o filtros",
+                                    color = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.6f),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
                 }
-                items(motos, key = { it.idMoto }) { moto ->
+                items(motosFiltradas, key = { it.idMoto }) { moto ->
                     TarjetaMoto(
                         moto = moto,
                         onClick = {
@@ -147,14 +225,14 @@ fun VistaListaGaraje() {
 }
 
 @Composable
-fun CabeceraGaraje() {
+fun CabeceraGaraje(onSearchToggle: () -> Unit = {}, mostrandoBusqueda: Boolean = false) {
     val contexto = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp) // Reducido de 64.dp
+            .height(56.dp)
             .background(ColoresTorque.Background.copy(alpha = 0.95f))
-            .padding(horizontal = 4.dp), // Reducido de 8.dp
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
@@ -168,24 +246,16 @@ fun CabeceraGaraje() {
         Text(
             text = "Mi Garaje",
             color = ColoresTorque.OnSurface,
-            fontSize = 18.sp, // Reducido de 20.sp
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
         Row {
-            IconButton(onClick = { /* Buscar */ }) {
+            IconButton(onClick = onSearchToggle) {
                 Icon(
-                    Icons.Default.Search,
+                    if (mostrandoBusqueda) Icons.Default.Close else Icons.Default.Search,
                     contentDescription = "Buscar",
-                    tint = ColoresTorque.OnSurfaceVariant,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            IconButton(onClick = { /* Más */ }) {
-                Icon(
-                    Icons.Default.MoreVert,
-                    contentDescription = "Más",
-                    tint = ColoresTorque.OnSurfaceVariant,
+                    tint = if (mostrandoBusqueda) ColoresTorque.Primary else ColoresTorque.OnSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -194,7 +264,7 @@ fun CabeceraGaraje() {
 }
 
 @Composable
-fun FiltroChip(texto: String, estaSeleccionado: Boolean) {
+fun FiltroChip(texto: String, estaSeleccionado: Boolean, onClick: () -> Unit = {}) {
     val colorFondo = if (estaSeleccionado) ColoresTorque.PrimaryContainer else Color.Transparent
     val colorContenido =
         if (estaSeleccionado) ColoresTorque.OnPrimaryContainer else ColoresTorque.OnSurfaceVariant
@@ -209,7 +279,7 @@ fun FiltroChip(texto: String, estaSeleccionado: Boolean) {
                 color = colorBorde,
                 shape = RoundedCornerShape(8.dp)
             )
-            .clickable { /* Seleccionar */ }
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(

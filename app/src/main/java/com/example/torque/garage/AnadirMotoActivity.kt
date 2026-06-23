@@ -46,16 +46,18 @@ class AnadirMotoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val idMoto = intent.getLongExtra("idMoto", -1L)
+        val editando = intent.getBooleanExtra("editando", false)
         setContent {
             TorqueTheme {
-                VistaAnadirMoto()
+                VistaAnadirMoto(idMoto = idMoto, editando = editando)
             }
         }
     }
 }
 
 @Composable
-fun VistaAnadirMoto() {
+fun VistaAnadirMoto(idMoto: Long = -1L, editando: Boolean = false) {
     val contexto = LocalContext.current
     val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val scrollState = rememberScrollState()
@@ -70,9 +72,35 @@ fun VistaAnadirMoto() {
     var estilo by remember { mutableStateOf("") }
     var kilometros by remember { mutableStateOf("") }
     var uriImagen by remember { mutableStateOf<android.net.Uri?>(null) }
+    var fotoActual by remember { mutableStateOf<String?>(null) }
     var esPrincipal by remember { mutableStateOf(false) }
     var errorMarca by remember { mutableStateOf(false) }
     var errorModelo by remember { mutableStateOf(false) }
+    var cargando by remember { mutableStateOf(editando) }
+    var mostrarDialogoDescartar by remember { mutableStateOf(false) }
+
+    val hayCambios = marca.isNotBlank() || modelo.isNotBlank() || anio.isNotBlank() ||
+        matricula.isNotBlank() || cilindrada.isNotBlank() || caballos.isNotBlank() ||
+        estilo.isNotBlank() || kilometros.isNotBlank() || uriImagen != null || esPrincipal
+
+    LaunchedEffect(idMoto) {
+        if (editando && idMoto != -1L) {
+            val moto = repositorio.obtenerMotoPorId(idMoto)
+            if (moto != null) {
+                marca = moto.marca
+                modelo = moto.modelo
+                anio = if (moto.anio > 0) moto.anio.toString() else ""
+                matricula = moto.matricula ?: ""
+                cilindrada = moto.cilindrada ?: ""
+                caballos = moto.caballos ?: ""
+                estilo = moto.estilo ?: ""
+                kilometros = moto.kilometros.toString()
+                fotoActual = moto.uriFoto
+                esPrincipal = moto.esPrincipal == 1
+            }
+            cargando = false
+        }
+    }
 
     val selectorImagen = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -94,7 +122,10 @@ fun VistaAnadirMoto() {
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { (contexto as? Activity)?.finish() }) {
+                IconButton(onClick = {
+                    if (hayCambios && !editando) mostrarDialogoDescartar = true
+                    else (contexto as? Activity)?.finish()
+                }) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
@@ -102,7 +133,7 @@ fun VistaAnadirMoto() {
                     )
                 }
                 Text(
-                    text = "Nueva Motocicleta",
+                    text = if (editando) "Editar Motocicleta" else "Nueva Motocicleta",
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     color = Color.White,
@@ -112,6 +143,11 @@ fun VistaAnadirMoto() {
                 Spacer(modifier = Modifier.width(48.dp))
             }
 
+        if (cargando) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = ColoresTorque.Primary)
+            }
+        } else {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -130,9 +166,10 @@ fun VistaAnadirMoto() {
                         .clickable { selectorImagen.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (uriImagen != null) {
+                    val imagenAMostrar = uriImagen ?: fotoActual
+                    if (imagenAMostrar != null) {
                         Image(
-                            painter = rememberAsyncImagePainter(uriImagen),
+                            painter = rememberAsyncImagePainter(imagenAMostrar),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -185,6 +222,29 @@ fun VistaAnadirMoto() {
                 Spacer(modifier = Modifier.height(120.dp))
             }
         }
+        }
+
+        if (mostrarDialogoDescartar) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoDescartar = false },
+                containerColor = ColoresTorque.SurfaceDark,
+                title = { Text("¿Descartar cambios?") },
+                text = { Text("Los datos introducidos se perderán.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        mostrarDialogoDescartar = false
+                        (contexto as? Activity)?.finish()
+                    }) {
+                        Text("Descartar", color = Color(0xFFEF4444))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoDescartar = false }) {
+                        Text("Seguir editando", color = ColoresTorque.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
 
         Box(
             modifier = Modifier
@@ -193,7 +253,7 @@ fun VistaAnadirMoto() {
                 .padding(24.dp)
         ) {
             BotonTorque(
-                text = "Guardar Moto",
+                text = if (editando) "Actualizar Moto" else "Guardar Moto",
                 icon = Icons.Default.Save,
                 onClick = {
                     errorMarca = marca.isBlank()
@@ -204,39 +264,63 @@ fun VistaAnadirMoto() {
                     }
 
                     scope.launch {
-                        val rutaFoto = uriImagen?.let { ArchivoUtils.copiarImagenAInterno(contexto, it) }
-                        
-                        // Obtenemos el conteo antes de insertar
-                        val numMotos = repositorio.contarMotos()
-                        val marcarPrincipal = esPrincipal || numMotos == 0
-                        
                         val fecha = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                        
-                        val nuevaMoto = MotoEntity(
-                            marca = marca.trim(),
-                            modelo = modelo.trim(),
-                            anio = anio.toIntOrNull() ?: 0,
-                            matricula = matricula.trim(),
-                            kilometros = kilometros.toIntOrNull() ?: 0,
-                            cilindrada = cilindrada.trim(),
-                            caballos = caballos.trim().ifEmpty { null },
-                            estilo = estilo.trim(),
-                            esPrincipal = 0, // Insertamos inicialmente como 0
-                            uriFoto = rutaFoto,
-                            creadoEn = fecha,
-                            actualizadoEn = fecha
-                        )
+                        val rutaFoto = uriImagen?.let { ArchivoUtils.copiarImagenAInterno(contexto, it) } ?: fotoActual
 
-                        val id = repositorio.insertarMoto(nuevaMoto)
-                        
-                        // Si debe ser principal, actualizamos después de insertar para asegurar el reseteo de las otras
-                        if (marcarPrincipal && id > 0) {
-                            repositorio.establecerMotoPrincipal(id)
-                        }
+                        if (editando && idMoto != -1L) {
+                            val motoExistente = repositorio.obtenerMotoPorId(idMoto)
+                            if (motoExistente != null) {
+                                repositorio.actualizarMoto(
+                                    motoExistente.copy(
+                                        marca = marca.trim(),
+                                        modelo = modelo.trim(),
+                                        anio = anio.toIntOrNull() ?: 0,
+                                        matricula = matricula.trim(),
+                                        kilometros = kilometros.toIntOrNull() ?: 0,
+                                        cilindrada = cilindrada.trim(),
+                                        caballos = caballos.trim().ifEmpty { null },
+                                        estilo = estilo.trim(),
+                                        uriFoto = rutaFoto,
+                                        actualizadoEn = fecha
+                                    )
+                                )
+                                if (esPrincipal && motoExistente.esPrincipal != 1) {
+                                    repositorio.establecerMotoPrincipal(idMoto)
+                                }
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(contexto, "¡Moto actualizada con éxito!", Toast.LENGTH_SHORT).show()
+                                    (contexto as? Activity)?.finish()
+                                }
+                            }
+                        } else {
+                            val numMotos = repositorio.contarMotos()
+                            val marcarPrincipal = esPrincipal || numMotos == 0
 
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(contexto, "¡Moto añadida con éxito!", Toast.LENGTH_SHORT).show()
-                            (contexto as? Activity)?.finish()
+                            val nuevaMoto = MotoEntity(
+                                marca = marca.trim(),
+                                modelo = modelo.trim(),
+                                anio = anio.toIntOrNull() ?: 0,
+                                matricula = matricula.trim(),
+                                kilometros = kilometros.toIntOrNull() ?: 0,
+                                cilindrada = cilindrada.trim(),
+                                caballos = caballos.trim().ifEmpty { null },
+                                estilo = estilo.trim(),
+                                esPrincipal = 0,
+                                uriFoto = rutaFoto,
+                                creadoEn = fecha,
+                                actualizadoEn = fecha
+                            )
+
+                            val id = repositorio.insertarMoto(nuevaMoto)
+
+                            if (marcarPrincipal && id > 0) {
+                                repositorio.establecerMotoPrincipal(id)
+                            }
+
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(contexto, "¡Moto añadida con éxito!", Toast.LENGTH_SHORT).show()
+                                (contexto as? Activity)?.finish()
+                            }
                         }
                     }
                 }
