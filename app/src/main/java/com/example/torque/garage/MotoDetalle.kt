@@ -70,6 +70,8 @@ fun VistaMotoDetalle(idMoto: Long) {
     var moto by remember { mutableStateOf<MotoEntity?>(null) }
     val fotos = remember { mutableStateListOf<FotoEntity>() }
     var mostrarMenu by remember { mutableStateOf(false) }
+    var mostrarDialogoKm by remember { mutableStateOf(false) }
+    var nuevoKm by remember { mutableStateOf("") }
     val estadoScroll = rememberScrollState()
 
     LaunchedEffect(idMoto) {
@@ -301,7 +303,10 @@ fun VistaMotoDetalle(idMoto: Long) {
                         FilaDetalle("Matrícula", moto!!.matricula ?: "N/A")
                         FilaDetalle("Cilindrada", moto!!.cilindrada ?: "N/A")
                         FilaDetalle("Potencia", if (moto!!.caballos != null) "${moto!!.caballos} CV" else "N/A")
-                        FilaDetalle("Kilómetros", "${moto!!.kilometros} km")
+                        FilaDetalle("Kilómetros", "${moto!!.kilometros} km", editable = true, onClick = {
+                            nuevoKm = moto!!.kilometros.toString()
+                            mostrarDialogoKm = true
+                        })
                         FilaDetalle("Estilo", moto!!.estilo ?: "N/A")
                     }
 
@@ -331,22 +336,76 @@ fun VistaMotoDetalle(idMoto: Long) {
                 }
             }
         }
+
+        if (mostrarDialogoKm) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogoKm = false },
+                containerColor = TorqueColors.SurfaceDark,
+                titleContentColor = Color.White,
+                textContentColor = Color.White,
+                title = { Text("Actualizar Kilometraje") },
+                text = {
+                    OutlinedTextField(
+                        value = nuevoKm,
+                        onValueChange = { nuevoKm = it.filter { c -> c.isDigit() } },
+                        label = { Text("Kilómetros") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = TorqueColors.Primary,
+                            unfocusedBorderColor = TorqueColors.BorderDark,
+                            focusedLabelColor = TorqueColors.Primary,
+                            unfocusedLabelColor = TorqueColors.OnSurfaceVariant
+                        )
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val km = nuevoKm.toIntOrNull()
+                        if (km != null && km >= 0) {
+                            scope.launch {
+                                repositorio.actualizarKilometros(idMoto, km)
+                                moto = repositorio.obtenerMotoPorId(idMoto)
+                            }
+                        }
+                        mostrarDialogoKm = false
+                    }) {
+                        Text("Guardar", color = TorqueColors.Primary)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogoKm = false }) {
+                        Text("Cancelar", color = TorqueColors.OnSurfaceVariant)
+                    }
+                }
+            )
+        }
     }
 }
 
 @Composable
-fun FilaDetalle(etiqueta: String, valor: String?) {
+fun FilaDetalle(etiqueta: String, valor: String?, editable: Boolean = false, onClick: () -> Unit = {}) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = if (editable) Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+        else Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = etiqueta, color = TorqueColors.OnSurfaceVariant, fontSize = 14.sp)
-        Text(
-            text = valor ?: "N/A",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = valor ?: "N/A",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
+            if (editable) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(Icons.Default.Edit, contentDescription = null, tint = TorqueColors.Primary, modifier = Modifier.size(14.dp))
+            }
+        }
     }
 }
 

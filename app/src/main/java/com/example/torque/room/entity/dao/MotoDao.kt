@@ -32,4 +32,7 @@ interface MotoDao {
 
     @Query("UPDATE motos SET esPrincipal = 1 WHERE idMoto = :id")
     suspend fun marcarComoPrincipal(id: Long)
+
+    @Query("UPDATE motos SET kilometros = :kilometros WHERE idMoto = :idMoto")
+    suspend fun actualizarKilometros(idMoto: Long, kilometros: Int)
 }

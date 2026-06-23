@@ -32,6 +32,7 @@ import com.example.torque.R
 import com.example.torque.ajustes.AjustesActivity
 import com.example.torque.garage.AnadirMotoActivity
 import com.example.torque.room.AppRepository
+import com.example.torque.room.entity.MantenimientoEntity
 import com.example.torque.room.entity.MotoEntity
 
 @Composable
@@ -43,6 +44,23 @@ fun TorqueDashboardScreen(
     val contexto = LocalContext.current
     val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
     val motoPrincipal by repositorio.obtenerMotoPrincipalFlow().collectAsState(initial = null)
+    var ultimoMantenimiento by remember { mutableStateOf<MantenimientoEntity?>(null) }
+
+    LaunchedEffect(motoPrincipal) {
+        if (motoPrincipal != null) {
+            ultimoMantenimiento = repositorio.obtenerUltimoMantenimiento(motoPrincipal!!.idMoto)
+        } else {
+            ultimoMantenimiento = null
+        }
+    }
+
+    val kmRestantes = remember(motoPrincipal, ultimoMantenimiento) {
+        if (motoPrincipal != null && ultimoMantenimiento != null) {
+            val proxServicio = ultimoMantenimiento!!.kms + ultimoMantenimiento!!.intervaloKms
+            val restante = proxServicio - motoPrincipal!!.kilometros
+            if (restante < 0) -1 else restante
+        } else null
+    }
 
     Box(
         modifier = Modifier
@@ -81,7 +99,7 @@ fun TorqueDashboardScreen(
                 }
 
                 item {
-                    TarjetaProximoServicio(moto = motoPrincipal, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
+                    TarjetaProximoServicio(moto = motoPrincipal, kmRestantes = kmRestantes, onClick = { onIrMantenimientos(motoPrincipal?.idMoto) })
                 }
 
                 item {
@@ -226,7 +244,7 @@ fun CabeceraDashboard(onIrPerfil: () -> Unit) {
 }
 
 @Composable
-fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
+fun TarjetaProximoServicio(moto: MotoEntity?, kmRestantes: Int? = null, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -300,19 +318,35 @@ fun TarjetaProximoServicio(moto: MotoEntity?, onClick: () -> Unit) {
                         )
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = "12",
-                            color = TorqueColors.Primary,
-                            fontSize = 28.sp, // Reducido de 32.sp
-                            fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            text = "DÍAS",
-                            color = TorqueColors.Outline,
-                            fontSize = 9.sp, // Reducido de 10.sp
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        )
+                        if (kmRestantes != null) {
+                            Text(
+                                text = if (kmRestantes < 0) "¡VENCIDO!" else kmRestantes.toString(),
+                                color = if (kmRestantes < 0) Color(0xFFEF4444) else TorqueColors.Primary,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                text = if (kmRestantes < 0) "KM DE SERVICIO" else "KM RESTANTES",
+                                color = TorqueColors.Outline,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
+                        } else {
+                            Text(
+                                text = "—",
+                                color = TorqueColors.OnSurfaceVariant,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                            Text(
+                                text = "SIN DATOS",
+                                color = TorqueColors.Outline,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp)) // Reducido de 20.dp
