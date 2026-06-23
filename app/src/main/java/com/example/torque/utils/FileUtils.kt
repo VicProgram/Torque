@@ -5,7 +5,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import java.io.File
 
-object FileUtils {
+object ArchivoUtils {
     fun copiarImagenAInterno(contexto: Context, uri: Uri): String? {
         return try {
             val flujoEntrada = contexto.contentResolver.openInputStream(uri)

@@ -30,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.torque.components.ui.dashboard.DashboardBottomNav
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.room.AppRepository
+
+import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import android.content.Intent
@@ -53,35 +53,143 @@ class ListaGaraje : ComponentActivity() {
 @Composable
 fun VistaListaGaraje() {
     val contexto = LocalContext.current
-    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val motos by repositorio.obtenerMotosFlow().collectAsState(initial = emptyList())
+
+    var textoBusqueda by remember { mutableStateOf("") }
+    var filtroActivo by remember { mutableStateOf("Todas") }
+    var mostrarBusqueda by remember { mutableStateOf(false) }
+
+    val motosFiltradas = motos.filter { moto ->
+        val coincideBusqueda = textoBusqueda.isBlank() ||
+            moto.marca.contains(textoBusqueda, ignoreCase = true) ||
+            moto.modelo.contains(textoBusqueda, ignoreCase = true)
+        val coincideFiltro = when (filtroActivo) {
+            "En Uso" -> moto.esPrincipal == 1
+            "Históricas" -> moto.esPrincipal == 0
+            else -> true
+        }
+        coincideBusqueda && coincideFiltro
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            CabeceraGaraje()
+            CabeceraGaraje(
+                onSearchToggle = { mostrarBusqueda = !mostrarBusqueda },
+                mostrandoBusqueda = mostrarBusqueda
+            )
+
+            if (mostrarBusqueda) {
+                OutlinedTextField(
+                    value = textoBusqueda,
+                    onValueChange = { textoBusqueda = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    placeholder = { Text("Buscar por marca o modelo...", color = ColoresTorque.OnSurfaceVariant) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant) },
+                    trailingIcon = {
+                        if (textoBusqueda.isNotEmpty()) {
+                            IconButton(onClick = { textoBusqueda = "" }) {
+                                Icon(Icons.Default.Close, contentDescription = "Limpiar", tint = ColoresTorque.OnSurfaceVariant)
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = ColoresTorque.Primary,
+                        unfocusedBorderColor = ColoresTorque.BorderDark,
+                        cursorColor = ColoresTorque.Primary,
+                        focusedContainerColor = ColoresTorque.SurfaceDark,
+                        unfocusedContainerColor = ColoresTorque.SurfaceDark
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 80.dp, start = 16.dp, end = 16.dp), // Reducido bottom padding
-                verticalArrangement = Arrangement.spacedBy(16.dp) // Reducido de 24.dp
+                contentPadding = PaddingValues(bottom = 80.dp, start = 16.dp, end = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
                     LazyRow(
                         modifier = Modifier.padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        item { FiltroChip("Todas", estaSeleccionado = true) }
-                        item { FiltroChip("En Uso", estaSeleccionado = false) } // Renombrado
-                        item { FiltroChip("Históricas", estaSeleccionado = false) } // Renombrado
+                        item { FiltroChip("Todas", estaSeleccionado = filtroActivo == "Todas", onClick = { filtroActivo = "Todas" }) }
+                        item { FiltroChip("En Uso", estaSeleccionado = filtroActivo == "En Uso", onClick = { filtroActivo = "En Uso" }) }
+                        item { FiltroChip("Históricas", estaSeleccionado = filtroActivo == "Históricas", onClick = { filtroActivo = "Históricas" }) }
                     }
                 }
 
-                items(motos) { moto ->
+                if (motos.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(48.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.Default.Motorcycle,
+                                    contentDescription = null,
+                                    tint = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(72.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    "Aún no tienes motos",
+                                    color = ColoresTorque.OnSurfaceVariant,
+                                    fontSize = 18.sp
+                                )
+                                Text(
+                                    "Pulsa el botón + para añadir tu primera moto",
+                                    color = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.6f),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                } else if (motosFiltradas.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(48.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.Default.SearchOff,
+                                    contentDescription = null,
+                                    tint = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(72.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    "Sin resultados",
+                                    color = ColoresTorque.OnSurfaceVariant,
+                                    fontSize = 18.sp
+                                )
+                                Text(
+                                    "Prueba con otros términos o filtros",
+                                    color = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.6f),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+                items(motosFiltradas, key = { it.idMoto }) { moto ->
                     TarjetaMoto(
                         moto = moto,
                         onClick = {
@@ -102,8 +210,8 @@ fun VistaListaGaraje() {
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 80.dp), // Ajustado al nuevo padding
-            containerColor = TorqueColors.Primary,
-            contentColor = TorqueColors.OnPrimary,
+            containerColor = ColoresTorque.Primary,
+            contentColor = ColoresTorque.OnPrimary,
             shape = RoundedCornerShape(16.dp)
         ) {
             Icon(
@@ -113,50 +221,41 @@ fun VistaListaGaraje() {
             )
         }
 
-        DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
 @Composable
-fun CabeceraGaraje() {
+fun CabeceraGaraje(onSearchToggle: () -> Unit = {}, mostrandoBusqueda: Boolean = false) {
     val contexto = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp) // Reducido de 64.dp
-            .background(TorqueColors.Background.copy(alpha = 0.95f))
-            .padding(horizontal = 4.dp), // Reducido de 8.dp
+            .height(56.dp)
+            .background(ColoresTorque.Background.copy(alpha = 0.95f))
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { (contexto as? android.app.Activity)?.finish() }) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Atrás",
-                tint = TorqueColors.OnSurface,
+                tint = ColoresTorque.Primary,
                 modifier = Modifier.size(24.dp)
             )
         }
         Text(
             text = "Mi Garaje",
-            color = TorqueColors.OnSurface,
-            fontSize = 18.sp, // Reducido de 20.sp
+            color = ColoresTorque.OnSurface,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
         Row {
-            IconButton(onClick = { /* Buscar */ }) {
+            IconButton(onClick = onSearchToggle) {
                 Icon(
-                    Icons.Default.Search,
+                    if (mostrandoBusqueda) Icons.Default.Close else Icons.Default.Search,
                     contentDescription = "Buscar",
-                    tint = TorqueColors.OnSurfaceVariant,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            IconButton(onClick = { /* Más */ }) {
-                Icon(
-                    Icons.Default.MoreVert,
-                    contentDescription = "Más",
-                    tint = TorqueColors.OnSurfaceVariant,
+                    tint = if (mostrandoBusqueda) ColoresTorque.Primary else ColoresTorque.OnSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -165,11 +264,11 @@ fun CabeceraGaraje() {
 }
 
 @Composable
-fun FiltroChip(texto: String, estaSeleccionado: Boolean) {
-    val colorFondo = if (estaSeleccionado) TorqueColors.PrimaryContainer else Color.Transparent
+fun FiltroChip(texto: String, estaSeleccionado: Boolean, onClick: () -> Unit = {}) {
+    val colorFondo = if (estaSeleccionado) ColoresTorque.PrimaryContainer else Color.Transparent
     val colorContenido =
-        if (estaSeleccionado) TorqueColors.OnPrimaryContainer else TorqueColors.OnSurfaceVariant
-    val colorBorde = if (estaSeleccionado) Color.Transparent else TorqueColors.Outline
+        if (estaSeleccionado) ColoresTorque.OnPrimaryContainer else ColoresTorque.OnSurfaceVariant
+    val colorBorde = if (estaSeleccionado) Color.Transparent else ColoresTorque.Outline
 
     Box(
         modifier = Modifier
@@ -180,7 +279,7 @@ fun FiltroChip(texto: String, estaSeleccionado: Boolean) {
                 color = colorBorde,
                 shape = RoundedCornerShape(8.dp)
             )
-            .clickable { /* Seleccionar */ }
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         Text(
@@ -198,15 +297,15 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(TorqueColors.SurfaceContainer)
-            .border(1.dp, TorqueColors.Outline.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+            .background(ColoresTorque.SurfaceContainer)
+            .border(1.dp, ColoresTorque.Outline.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
             .clickable { onClick() }
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
-                .background(TorqueColors.SurfaceContainerLow),
+                .background(ColoresTorque.SurfaceContainerLow),
             contentAlignment = Alignment.Center
         ) {
             val foto = moto.uriFoto ?: ""
@@ -224,7 +323,7 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                     imageVector = Icons.Default.Motorcycle,
                     contentDescription = null,
                     modifier = Modifier.size(64.dp),
-                    tint = TorqueColors.OnSurfaceVariant.copy(alpha = 0.3f)
+                    tint = ColoresTorque.OnSurfaceVariant.copy(alpha = 0.3f)
                 )
             }
         }
@@ -247,14 +346,14 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "Principal",
-                        tint = TorqueColors.Primary,
+                        tint = ColoresTorque.Primary,
                         modifier = Modifier.size(20.dp) // Reducido de 28.dp
                     )
                 }
             }
             Text(
                 text = "${moto.marca} • ${moto.anio}",
-                color = TorqueColors.OnSurfaceVariant,
+                color = ColoresTorque.OnSurfaceVariant,
                 fontSize = 14.sp, // Reducido de 24.sp
                 fontWeight = FontWeight.Medium,
                 lineHeight = 18.sp
@@ -286,12 +385,12 @@ fun TarjetaMoto(moto: MotoEntity, onClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .border(1.dp, TorqueColors.Outline.copy(alpha = 0.5f), CircleShape)
+                        .border(1.dp, ColoresTorque.Outline.copy(alpha = 0.5f), CircleShape)
                         .padding(horizontal = 16.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "Ver Detalles",
-                        color = TorqueColors.Primary,
+                        color = ColoresTorque.Primary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
                     )

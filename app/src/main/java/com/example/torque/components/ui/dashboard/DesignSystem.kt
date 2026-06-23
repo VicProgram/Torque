@@ -75,8 +75,8 @@ import com.example.torque.ui.theme.TorqueSurfaceDark
 import com.example.torque.ui.theme.TorqueSurfaceVariant
 import com.example.torque.ui.theme.TorqueTertiary
 
-// Object para acceder a los colores desde otros archivos
-object TorqueColors {
+// Objeto para acceder a los colores desde otros archivos
+object ColoresTorque {
     val Primary = TorquePrimary
     val Accent = TorqueAccent
     val OnPrimary = TorqueOnPrimary
@@ -103,31 +103,31 @@ object TorqueColors {
     val Slate900 = TorqueSlate900
 }
 
-// --- Navigation & Utility ---
-fun navigateTo(context: Context, destination: Class<*>, extras: (Intent.() -> Unit)? = null) {
-    val intent = Intent(context, destination)
+// --- Navegación y Utilidad ---
+fun navegarA(context: Context, destino: Class<*>, extras: (Intent.() -> Unit)? = null) {
+    val intent = Intent(context, destino)
     extras?.invoke(intent)
     context.startActivity(intent)
 }
 
-fun launchActivity(
+fun lanzarActividad(
     launcher: ActivityResultLauncher<Intent>,
     context: Context,
-    destination: Class<*>,
+    destino: Class<*>,
     extras: (Intent.() -> Unit)? = null
 ) {
-    val intent = Intent(context, destination)
+    val intent = Intent(context, destino)
     extras?.invoke(intent)
     launcher.launch(intent)
 }
 
-fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+fun mostrarToast(context: Context, mensaje: String) {
+    Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
 }
 
-// --- UI Wrappers ---
+// --- Envoltorios de UI ---
 @Composable
-fun BackgroundImage(resourceId: Int, alpha: Float = 1f) {
+fun ImagenDeFondo(resourceId: Int, alpha: Float = 1f) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = resourceId),
@@ -144,9 +144,9 @@ fun BackgroundImage(resourceId: Int, alpha: Float = 1f) {
 }
 
 @Composable
-fun TorqueCard(
+fun TarjetaTorque(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = TorqueColors.SurfaceDark,
+    backgroundColor: Color = ColoresTorque.SurfaceDark,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
@@ -159,7 +159,7 @@ fun TorqueCard(
 }
 
 @Composable
-fun TorqueTextField(
+fun CampoTextoTorque(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -170,7 +170,7 @@ fun TorqueTextField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = TorqueColors.OnSurfaceVariant) },
+        label = { Text(label, color = ColoresTorque.OnSurfaceVariant) },
         singleLine = singleLine,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         modifier = modifier
@@ -180,9 +180,9 @@ fun TorqueTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = Color.White,
             unfocusedTextColor = Color.White,
-            focusedBorderColor = TorqueColors.Primary,
-            unfocusedBorderColor = TorqueColors.Outline,
-            cursorColor = TorqueColors.Primary,
+            focusedBorderColor = ColoresTorque.Primary,
+            unfocusedBorderColor = ColoresTorque.Outline,
+            cursorColor = ColoresTorque.Primary,
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent
         )
@@ -190,11 +190,11 @@ fun TorqueTextField(
 }
 
 @Composable
-fun SectionHeader(text: String) {
+fun EncabezadoDeSeccion(text: String) {
     Text(
         text = text.uppercase(),
         style = MaterialTheme.typography.labelMedium.copy(
-            color = TorqueColors.Slate500,
+            color = ColoresTorque.Slate500,
             fontWeight = FontWeight.Bold,
             letterSpacing = 2.sp
         ),
@@ -203,11 +203,11 @@ fun SectionHeader(text: String) {
 }
 
 @Composable
-fun TorqueButton(
+fun BotonTorque(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = TorqueColors.Primary,
+    color: Color = ColoresTorque.Primary,
     contentColor: Color = Color.White,
     icon: ImageVector? = null
 ) {
@@ -241,14 +241,14 @@ fun TorqueButton(
 }
 
 @Composable
-fun QuickSelectChip(
+fun ChipDeSeleccionRapida(
     text: String,
     iconRes: Int,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val bgColor = if (isSelected) TorqueColors.Primary else TorqueColors.SurfaceVariant
-    val contentColor = if (isSelected) TorqueColors.OnPrimary else TorqueColors.OnSurfaceVariant
+    val bgColor = if (isSelected) ColoresTorque.Primary else ColoresTorque.SurfaceVariant
+    val contentColor = if (isSelected) ColoresTorque.OnPrimary else ColoresTorque.OnSurfaceVariant
 
     Row(
         modifier = Modifier
@@ -276,7 +276,7 @@ fun QuickSelectChip(
 }
 
 @Composable
-fun MotoKeepCheckItem(
+fun ElementoCheckMotoKeep(
     title: String,
     description: String,
     icon: ImageVector,
@@ -288,8 +288,8 @@ fun MotoKeepCheckItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(TorqueColors.SurfaceDark)
-            .border(1.dp, TorqueColors.BorderDark, RoundedCornerShape(12.dp))
+            .background(ColoresTorque.SurfaceDark)
+            .border(1.dp, ColoresTorque.BorderDark, RoundedCornerShape(12.dp))
             .clickable { onCheckedChange(!isChecked) }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -307,71 +307,18 @@ fun MotoKeepCheckItem(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = description, color = TorqueColors.Slate500, fontSize = 12.sp)
+            Text(text = description, color = ColoresTorque.Slate500, fontSize = 12.sp)
         }
 
         Checkbox(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(
-                checkedColor = TorqueColors.Primary,
-                uncheckedColor = TorqueColors.BorderDark,
+                checkedColor = ColoresTorque.Primary,
+                uncheckedColor = ColoresTorque.BorderDark,
                 checkmarkColor = Color.White
             ),
             modifier = Modifier.size(24.dp)
-        )
-    }
-}
-
-@Composable
-fun DashboardBottomNav(modifier: Modifier = Modifier) {
-    val contexto = LocalContext.current
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(TorqueColors.Surface.copy(alpha = 0.85f))
-            .padding(vertical = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BottomNavItem("Atrás", Icons.AutoMirrored.Filled.ArrowBack, false) {
-                (contexto as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
-            }
-            BottomNavItem("Inicio", Icons.Default.GridView, true) {
-                // Ya estamos en una actividad que suele tener el NavHost o es el Dashboard
-            }
-        }
-    }
-}
-
-@Composable
-fun BottomNavItem(label: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(if (isSelected) TorqueColors.SecondaryContainer else Color.Transparent)
-                .padding(horizontal = 20.dp, vertical = 6.dp)
-        ) {
-            Icon(
-                icon,
-                contentDescription = label,
-                tint = if (isSelected) TorqueColors.OnSecondaryContainer else TorqueColors.OnSurfaceVariant,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        Text(
-            text = label,
-            color = if (isSelected) Color.White else TorqueColors.OnSurfaceVariant,
-            fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
     }
 }

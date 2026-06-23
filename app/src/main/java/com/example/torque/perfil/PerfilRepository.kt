@@ -15,7 +15,7 @@ object ClavesPerfil {
     val FECHA_NACIMIENTO = stringPreferencesKey("perfil_fecha_nacimiento_iso")
 }
 
-class PerfilRepository(private val dataStore: DataStore<Preferences>) {
+class PerfilRepositorio(private val dataStore: DataStore<Preferences>) {
 
     val nombreFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.NOMBRE] }
     val emailFlow: Flow<String?> = dataStore.data.map { prefs -> prefs[ClavesPerfil.EMAIL] }
