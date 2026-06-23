@@ -28,6 +28,9 @@ class AppRepository private constructor(private val db: AppDatabase) {
     fun obtenerMantenimientosPorMoto(idMoto: Long) = db.mantenimientoDao().obtenerPorMotoFlow(idMoto)
     suspend fun insertarMantenimiento(mantenimiento: MantenimientoEntity) = db.mantenimientoDao().insertar(mantenimiento)
 
+    suspend fun actualizarKilometros(idMoto: Long, kilometros: Int) = db.motoDao().actualizarKilometros(idMoto, kilometros)
+    suspend fun obtenerUltimoMantenimiento(idMoto: Long) = db.mantenimientoDao().obtenerUltimoPorMoto(idMoto)
+
     fun obtenerFotosPorMoto(idMoto: Long) = db.fotoDao().obtenerPorMotoFlow(idMoto)
     suspend fun insertarFoto(foto: FotoEntity) = db.fotoDao().insertar(foto)
 

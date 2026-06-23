@@ -57,46 +57,45 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
     val itemsSeleccionados = remember { mutableStateMapOf<String, Boolean>() }
     var consultaBusqueda by remember { mutableStateOf("") }
 
-    val tareasComunes = listOf(
-        Tarea(
-            "Cambio de Aceite Motor",
-            "Recomendado cada 5,000 km",
-            Icons.Default.OilBarrel,
-            Color(0xFF3B82F6),
-            "Motor"
-        ),
-        Tarea(
-            "Filtro de Aceite",
-            "Incluido en servicio estándar",
-            Icons.Default.FilterAlt,
-            Color(0xFFF97316),
-            "Motor"
-        ),
-        Tarea(
-            "Limpieza y Engrase de Cadena",
-            "Mantenimiento regular",
-            Icons.Default.SettingsInputComponent,
-            Color(0xFF6366F1),
-            "Transmisión"
-        )
+    val tareasMotor = listOf(
+        Tarea("Cambio de Aceite Motor", "Recomendado cada 5,000 km", Icons.Default.OilBarrel, Color(0xFF3B82F6), "Motor"),
+        Tarea("Filtro de Aceite", "Incluido en servicio estándar", Icons.Default.FilterAlt, Color(0xFFF97316), "Motor"),
+        Tarea("Bujías", "Reemplazo cada 10,000 km", Icons.Default.FlashOn, Color(0xFFFACC15), "Motor"),
+        Tarea("Filtro de Aire", "Limpieza o cambio cada 10,000 km", Icons.Default.Air, Color(0xFF60A5FA), "Motor"),
+        Tarea("Líquido Refrigerante", "Cambio cada 20,000 km", Icons.Default.WaterDrop, Color(0xFF06B6D4), "Motor"),
+        Tarea("Reglaje de Válvulas", "Cada 12,000 km", Icons.Default.Tune, Color(0xFF8B5CF6), "Motor")
     )
 
-    val tareasSeguridad = listOf(
-        Tarea(
-            "Presión de Neumáticos",
-            "Esencial para seguridad",
-            Icons.Default.TireRepair,
-            Color(0xFF10B981),
-            "Neumáticos"
-        ),
-        Tarea(
-            "Inspección Pastillas Freno",
-            "Revisar indicadores de desgaste",
-            Icons.Default.CarRepair,
-            Color(0xFFEF4444),
-            "Frenos"
-        )
+    val tareasTransmision = listOf(
+        Tarea("Limpieza y Engrase de Cadena", "Mantenimiento regular cada 500 km", Icons.Default.SettingsInputComponent, Color(0xFF6366F1), "Transmisión"),
+        Tarea("Tensado de Cadena", "Revisar cada 1,000 km", Icons.Default.Link, Color(0xFFA78BFA), "Transmisión"),
+        Tarea("Cambio de Cadena y Coronas", "Cada 20,000 km", Icons.Default.Cyclone, Color(0xFF818CF8), "Transmisión")
     )
+
+    val tareasFrenos = listOf(
+        Tarea("Pastillas de Freno Delantero", "Revisar cada 5,000 km", Icons.Default.CarRepair, Color(0xFFEF4444), "Frenos"),
+        Tarea("Pastillas de Freno Trasero", "Revisar cada 5,000 km", Icons.Default.CarRepair, Color(0xFFDC2626), "Frenos"),
+        Tarea("Líquido de Frenos", "Cambio cada 20,000 km", Icons.Default.Dangerous, Color(0xFFB91C1C), "Frenos"),
+        Tarea("Discos de Freno", "Inspeccionar desgaste cada 10,000 km", Icons.Default.DiscFull, Color(0xFF991B1B), "Frenos")
+    )
+
+    val tareasNeumaticos = listOf(
+        Tarea("Presión de Neumáticos", "Revisión semanal", Icons.Default.TireRepair, Color(0xFF10B981), "Neumáticos"),
+        Tarea("Cambio de Neumáticos", "Cada 10,000 km o según desgaste", Icons.Default.Circle, Color(0xFF34D399), "Neumáticos")
+    )
+
+    val tareasElectrico = listOf(
+        Tarea("Batería", "Revisar cada 6 meses", Icons.Default.BatteryStd, Color(0xFF84CC16), "Eléctrico"),
+        Tarea("Luces y Señalización", "Revisión mensual", Icons.Default.Lightbulb, Color(0xFFEAB308), "Eléctrico"),
+        Tarea("Centralita / ECU", "Diagnóstico anual", Icons.Default.Memory, Color(0xFFA3E635), "Eléctrico")
+    )
+
+    val tareasSuspension = listOf(
+        Tarea("Suspensión Delantera", "Revisión cada 15,000 km", Icons.Default.ArrowDownward, Color(0xFFE87930), "Suspensión"),
+        Tarea("Suspensión Trasera", "Revisión cada 15,000 km", Icons.Default.ArrowUpward, Color(0xFFE87930), "Suspensión")
+    )
+
+
 
     Box(
         modifier = Modifier
@@ -179,31 +178,27 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     }
                 }
 
-                item { SectionHeader("Mantenimiento Común") }
-                items(tareasComunes) { tarea ->
-                    Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                        MotoKeepCheckItem(
-                            title = tarea.nombre,
-                            description = tarea.descripcion,
-                            icon = tarea.icono,
-                            iconColor = tarea.colorIcono,
-                            isChecked = itemsSeleccionados[tarea.nombre] == true,
-                            onCheckedChange = { itemsSeleccionados[tarea.nombre] = it }
-                        )
-                    }
-                }
-
-                item { SectionHeader("Inspección de Seguridad") }
-                items(tareasSeguridad) { tarea ->
-                    Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
-                        MotoKeepCheckItem(
-                            title = tarea.nombre,
-                            description = tarea.descripcion,
-                            icon = tarea.icono,
-                            iconColor = tarea.colorIcono,
-                            isChecked = itemsSeleccionados[tarea.nombre] == true,
-                            onCheckedChange = { itemsSeleccionados[tarea.nombre] = it }
-                        )
+                val secciones = listOf(
+                    "Motor" to tareasMotor,
+                    "Transmisión" to tareasTransmision,
+                    "Frenos" to tareasFrenos,
+                    "Neumáticos" to tareasNeumaticos,
+                    "Eléctrico" to tareasElectrico,
+                    "Suspensión" to tareasSuspension
+                )
+                secciones.forEach { (nombre, lista) ->
+                    item { SectionHeader(nombre) }
+                    items(lista) { tarea ->
+                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                            MotoKeepCheckItem(
+                                title = tarea.nombre,
+                                description = tarea.descripcion,
+                                icon = tarea.icono,
+                                iconColor = tarea.colorIcono,
+                                isChecked = itemsSeleccionados[tarea.nombre] == true,
+                                onCheckedChange = { itemsSeleccionados[tarea.nombre] = it }
+                            )
+                        }
                     }
                 }
             }
