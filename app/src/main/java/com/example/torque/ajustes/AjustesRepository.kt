@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-class AjustesRepository(private val dataStore: DataStore<Preferences>) {
+class AjustesRepositorio(private val dataStore: DataStore<Preferences>) {
 
     private object ClavesPreferencias {
         val NOTIFICACIONES_ACTIVADAS = booleanPreferencesKey("notificaciones_activadas")

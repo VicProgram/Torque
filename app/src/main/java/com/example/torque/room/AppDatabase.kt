@@ -16,20 +16,20 @@ import com.example.torque.room.entity.FotoEntity
     version = 1,
     exportSchema = false
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class BaseDeDatosApp : RoomDatabase() {
     abstract fun motoDao(): MotoDao
     abstract fun mantenimientoDao(): MantenimientoDao
     abstract fun fotoDao(): FotoDao
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var INSTANCE: BaseDeDatosApp? = null
 
-        fun obtenerInstancia(context: Context): AppDatabase =
+        fun obtenerInstancia(context: Context): BaseDeDatosApp =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
-                    AppDatabase::class.java,
+                    BaseDeDatosApp::class.java,
                     "torque_room.db"
                 ).build().also { INSTANCE = it }
             }

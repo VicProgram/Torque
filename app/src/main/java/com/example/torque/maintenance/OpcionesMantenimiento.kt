@@ -24,9 +24,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.torque.components.ui.dashboard.DashboardBottomNav
-import com.example.torque.components.ui.dashboard.TorqueColors
-import com.example.torque.room.AppRepository
+
+import com.example.torque.components.ui.dashboard.ColoresTorque
+import com.example.torque.room.RepositorioApp
 import com.example.torque.room.entity.MotoEntity
 import com.example.torque.ui.theme.TorqueTheme
 import kotlinx.coroutines.launch
@@ -67,7 +67,7 @@ fun PantallaOpcionesMantenimiento(
     onAtras: () -> Unit
 ) {
     val contexto = LocalContext.current
-    val repositorio = remember { AppRepository.obtenerInstancia(contexto) }
+    val repositorio = remember { RepositorioApp.obtenerInstancia(contexto) }
     val coroutineScope = rememberCoroutineScope()
     
     var motoSeleccionada by remember { mutableStateOf<MotoEntity?>(null) }
@@ -87,7 +87,7 @@ fun PantallaOpcionesMantenimiento(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // --- Header (Compacto) ---
@@ -102,7 +102,7 @@ fun PantallaOpcionesMantenimiento(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
-                        tint = Color.White,
+                        tint = ColoresTorque.Primary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -125,7 +125,7 @@ fun PantallaOpcionesMantenimiento(
                 // Info de la moto seleccionada
                 motoSeleccionada?.let { moto ->
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = TorqueColors.SurfaceDark),
+                        colors = CardDefaults.cardColors(containerColor = ColoresTorque.SurfaceDark),
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -134,10 +134,10 @@ fun PantallaOpcionesMantenimiento(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(Icons.Default.Motorcycle, contentDescription = null, tint = TorqueColors.Primary)
+                            Icon(Icons.Default.Motorcycle, contentDescription = null, tint = ColoresTorque.Primary)
                             Column {
                                 Text("${moto.marca} ${moto.modelo}", color = Color.White, fontWeight = FontWeight.Bold)
-                                Text("${moto.kilometros} km", color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
+                                Text("${moto.kilometros} km", color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                             }
                         }
                     }
@@ -146,7 +146,7 @@ fun PantallaOpcionesMantenimiento(
                         titulo = "Nuevo Registro",
                         subtitulo = "Registrar tareas realizadas",
                         icono = Icons.Default.Build,
-                        color = TorqueColors.Primary,
+                        color = ColoresTorque.Primary,
                         onClick = { onNuevoMantenimiento(moto.idMoto) }
                     )
 
@@ -154,7 +154,7 @@ fun PantallaOpcionesMantenimiento(
                         titulo = "Ver Historial",
                         subtitulo = "Consulta registros pasados",
                         icono = Icons.Default.History,
-                        color = TorqueColors.Accent,
+                        color = ColoresTorque.Accent,
                         onClick = { onVerHistorial(moto.idMoto) }
                     )
                 } ?: run {
@@ -165,7 +165,6 @@ fun PantallaOpcionesMantenimiento(
             }
         }
 
-        DashboardBottomNav(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -181,7 +180,7 @@ fun TarjetaOpcionMantenimiento(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(TorqueColors.SurfaceDark)
+            .background(ColoresTorque.SurfaceDark)
             .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(20.dp))
             .clickable(onClick = onClick)
             .padding(16.dp), // Reducido de 24.dp
@@ -199,7 +198,7 @@ fun TarjetaOpcionMantenimiento(
         }
         Column {
             Text(titulo, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold) // Reducido de 18.sp
-            Text(subtitulo, color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp) // Reducido de 14.sp
+            Text(subtitulo, color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp) // Reducido de 14.sp
         }
     }
 }

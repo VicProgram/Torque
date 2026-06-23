@@ -44,9 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
-import com.example.torque.components.ui.dashboard.TorqueColors
+import com.example.torque.components.ui.dashboard.ColoresTorque
 import com.example.torque.ui.theme.TorqueTheme
-import com.example.torque.ajustes.AjustesRepository
+import com.example.torque.ajustes.AjustesRepositorio
 
 class AjustesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +63,7 @@ class AjustesActivity : ComponentActivity() {
 @Composable
 fun AjustesScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-    val repo = AjustesRepository(context.dataStore)
+    val repo = AjustesRepositorio(context.dataStore)
     val coroutineScope = rememberCoroutineScope()
 
     val notificacionesActivadas by repo.notificacionesActivadasFlow.collectAsState(initial = true)
@@ -73,7 +73,7 @@ fun AjustesScreen(onBack: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
-            .background(TorqueColors.Background)
+            .background(ColoresTorque.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -84,7 +84,7 @@ fun AjustesScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás", tint = ColoresTorque.Primary)
                 }
                 Text(
                     text = stringResource(id = com.example.torque.R.string.settings_title),
@@ -103,7 +103,7 @@ fun AjustesScreen(onBack: () -> Unit) {
             ) {
                 Text(
                     text = stringResource(id = com.example.torque.R.string.preferences_header),
-                    color = TorqueColors.Primary,
+                    color = ColoresTorque.Primary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp,
@@ -114,20 +114,20 @@ fun AjustesScreen(onBack: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(TorqueColors.SurfaceDark)
+                        .background(ColoresTorque.SurfaceDark)
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Notifications, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Default.Notifications, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = stringResource(id = com.example.torque.R.string.notifications), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(id = com.example.torque.R.string.notifications_subtitle), color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
+                        Text(text = stringResource(id = com.example.torque.R.string.notifications_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                     }
                     Switch(
                         checked = notificacionesActivadas,
                         onCheckedChange = { activado -> coroutineScope.launch { repo.establecerNotificacionesActivadas(activado) } },
-                        colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary, uncheckedThumbColor = TorqueColors.OnSurfaceVariant)
+                        colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary, uncheckedThumbColor = ColoresTorque.OnSurfaceVariant)
                     )
                 }
 
@@ -136,20 +136,20 @@ fun AjustesScreen(onBack: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(TorqueColors.SurfaceDark)
+                        .background(ColoresTorque.SurfaceDark)
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Palette, contentDescription = null, tint = TorqueColors.OnSurfaceVariant, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Default.Palette, contentDescription = null, tint = ColoresTorque.OnSurfaceVariant, modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = stringResource(id = com.example.torque.R.string.dark_mode), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                        Text(text = stringResource(id = com.example.torque.R.string.dark_mode_subtitle), color = TorqueColors.OnSurfaceVariant, fontSize = 12.sp)
+                        Text(text = stringResource(id = com.example.torque.R.string.dark_mode_subtitle), color = ColoresTorque.OnSurfaceVariant, fontSize = 12.sp)
                     }
                     Switch(
                         checked = modoOscuroActivado,
                         onCheckedChange = { activado -> coroutineScope.launch { repo.establecerModoOscuroActivado(activado) } },
-                        colors = SwitchDefaults.colors(checkedThumbColor = TorqueColors.Primary, uncheckedThumbColor = TorqueColors.OnSurfaceVariant)
+                        colors = SwitchDefaults.colors(checkedThumbColor = ColoresTorque.Primary, uncheckedThumbColor = ColoresTorque.OnSurfaceVariant)
                     )
                 }
             }
