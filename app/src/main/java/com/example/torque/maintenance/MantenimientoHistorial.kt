@@ -6,6 +6,7 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -64,6 +65,7 @@ class MantenimientoHistorialViewModel(application: Application) : AndroidViewMod
 class MantenimientoHistorial : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val idMoto = intent.getLongExtra("idMoto", -1L).takeIf { it != -1L }
         setContent {
             TorqueTheme {
@@ -110,7 +112,7 @@ fun PantallaHistorialMantenimiento(idMoto: Long? = null) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(TorqueColors.Background)) {
+    Box(modifier = Modifier.fillMaxSize().systemBarsPadding().background(TorqueColors.Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Cabecera
             Row(

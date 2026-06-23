@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import com.example.torque.ui.theme.TorqueTheme
 class RegistroMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val idMoto = intent.getLongExtra("idMoto", -1L)
         setContent {
             TorqueTheme {
@@ -100,6 +102,7 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {

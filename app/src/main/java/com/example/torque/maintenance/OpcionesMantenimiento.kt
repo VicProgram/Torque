@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,8 +34,8 @@ import kotlinx.coroutines.launch
 class OpcionesMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val motoIdIntent = intent.getLongExtra("idMoto", -1L)
-
         setContent {
             TorqueTheme {
                 PantallaOpcionesMantenimiento(
@@ -85,6 +86,7 @@ fun PantallaOpcionesMantenimiento(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {

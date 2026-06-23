@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,7 @@ import java.util.*
 class FormularioMantenimiento : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val tareasSeleccionadas = intent.getStringArrayListExtra("seleccionados") ?: arrayListOf()
         val idMoto = intent.getLongExtra("idMoto", -1L)
         setContent {
@@ -61,6 +63,7 @@ fun VistaFormularioMantenimiento(tareasSeleccionadas: List<String>, idMoto: Long
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .background(TorqueColors.Background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,8 +52,8 @@ import com.example.torque.maintenance.RegistroMantenimiento
 class MotoDetalle : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val idMoto = intent.getLongExtra("idMoto", -1L)
-
         setContent {
             TorqueTheme {
                 VistaMotoDetalle(idMoto)
@@ -106,6 +107,7 @@ fun VistaMotoDetalle(idMoto: Long) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .background(TorqueColors.Background)
     ) {
         if (moto == null) {

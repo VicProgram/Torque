@@ -65,12 +65,13 @@ fun TorqueDashboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .systemBarsPadding()
             .background(TorqueColors.Background)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 64.dp) // Espacio para la barra de navegación reducida
+                .padding(bottom = 64.dp)
         ) {
             CabeceraDashboard(onIrPerfil)
 
