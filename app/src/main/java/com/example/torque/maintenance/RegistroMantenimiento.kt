@@ -189,9 +189,31 @@ fun PantallaRegistroMantenimiento(idMoto: Long) {
                     "Eléctrico" to tareasElectrico,
                     "Suspensión" to tareasSuspension
                 )
+                item {
+                    val todasLasTareas = tareasMotor + tareasTransmision + tareasFrenos +
+                        tareasNeumaticos + tareasElectrico + tareasSuspension
+                    val tareasFiltradas = if (consultaBusqueda.isBlank()) todasLasTareas
+                        else todasLasTareas.filter { it.nombre.contains(consultaBusqueda, ignoreCase = true) }
+                    if (tareasFiltradas.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "No se encontraron tareas para \"$consultaBusqueda\"",
+                                color = ColoresTorque.OnSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        return@item
+                    }
+                }
                 secciones.forEach { (nombre, lista) ->
+                    val listaFiltrada = if (consultaBusqueda.isBlank()) lista
+                        else lista.filter { it.nombre.contains(consultaBusqueda, ignoreCase = true) }
+                    if (listaFiltrada.isEmpty()) return@forEach
                     item { EncabezadoDeSeccion(nombre) }
-                    items(lista) { tarea ->
+                    items(listaFiltrada) { tarea ->
                         Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
                             ElementoCheckMotoKeep(
                                 title = tarea.nombre,
